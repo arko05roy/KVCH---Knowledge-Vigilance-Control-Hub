@@ -110,6 +110,13 @@ class ThreatHunter3000:
             return netifaces.gateways()['default'][netifaces.AF_INET][1]
         except:
             try:
+                import ifaddr
+                for adapter in ifaddr.get_adapters():
+                    if any(isinstance(address.ip, str) and address.ip != '127.0.0.1' for address in adapter.ips):
+                        return adapter.name
+            except:
+                pass
+            try:
                 return str(conf.iface)
             except:
                 return None
