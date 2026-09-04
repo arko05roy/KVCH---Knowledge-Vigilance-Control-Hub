@@ -7,7 +7,13 @@
 
 
 # Arko
-*List your implementation details and status here.*
+Implemented and integrated the KVCH external threat-detection system:
+- Added local-laptop targeting for IP, hostname, interface, live traffic, and local files.
+- Added one aggregate Finding Envelope report per extension while preserving the contract.
+- Added portable YARA-X and ifaddr support, Nmap/TShark integration, and real packet metadata analysis.
+- Added netstat -anv socket snapshots and TShark protocol statistics to reports.
+- Added detailed risk, evidence, capability, count, and recommendation sections.
+- Executed and reviewed the five extensions and maintained the web integration.
 
 
 

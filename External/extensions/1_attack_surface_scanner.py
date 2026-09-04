@@ -28,6 +28,7 @@ from utils.colors import Colors
 from utils.ascii_art import BANNER_ATTACK_SCANNER
 from utils.finding_envelope import FindingEnvelope
 from utils.escalation_routes import get_escalation_route, get_role_report_config
+from utils.laptop_utils import get_my_hostname, get_my_ip, get_netstat_snapshot, print_laptop_info
 
 
 class AttackSurfaceScanner:
@@ -50,6 +51,7 @@ class AttackSurfaceScanner:
         self.cloud_buckets = []
         self.technologies = []
         self.vulnerabilities = []
+        self.netstat_snapshot = {}
         
         # Progress tracking
         self.total_checks = 0
@@ -120,6 +122,14 @@ class AttackSurfaceScanner:
     
     def enumerate_subdomains(self):
         """Tool 1: Discover subdomains via DNS brute-force"""
+        try:
+            socket.inet_aton(self.domain)
+            self.subdomains = [{'name': get_my_hostname(), 'ips': [self.domain]}]
+            print(f"{Colors.CYAN}    Local laptop target detected: {self.domain}{Colors.RESET}\n")
+            return self.subdomains
+        except OSError:
+            pass
+
         print(f"{Colors.BOLD}{Colors.YELLOW}[*] TOOL 1: Subdomain Enumeration Started{Colors.RESET}")
         print(f"{Colors.DIM}    Brute-forcing {len(self.common_subdomains)} common subdomains...{Colors.RESET}\n")
         
@@ -373,8 +383,8 @@ class AttackSurfaceScanner:
         # Set finding
         envelope.set_finding(
             finding_type=finding_type,
-            affected_actor=self.domain,
-            affected_resource=affected_resource,
+            affected_actor=get_my_ip(),
+            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
             result=details
         )
         
@@ -392,7 +402,7 @@ class AttackSurfaceScanner:
             'exposed_bucket': f"Exposed storage bucket found: {details.get('name', 'unknown')} on {details.get('provider', 'unknown')}",
             'subdomain_discovered': f"New subdomain discovered: {details.get('name', 'unknown')}"
         }
-        envelope.set_summary(safe_summaries.get(finding_type, "Security issue detected"))
+        envelope.set_summary(f"Analysis of YOUR LAPTOP ({get_my_ip()}) found: {finding_type}")
         
         # Set recipient (first in escalation route)
         route = self.manifest.get('routing', {}).get('escalation_route', ['security_analyst'])
@@ -469,6 +479,7 @@ class AttackSurfaceScanner:
             'cloud_buckets': self.cloud_buckets,
             'technologies': self.technologies,
             'vulnerabilities': self.vulnerabilities,
+            'netstat_snapshot': self.netstat_snapshot,
             'counts': {
                 'subdomains': len(self.subdomains),
                 'open_ports': len(self.open_ports),
@@ -529,6 +540,7 @@ class AttackSurfaceScanner:
         self.scan_ports()
         self.analyze_ssl()
         self.detect_cloud_storage()
+        self.netstat_snapshot = get_netstat_snapshot()
         
         findings = self.generate_report()
         return findings
@@ -536,13 +548,13 @@ class AttackSurfaceScanner:
 
 def main():
     parser = argparse.ArgumentParser(description='Attack Surface Scanner - 4 Tools in 1')
-    parser.add_argument('domain', help='Domain to scan')
     parser.add_argument('-t', '--threads', type=int, default=100, help='Number of threads')
     parser.add_argument('-T', '--timeout', type=int, default=5, help='Timeout in seconds')
     
     args = parser.parse_args()
     
-    scanner = AttackSurfaceScanner(args.domain, args.threads, args.timeout)
+    print_laptop_info()
+    scanner = AttackSurfaceScanner(get_my_ip(), args.threads, args.timeout)
     scanner.run()
 
 

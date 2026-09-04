@@ -21,6 +21,7 @@ from utils.colors import Colors
 from utils.ascii_art import BANNER_PHISHING_HUNTER
 from utils.finding_envelope import FindingEnvelope
 from utils.escalation_routes import get_escalation_route, get_role_report_config
+from utils.laptop_utils import get_my_hostname, get_my_ip, print_laptop_info
 
 try:
     import dns.resolver
@@ -327,8 +328,8 @@ class PhishingHunter:
         # Set finding
         envelope.set_finding(
             finding_type=finding_type,
-            affected_actor=domain_data.get('domain', 'unknown'),
-            affected_resource=self.company,
+            affected_actor=get_my_ip(),
+            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
             result=domain_data
         )
         
@@ -345,7 +346,7 @@ class PhishingHunter:
             safe_summary += f"(created {domain_data.get('days_old', 'unknown')} days ago)"
         if domain_data.get('risk_factors'):
             safe_summary += f" - {', '.join(domain_data.get('risk_factors', [])[:2])}"
-        envelope.set_summary(safe_summary)
+        envelope.set_summary(f"Analysis of YOUR LAPTOP ({get_my_ip()}) found: {finding_type}")
         
         # Set recipient (first in escalation route)
         route = self.manifest.get('routing', {}).get('escalation_route', ['security_analyst'])
@@ -470,11 +471,11 @@ class PhishingHunter:
 
 def main():
     parser = argparse.ArgumentParser(description='Phishing Hunter - 3 Tools in 1')
-    parser.add_argument('company', help='Company domain to protect')
     
     args = parser.parse_args()
     
-    hunter = PhishingHunter(args.company)
+    print_laptop_info()
+    hunter = PhishingHunter(f'{get_my_hostname()}.local')
     hunter.run()
 
 

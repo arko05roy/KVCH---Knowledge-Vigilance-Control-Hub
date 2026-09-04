@@ -12,6 +12,7 @@ import json
 import time
 import yaml
 import shutil
+import subprocess
 from datetime import datetime
 import argparse
 
@@ -20,6 +21,7 @@ from utils.colors import Colors
 from utils.ascii_art import BANNER_VPN_ANALYZER
 from utils.finding_envelope import FindingEnvelope
 from utils.escalation_routes import get_escalation_route, get_role_report_config
+from utils.laptop_utils import get_my_hostname, get_my_interface, get_my_ip, print_laptop_info
 
 try:
     import pyshark
@@ -44,6 +46,7 @@ class VPNAnalyzer:
         self.security_associations = []
         self.traffic_classes = []
         self.traffic_observations = []
+        self.tshark_statistics = {}
         self.weaknesses = []
         self.recommendations = []
         
@@ -110,6 +113,15 @@ class VPNAnalyzer:
             return
         
         try:
+            stats = subprocess.run(
+                ['tshark', '-r', self.pcap_file, '-q', '-z', 'io,phs'],
+                capture_output=True, text=True, timeout=30, check=False,
+            )
+            self.tshark_statistics = {
+                'return_code': stats.returncode,
+                'output': stats.stdout[-12000:],
+                'error': stats.stderr[-2000:] if stats.returncode else '',
+            }
             cap = pyshark.FileCapture(self.pcap_file)
         except Exception as e:
             print(f"{Colors.RED}✖ Error reading PCAP: {e}{Colors.RESET}")
@@ -317,8 +329,8 @@ class VPNAnalyzer:
         # Set finding
         envelope.set_finding(
             finding_type=finding_type,
-            affected_actor=self.pcap_file,
-            affected_resource=affected_resource,
+            affected_actor=get_my_ip(),
+            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
             result=details
         )
         
@@ -335,7 +347,7 @@ class VPNAnalyzer:
             'WEAK_PRF': f"Weak PRF {details.get('prf', 'unknown')} detected in VPN traffic",
             'TRAFFIC_CLASS': f"Traffic classified as {details.get('type', 'unknown')} with {details.get('confidence', 0)*100:.0f}% confidence"
         }
-        envelope.set_summary(safe_summaries.get(finding_type, "VPN security issue detected"))
+        envelope.set_summary(f"Analysis of YOUR LAPTOP ({get_my_ip()}) found: {finding_type}")
         
         # Set recipient (first in escalation route)
         route = self.manifest.get('routing', {}).get('escalation_route', ['network_engineer'])
@@ -394,6 +406,7 @@ class VPNAnalyzer:
             },
             'ike_exchanges': self.ike_exchanges,
             'traffic_observations': self.traffic_observations,
+            'tshark_statistics': self.tshark_statistics,
             'security_associations': self.security_associations,
             'traffic_classes': self.traffic_classes,
             'weaknesses': self.weaknesses,
@@ -458,11 +471,27 @@ class VPNAnalyzer:
 
 def main():
     parser = argparse.ArgumentParser(description='VPN Crypto Analyzer - 3 Tools in 1')
-    parser.add_argument('pcap_file', help='PCAP file to analyze')
+    parser.add_argument('--pcap-file', help='Existing PCAP file; otherwise capture laptop traffic')
     
     args = parser.parse_args()
     
-    analyzer = VPNAnalyzer(args.pcap_file)
+    print_laptop_info()
+    pcap_file = args.pcap_file or '/tmp/kvch_laptop_traffic.pcap'
+    if not args.pcap_file:
+        print(f"{Colors.CYAN}Capturing laptop traffic on {get_my_interface()}...{Colors.RESET}")
+        try:
+            subprocess.run(
+                ['sudo', 'tcpdump', '-i', get_my_interface(), '-c', '200', '-w', pcap_file],
+                timeout=30,
+                check=True,
+            )
+        except (OSError, subprocess.SubprocessError) as error:
+            print(f"{Colors.YELLOW}⚠ Live capture unavailable: {error}{Colors.RESET}")
+            if not os.path.exists(pcap_file):
+                print(f"{Colors.RED}No PCAP available for analysis.{Colors.RESET}")
+                return
+
+    analyzer = VPNAnalyzer(pcap_file)
     analyzer.run()
 
 
