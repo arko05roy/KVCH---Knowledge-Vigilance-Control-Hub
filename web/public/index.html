@@ -1,32 +1,10 @@
-
-"use client";
-
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-
-export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.documentElement.classList.add('motion-pending');
-      const fallback = setTimeout(() => {
-        document.documentElement.classList.remove('motion-pending');
-      }, 3500);
-      
-      const card = document.querySelector('.demo-card');
-      if(card) {
-        card.addEventListener('animationend', () => {
-          document.documentElement.classList.remove('motion-pending');
-          clearTimeout(fallback);
-        }, { once: true });
-      }
-    }
-  }, []);
-
-  return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Stop Digging Through Dashboards</title>
+  <style>
     @font-face {
       font-family: 'Reference Sans';
       src: local('Reference Sans'), local('Helvetica Neue'), local('Arial');
@@ -603,19 +581,46 @@ export default function Home() {
         right: var(--gutter-end);
       }
     }
-  ` }} />
+  </style>
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('motion-pending');
+      const fallback = setTimeout(() => {
+        document.documentElement.classList.remove('motion-pending');
+      }, 3500);
       
-  <main className="viewport">
-    <section className="screen" id="screen">
-      <video className="background" autoPlay muted loop playsInline disablePictureInPicture aria-hidden="true">
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
+      document.addEventListener('DOMContentLoaded', () => {
+        const card = document.querySelector('.demo-card');
+        if(card) {
+          card.addEventListener('animationend', () => {
+            document.documentElement.classList.remove('motion-pending');
+            clearTimeout(fallback);
+          }, { once: true });
+        }
+      });
+    }
+
+    function openModal() {
+      document.getElementById('loginModal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+  </script>
+</head>
+<body>
+  <main class="viewport">
+    <section class="screen" id="screen">
+      <video class="background" autoplay muted loop playsinline disablepictureinpicture aria-hidden="true">
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4">
       </video>
       
-      <header className="header">
-        <a className="brand" aria-label="Vantage home">
+      <header class="header">
+        <a class="brand" aria-label="Vantage home">
           <svg viewBox="0 0 25 25" fill="none">
             <clipPath id="circleClip"><circle cx="12.5" cy="12.5" r="12.5"/></clipPath>
-            <g clipPath="url(#circleClip)">
+            <g clip-path="url(#circleClip)">
               <rect width="25" height="25" fill="#ededed"/>
               <path d="M12.5 5 L20 12.5 L12.5 20 L5 12.5 Z" fill="#050606" opacity="0.9"/>
               <path d="M12.5 5 L20 12.5 L12.5 12.5 Z" fill="#737778"/>
@@ -623,88 +628,86 @@ export default function Home() {
           </svg>
         </a>
         
-        <div className="header-actions" id="tablet-navigation">
-          <nav className="nav">
-            <a href="#" className="active">Home</a>
+        <div class="header-actions" id="tablet-navigation">
+          <nav class="nav">
+            <a href="#" class="active">Home</a>
             <a href="#">About</a>
             <a href="#">Services</a>
             <a href="#">Contact</a>
           </nav>
           
-          <div className="time-panel">
-            <span className="time-label">Timezone</span>
-            <span className="time-value">9:47 PM&nbsp; • &nbsp;14 July 2026</span>
+          <div class="time-panel">
+            <span class="time-label">Timezone</span>
+            <span class="time-value">9:47 PM&nbsp; • &nbsp;14 July 2026</span>
           </div>
           
-          <button className="sign-up" onClick={() => setIsModalOpen(true)}>Log in</button>
+          <button class="sign-up" onclick="openModal()">Log in</button>
         </div>
         
-        <button className="menu-toggle" aria-label="Toggle menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <button class="menu-toggle" aria-label="Toggle menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
       </header>
 
-      <section className="hero">
-        <div className="hero-content">
-          <h1 className="hero-title">
-            <span className="line line-one"><span className="line-reveal">Sovereign AI.</span></span>
-            <span className="line line-two"><span className="line-reveal">Enterprise Armor.</span></span>
+      <section class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            <span class="line line-one"><span class="line-reveal">Stop Digging</span></span>
+            <span class="line line-two"><span class="line-reveal">Through Dashboards.</span></span>
           </h1>
-          <p className="hero-copy">
-            Your company's work is scattered across disconnected systems.<br />
-            KVCH brings it into one intelligent control plane, so every<br />
-            employee gets a workbench and the enterprise gets armor.
+          <p class="hero-copy">
+            Your metrics are scattered across a dozen dashboards.<br>
+            Vantage bring them into one clear signal, so every<br>
+            decision is backed by data you actually trust.
           </p>
-          <button className="primary-cta">
-            <span className="label">Get Started</span>
-            <span className="arrow-box">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <button class="primary-cta">
+            <span class="label">Get Started</span>
+            <span class="arrow-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </span>
           </button>
         </div>
 
-        <article className="demo-card">
-          <div className="demo-visual">
-            {/* Using CSS gradient fallback for image as instructed to embed or use local */}
-            <div style={{width: '100%', height: '100%', background: 'radial-gradient(circle at top right, #9b2c3a, #1a2a3a)', filter: 'brightness(.89) saturate(.93) contrast(1.03)'}}></div>
-            <button className="play" aria-label="Play demo">
+        <article class="demo-card">
+          <div class="demo-visual">
+            <!-- Using CSS gradient fallback for image as instructed to embed or use local -->
+            <div style="width: 100%; height: 100%; background: radial-gradient(circle at top right, #9b2c3a, #1a2a3a); filter: brightness(.89) saturate(.93) contrast(1.03);"></div>
+            <button class="play" aria-label="Play demo">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             </button>
           </div>
-          <button className="watch-button">Watch Demo</button>
+          <button class="watch-button">Watch Demo</button>
         </article>
       </section>
     </section>
   </main>
 
-  {/* Login Modal */}
-  <div className={`login-modal ${isModalOpen ? 'active' : ''}`} id="loginModal">
-    <div className="modal-content">
-      <button className="modal-close" onClick={() => setIsModalOpen(false)}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  <!-- Login Modal -->
+  <div class="login-modal" id="loginModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       <h2>Select your role</h2>
-      <div className="roles-grid">
-        <a href="/intern/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div class="roles-grid">
+        <a href="/intern/dashboard" class="role-card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Intern
         </a>
-        <a href="/sr-dev/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <a href="/sr-dev/dashboard" class="role-card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Senior Dev
         </a>
-        <a href="/hr/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <a href="/hr/dashboard" class="role-card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           HR
         </a>
-        <a href="/management/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <a href="/management/dashboard" class="role-card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
           Management
         </a>
       </div>
     </div>
   </div>
-
-    </>
-  );
-}
+</body>
+</html>
