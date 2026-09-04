@@ -26,7 +26,7 @@ It deliberately defers connector implementation, model selection, extension runt
 - **Extension Publisher** — a delegated senior developer or equivalent who can create and target extensions within management-approved scope.
 - **Extension Evaluation Gate** — a Judge0-like isolated evaluator that tests an extension before it can be whitelisted.
 - **Approved Artifact Hash** — the immutable hash of the exact evaluated and whitelisted extension artifact.
-- **Extension Tracking ID** — the stable identifier used by the website, monitoring, audit trail, and cases.
+- **Extension Tracking ID** — the SHA-256 hash of the exact evaluated artifact, used by the website, monitoring, audit trail, and cases.
 - **Finding Envelope** — the common parseable result emitted by all extensions, independent of how their code is written.
 - **Escalation Route** — an ordered list of roles. It is not a broadcast list.
 - **Role Projection** — the authorized, role-appropriate case view rendered for a recipient.
@@ -55,8 +55,9 @@ routing:
 
 governance:
   evaluation_threshold: set at whitelisting by higher management
-  approved_artifact_hash: assigned only after evaluation and approval
 ```
+
+KVCH calculates and returns the Approved Artifact Hash after deterministic packaging and evaluation; an authored extension declaration cannot contain its own final hash.
 
 Every execution emits a common **Finding Envelope**. The exact implementation is deferred, but it must at minimum identify the extension/version, finding, observed time, affected actor/resource, result, evidence references, enforcement result, and a safe summary. This is what lets one website monitor every extension without dictating how extensions are written.
 

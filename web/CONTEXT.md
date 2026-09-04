@@ -50,7 +50,7 @@ The ordered sequence of roles configured by a **Security Extension** that determ
 An authorized, role-appropriate rendering of an incident that exposes only the evidence, impact, and actions relevant to its recipient.
 
 **Extension Tracking ID**:
-The immutable identifier assigned to a published version of a **Security Extension** for monitoring, audit, and case linkage.
+The immutable cryptographic hash of the exact evaluated extension artifact, used for monitoring, audit, and case linkage.
 
 **Extension Authoring Assistant**:
 An AI skill and tool interface that helps an **Extension Publisher** compose a valid **Security Extension** within their delegated scope.
@@ -68,13 +68,55 @@ The isolated pre-publication assessment that validates a **Security Extension** 
 The management-selected minimum evaluation score an extension must meet before it may be activated for its intended company scope.
 
 **Approved Artifact Hash**:
-The immutable content hash of the exact extension artifact that passed evaluation and whitelisting, which KVCH verifies before activation and execution.
+The SHA-256 hash calculated by KVCH over the exact packaged extension artifact that passed evaluation and whitelisting.
+
+**Extension Installation**:
+A registered instance of an approved **Security Extension** running in a specific execution environment, such as VS Code or CI.
+
+**Extension Manifest**:
+The mandatory, hashed declaration of an extension artifact's runtime, monitored scope, capabilities, and shared protocol version.
+
+**Runtime Heartbeat**:
+A signed outbound liveness record from an **Extension Installation** that identifies its artifact hash, declared capabilities, and current time.
+
+**Installation Registration Token**:
+A short-lived, single-use KVCH credential that authorizes one Extension Installation to register its public signing key.
+
+**Ingestion Receipt**:
+The durable KVCH acknowledgment of one idempotent Runtime Heartbeat or Finding Envelope submission.
+
+**Case Notification**:
+An in-dashboard, email, or SMS prompt that directs an authorized recipient to an actionable case without exposing its sensitive projection outside KVCH.
 
 **AI Role Report**:
 An AI-generated explanation of an incident that is composed from an authorized **Role Projection** for the current recipient.
 
 **Case Comment**:
 An attributed, timestamped human note attached to an incident's audit timeline.
+
+**Company**:
+The tenant and authorization boundary that owns Security Extensions, installations, cases, and audit records.
+
+**Administrator**:
+The sole fixed KVCH role, held by a Company member who can configure that Company's groups, policies, and delegated authority.
+
+**Company Group**:
+A Company-defined collection of members, such as HR or Senior Developer, used to assign scoped KVCH authority and receive escalation routes.
+
+**Group Permission Policy**:
+The explicit, scoped list of KVCH actions and evidence access granted to one **Company Group**.
+
+**Group Representative**:
+A member authorized by a **Company Group**'s permission policy to manage that group's on-call notification recipient.
+
+**On-Call Recipient**:
+The configurable member of a **Company Group** selected to receive its next actionable case notification.
+
+**On-Call Availability**:
+The online or offline status a member declares for routing actionable notifications within their **Company Group**.
+
+**Audit Event**:
+An append-only, attributable record of a consequential KVCH action or state transition within one **Company**.
 
 
 ## Relationships
@@ -92,16 +134,30 @@ An attributed, timestamped human note attached to an incident's audit timeline.
 - A **Preventive Extension** evaluates an action before execution; a **Report Extension** evaluates an observed action or state after it occurs.
 - A **Security Extension** assigns an **Escalation Route** rather than broadcasting incidents to every listed role.
 - Each step of an **Escalation Route** receives a **Role Projection** appropriate to that role.
-- A published **Security Extension** receives an **Extension Tracking ID**.
+- An evaluated **Security Extension** receives an **Extension Tracking ID** from the exact artifact hash.
 - An **Extension Authoring Assistant** helps an **Extension Publisher** define an extension without receiving authority beyond that publisher's scope.
 - Every **Security Extension** satisfies the **Extension Contract** while retaining an open company-specific definition.
 - Every **Security Extension** emits a **Finding Envelope**.
 - A **Security Extension** must pass the **Extension Evaluation Gate** before publication or activation.
 - A **Security Extension** may be activated only when it passes mandatory safety checks and meets its **Whitelisting Threshold**.
-- KVCH verifies an extension against its **Approved Artifact Hash**; a changed artifact requires a new evaluation and whitelist decision.
+- KVCH calculates and verifies an extension's **Approved Artifact Hash** independently of sandbox evaluation; a changed artifact requires a new evaluation and whitelist decision.
+- An **Extension Installation** sends **Runtime Heartbeats** to KVCH; KVCH derives its healthy, stale, offline, or hash-mismatched status from them.
+- Every **Security Extension** includes an **Extension Manifest** in its approved artifact.
+- An **Extension Installation** registers a locally generated public signing key using one **Installation Registration Token**.
+- An **Extension Installation** receives one **Ingestion Receipt** for each accepted idempotent submission.
+- A current **On-Call Recipient** receives a **Case Notification** for their actionable case.
+- KVCH accepts a **Finding Envelope** only when it identifies a known **Extension Installation** using its approved artifact hash.
 - KVCH generates an **AI Role Report** for the first notified recipient and regenerates it from the next recipient's **Role Projection** upon manual escalation.
 - The current recipient may add a **Case Comment** while acknowledging, remediating, closing, or escalating an incident.
 - An upstream **Role Projection** includes authorized prior **Case Comments** from the incident timeline.
+- A **Company** owns its Security Extensions, Extension Installations, cases, and Audit Events.
+- An **Administrator** configures **Company Groups** and delegated authority only within their **Company**.
+- A **Group Permission Policy** grants a **Company Group** only its explicitly configured KVCH authority.
+- A **Group Representative** selects the **On-Call Recipient** for their **Company Group**.
+- A **Company Group** owns a shared inbox while its **On-Call Recipient** receives its actionable notification.
+- KVCH routes an actionable notification to the next eligible member in a **Company Group**'s configured hierarchy when the current **On-Call Recipient** is offline.
+- A **Company Group** may receive a step in an **Escalation Route**.
+- An **Audit Event** belongs to exactly one **Company**.
 
 ## Example dialogue
 
@@ -185,13 +241,24 @@ An attributed, timestamped human note attached to an incident's audit timeline.
 - Every **Security Extension** declares whether it is a **Preventive Extension** or a **Report Extension**.
 - `TO NOTIFY` is resolved as an ordered **Escalation Route**, not an immediate broadcast list.
 - AI may summarize and tailor a **Role Projection**, but a human recipient alone controls escalation decisions.
-- A published extension is monitored through its **Extension Tracking ID**.
+- An extension artifact is monitored through its **Extension Tracking ID**; changing its code produces a new ID and requires evaluation and whitelisting.
 - An **Extension Authoring Assistant** supports company-specific extension design; it does not create an authorization bypass.
 - Extension behavior is purposefully open behind a stable **Extension Contract**.
 - Every extension result uses a common **Finding Envelope**.
 - Extension implementation is open, but publication and activation require the **Extension Evaluation Gate**.
+- KVCH, rather than the execution sandbox, calculates the SHA-256 **Approved Artifact Hash** over the deterministic extension package.
+- Extension runtimes may execute in distributed environments; each registered **Extension Installation** reports liveness through an outbound signed **Runtime Heartbeat**.
+- The **Extension Manifest** defines what an extension monitors and may return without exposing its private implementation.
+- An Extension Installation retains its private signing key locally; KVCH verifies its heartbeats and Finding Envelopes with the registered public key and can revoke that installation independently.
+- Extension Installations submit versioned HTTPS payloads with idempotency keys, allowing retried submissions to receive their original Ingestion Receipt without duplicate cases or notifications.
+- KVCH delivers Case Notifications through the dashboard, email, and SMS; sensitive evidence remains in the authorized dashboard projection.
 - Higher management configures the **Whitelisting Threshold** during extension whitelisting; mandatory safety failures cannot be overridden by score.
 - The runtime artifact must match the **Approved Artifact Hash** evaluated and whitelisted for that extension version.
 - AI reports are generated for the current recipient only and are regenerated from the next role's authorized projection upon manual escalation.
 - Recipients may add **Case Comments** to the incident timeline.
 - Upstream recipients see authorized prior **Case Comments** in their role-specific view.
+- Each company has a logically isolated, append-only Audit Event stream, rather than dynamically created audit tables.
+- `Administrator` is the only fixed KVCH role; HR and Senior Developer are Company-defined groups rather than hard-coded roles.
+- Company Groups authorize actions through explicit Group Permission Policies rather than through their names.
+- A Group Representative can change their group's On-Call Recipient from the dashboard; KVCH audits the change and uses it for subsequent findings.
+- On-call notification routing follows member-declared On-Call Availability, falling through the configured group hierarchy without automatic upstream escalation.
