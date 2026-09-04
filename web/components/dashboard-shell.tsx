@@ -4,8 +4,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
+interface NavItem {
+  label: string;
+  href: string;
+  icon?: React.ReactNode;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+interface RoleNavConfig {
+  top: NavItem[];
+  sections: NavSection[];
+}
+
 // The navigation configuration for each role based on KVCH context
-const ROLE_NAVS: Record<string, { top: any[]; sections: { title: string; items: any[] }[] }> = {
+const ROLE_NAVS: Record<string, RoleNavConfig> = {
   "Intern": {
     top: [
       { label: "Pulse", href: "/intern/dashboard", icon: <PulseIcon /> },
@@ -80,12 +96,11 @@ const ROLE_NAVS: Record<string, { top: any[]; sections: { title: string; items: 
 export function DashboardShell({
   children,
   roleName,
-  navItems,
   hideHeader = false,
 }: {
   children: React.ReactNode;
   roleName: string;
-  navItems: { label: string; href: string; active?: boolean }[];
+  navItems?: { label: string; href: string; active?: boolean }[];
   hideHeader?: boolean;
 }) {
   const pathname = usePathname();
@@ -195,7 +210,7 @@ function InboxIcon() {
 function TasksIcon() {
   return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>;
 }
-function ExtensionsIcon() {
+export function ExtensionsIcon() {
   return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-8"/><path d="M12 12 8 8"/><path d="M12 12l4-4"/><path d="M20 20v-8"/><path d="M20 12l-4-4"/><path d="M20 12l4-4"/></svg>;
 }
 function IncidentsIcon() {

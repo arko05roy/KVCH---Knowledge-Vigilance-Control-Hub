@@ -3,7 +3,26 @@
 import React from "react";
 import { DashboardShell } from "@/components/dashboard-shell";
 
-const INITIATIVES_DATA = [
+interface ActiveProjectCount {
+  color: string;
+  count: number;
+}
+
+interface InitiativeItem {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: React.ReactNode;
+  iconBg?: string;
+  target?: string;
+  health?: string;
+  projects?: string;
+  activeProjects: ActiveProjectCount[];
+  activity?: string;
+  children?: InitiativeItem[];
+}
+
+const INITIATIVES_DATA: InitiativeItem[] = [
   {
     id: "core-product",
     name: "Core product",
@@ -108,7 +127,8 @@ const INITIATIVES_DATA = [
 
 export function InitiativesPage({ roleName }: { roleName: string }) {
   
-  const renderHealth = (health: string) => {
+  const renderHealth = (health?: string) => {
+    if (!health) return null;
     switch(health) {
       case 'On track':
         return <span className="flex items-center gap-1.5 text-[#2ea043]"><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> {health}</span>;
@@ -121,13 +141,13 @@ export function InitiativesPage({ roleName }: { roleName: string }) {
     }
   };
 
-  const renderActivity = (activity: string) => {
+  const renderActivity = (activity?: string) => {
     if (activity === 'up') return <svg className="w-4 h-4 text-[#2ea043]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="18 15 12 9 6 15"/><polyline points="18 10 12 4 6 10" className="opacity-50"/></svg>;
     if (activity === 'dash') return <span className="text-[#858688]">—</span>;
     return null;
   };
 
-  const renderRow = (item: any, depth = 0, isLastChild = false, parentLines: boolean[] = []) => {
+  const renderRow = (item: InitiativeItem, depth = 0, isLastChild = false, parentLines: boolean[] = []) => {
     const isTopLevel = depth === 0;
     
     return (
@@ -169,7 +189,7 @@ export function InitiativesPage({ roleName }: { roleName: string }) {
           </div>
           
           <div className="flex-[1.2] flex flex-wrap items-center gap-2">
-            {item.activeProjects.map((ap: any, i: number) => (
+            {item.activeProjects.map((ap: ActiveProjectCount, i: number) => (
               <div key={i} className="flex items-center gap-1.5 text-[#a1a3a6]">
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ap.color }} />
                 <span>{ap.count}</span>
@@ -182,14 +202,15 @@ export function InitiativesPage({ roleName }: { roleName: string }) {
           </div>
         </div>
 
-        {item.children && item.children.map((child: any, index: number) => 
-          renderRow(
+        {item.children?.map((child: InitiativeItem, index: number) => {
+          const totalChildren = item.children?.length ?? 0;
+          return renderRow(
             child, 
             depth + 1, 
-            index === item.children.length - 1, 
-            [...parentLines, index !== item.children.length - 1]
-          )
-        )}
+            index === totalChildren - 1, 
+            [...parentLines, index !== totalChildren - 1]
+          );
+        })}
       </React.Fragment>
     );
   };
