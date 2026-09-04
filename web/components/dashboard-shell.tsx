@@ -57,6 +57,7 @@ const ROLE_NAVS: Record<string, RoleNavConfig> = {
           { label: "Approval Queue", href: "/sr-dev/approvals", icon: <TasksIcon /> },
           { label: "Team Incidents", href: "/sr-dev/incidents", icon: <IncidentsIcon /> },
           { label: "Marketplace", href: "/sr-dev/marketplace", icon: <MarketplaceIcon /> },
+          { label: "Custom Extensions", href: "/sr-dev/custom-extensions", icon: <ExtensionsIcon /> },
         ]
       }
     ]
