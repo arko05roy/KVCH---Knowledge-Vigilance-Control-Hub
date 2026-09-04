@@ -184,7 +184,7 @@ export function CustomExtensionsPage() {
   };
 
   return (
-    <DashboardShell roleName="Sr-Dev">
+    <DashboardShell roleName="Sr. Dev">
       <div className="flex flex-col h-full bg-[#0d0e0f] text-[#e8e8e8] relative overflow-y-auto">
         
         {/* Top Header */}
@@ -229,14 +229,6 @@ export function CustomExtensionsPage() {
         {/* Central Workspace */}
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-3xl mx-auto w-full relative z-10">
           
-          {/* Subtle Background Watermark Logo */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
-            <svg width="340" height="340" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
-              <circle cx="50" cy="50" r="45" />
-              <path d="M20 50 L80 50 M50 20 L50 80" />
-            </svg>
-          </div>
-
           {/* Main Floating Input Box */}
           <div className="w-full bg-[#161718] border border-[#2b2c2e] rounded-2xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all focus-within:border-[#3b3c3e]">
             <textarea
