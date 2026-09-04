@@ -1,0 +1,190 @@
+{
+  "extension_id": "vpn_crypto_analyzer",
+  "version": "1.0.0",
+  "finding_type": "vpn_crypto_analysis",
+  "observed_time": "2026-09-04T13:45:49.332155",
+  "affected_actor": "/tmp/kvch_vpn_sample.pcap",
+  "affected_resource": "/tmp/kvch_vpn_sample.pcap",
+  "result": {
+    "analysis_metadata": {
+      "pcap_file": "/tmp/kvch_vpn_sample.pcap",
+      "started_at": "2026-09-04T13:45:42.598527",
+      "completed_at": "2026-09-04T13:45:49.331736",
+      "duration_seconds": 6.731,
+      "tools": [
+        "pcap_parser",
+        "ike_extractor",
+        "crypto_analyzer",
+        "traffic_classifier"
+      ],
+      "tshark_available": true
+    },
+    "ike_exchanges": [],
+    "traffic_observations": [
+      {
+        "protocol": "TCP",
+        "src_ip": "10.0.0.10",
+        "dst_ip": "10.0.0.20",
+        "src_port": 50000,
+        "dst_port": 443,
+        "length": 40
+      },
+      {
+        "protocol": "TCP",
+        "src_ip": "10.0.0.20",
+        "dst_ip": "10.0.0.10",
+        "src_port": 443,
+        "dst_port": 50000,
+        "length": 40
+      },
+      {
+        "protocol": "UDP",
+        "src_ip": "10.0.0.10",
+        "dst_ip": "10.0.0.20",
+        "src_port": 500,
+        "dst_port": 500,
+        "length": 28
+      }
+    ],
+    "security_associations": [],
+    "traffic_classes": [
+      {
+        "type": "WEB",
+        "confidence": 0.667,
+        "ports": [
+          443
+        ],
+        "packet_count": 2,
+        "evidence": "Observed source or destination ports in captured packets"
+      }
+    ],
+    "weaknesses": [],
+    "recommendations": [],
+    "security_score": 100,
+    "counts": {
+      "ike_exchanges": 0,
+      "security_associations": 0,
+      "traffic_classes": 1,
+      "weaknesses": 0
+    },
+    "crypto_profiles": {
+      "weak_ciphers": [
+        "DES",
+        "3DES",
+        "RC4",
+        "MD5"
+      ],
+      "weak_dh_groups": [
+        "1",
+        "2",
+        "5"
+      ],
+      "strong_ciphers": [
+        "AES-256-GCM",
+        "AES-128-GCM",
+        "ChaCha20-Poly1305"
+      ]
+    }
+  },
+  "evidence_refs": [
+    "/tmp/kvch_vpn_sample.pcap"
+  ],
+  "enforcement_result": "OBSERVE",
+  "safe_summary": "VPN crypto analysis completed for /tmp/kvch_vpn_sample.pcap",
+  "recipient": "network_engineer",
+  "case_id": null,
+  "technical_details": {
+    "pcap_file": "/tmp/kvch_vpn_sample.pcap",
+    "security_score": 100,
+    "details": {
+      "analysis_metadata": {
+        "pcap_file": "/tmp/kvch_vpn_sample.pcap",
+        "started_at": "2026-09-04T13:45:42.598527",
+        "completed_at": "2026-09-04T13:45:49.331736",
+        "duration_seconds": 6.731,
+        "tools": [
+          "pcap_parser",
+          "ike_extractor",
+          "crypto_analyzer",
+          "traffic_classifier"
+        ],
+        "tshark_available": true
+      },
+      "ike_exchanges": [],
+      "traffic_observations": [
+        {
+          "protocol": "TCP",
+          "src_ip": "10.0.0.10",
+          "dst_ip": "10.0.0.20",
+          "src_port": 50000,
+          "dst_port": 443,
+          "length": 40
+        },
+        {
+          "protocol": "TCP",
+          "src_ip": "10.0.0.20",
+          "dst_ip": "10.0.0.10",
+          "src_port": 443,
+          "dst_port": 50000,
+          "length": 40
+        },
+        {
+          "protocol": "UDP",
+          "src_ip": "10.0.0.10",
+          "dst_ip": "10.0.0.20",
+          "src_port": 500,
+          "dst_port": 500,
+          "length": 28
+        }
+      ],
+      "security_associations": [],
+      "traffic_classes": [
+        {
+          "type": "WEB",
+          "confidence": 0.667,
+          "ports": [
+            443
+          ],
+          "packet_count": 2,
+          "evidence": "Observed source or destination ports in captured packets"
+        }
+      ],
+      "weaknesses": [],
+      "recommendations": [],
+      "security_score": 100,
+      "counts": {
+        "ike_exchanges": 0,
+        "security_associations": 0,
+        "traffic_classes": 1,
+        "weaknesses": 0
+      },
+      "crypto_profiles": {
+        "weak_ciphers": [
+          "DES",
+          "3DES",
+          "RC4",
+          "MD5"
+        ],
+        "weak_dh_groups": [
+          "1",
+          "2",
+          "5"
+        ],
+        "strong_ciphers": [
+          "AES-256-GCM",
+          "AES-128-GCM",
+          "ChaCha20-Poly1305"
+        ]
+      }
+    },
+    "recommendation": "Review VPN configuration"
+  },
+  "executive_summary": {
+    "impact": "MEDIUM severity VPN security issue detected",
+    "recommended_action": "Update VPN cryptographic configuration",
+    "priority": "MEDIUM",
+    "affected_assets": [
+      "VPN Gateway"
+    ]
+  }
+}
