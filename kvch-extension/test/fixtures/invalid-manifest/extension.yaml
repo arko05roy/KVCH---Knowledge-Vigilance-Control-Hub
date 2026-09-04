@@ -21,3 +21,5 @@ runtime_compatibility:
   supports_graceful_stop: yes
   operation_boundaries: []
   credentials: embedded
+deployment:
+  schedule: "not a cron schedule"

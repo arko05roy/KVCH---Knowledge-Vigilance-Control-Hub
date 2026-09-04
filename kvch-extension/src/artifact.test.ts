@@ -14,8 +14,10 @@ test("validates both TypeScript and Python standalone packages", async () => {
   const python = await validateExtension(fixture("python-extension"));
   assert.equal(typescript.valid, true);
   assert.equal(typescript.manifest?.implementation.language, "typescript");
+  assert.equal(typescript.manifest?.deployment.schedule, "*/5 * * * *");
   assert.equal(python.valid, true);
   assert.equal(python.manifest?.implementation.language, "python");
+  assert.equal(python.manifest?.deployment.schedule, "*/10 * * * *");
 });
 
 test("reports specific invalid manifest failures", async () => {
@@ -25,6 +27,7 @@ test("reports specific invalid manifest failures", async () => {
   assert.ok(result.issues.some((issue) => issue.path === "implementation.entrypoint"));
   assert.ok(result.issues.some((issue) => issue.path === "commands.run"));
   assert.ok(result.issues.some((issue) => issue.path === "runtime_compatibility.credentials"));
+  assert.ok(result.issues.some((issue) => issue.path === "deployment.schedule"));
 });
 
 test("packing is byte deterministic and inspection does not execute package code", async () => {
@@ -34,6 +37,7 @@ test("packing is byte deterministic and inspection does not execute package code
   assert.deepEqual(first, second);
   const inspected = inspectArtifactBytes(first);
   assert.equal(inspected.manifest.id, "repository-secret-monitor");
+  assert.equal(inspected.manifest.deployment.schedule, "*/5 * * * *");
   assert.ok(inspected.files.some((file) => file.path === "src/index.ts"));
   assert.ok(!inspected.files.some((file) => file.path.startsWith("node_modules/")));
 });

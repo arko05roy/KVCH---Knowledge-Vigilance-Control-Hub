@@ -37,3 +37,5 @@ runtime_compatibility:
     - read_input
     - emit_finding
   credentials: injected_at_runtime
+deployment:
+  schedule: "*/10 * * * *"

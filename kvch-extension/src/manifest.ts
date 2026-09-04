@@ -1,5 +1,6 @@
 import { access, lstat, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { CronExpressionParser } from "cron-parser";
 import { parseDocument } from "yaml";
 import { ExtensionValidationError } from "./errors.js";
 import { MANIFEST_SCHEMA_VERSION } from "./types.js";
@@ -54,6 +55,26 @@ function validateContractItems(value: unknown, field: string, issues: Validation
 
 function safeRelativePath(value: string): boolean {
   return !path.isAbsolute(value) && value.split(/[\\/]/).every((part) => part !== "..") && value.length > 0;
+}
+
+function validateDeploymentSchedule(value: unknown, issues: ValidationIssue[]): ExtensionManifest["deployment"] | undefined {
+  if (!isRecord(value)) {
+    addIssue(issues, "deployment", "must define a five-field cron schedule");
+    return undefined;
+  }
+  const schedule = requireString(value.schedule, "deployment.schedule", issues);
+  if (!schedule) return undefined;
+  if (schedule.trim().split(/\s+/).length !== 5) {
+    addIssue(issues, "deployment.schedule", "must be a five-field cron expression (minute hour day-of-month month day-of-week)");
+    return undefined;
+  }
+  try {
+    CronExpressionParser.parse(schedule);
+  } catch {
+    addIssue(issues, "deployment.schedule", "must be a valid five-field cron expression");
+    return undefined;
+  }
+  return { schedule };
 }
 
 export function validateManifestData(value: unknown): ValidationResult {
@@ -150,7 +171,9 @@ export function validateManifestData(value: unknown): ValidationResult {
     }
   }
 
-  if (issues.length || !schemaVersion || !id || !name || !version || !description || !implementationResult || !interfaceResult || !behaviorResult || !dependenciesResult || !compatibilityResult || COMMAND_NAMES.some((name) => !commandResult[name])) {
+  const deploymentResult = validateDeploymentSchedule(value.deployment, issues);
+
+  if (issues.length || !schemaVersion || !id || !name || !version || !description || !implementationResult || !interfaceResult || !behaviorResult || !dependenciesResult || !compatibilityResult || !deploymentResult || COMMAND_NAMES.some((name) => !commandResult[name])) {
     return { valid: false, issues };
   }
   return {
@@ -167,6 +190,7 @@ export function validateManifestData(value: unknown): ValidationResult {
       behavior: behaviorResult,
       dependencies: dependenciesResult,
       runtime_compatibility: compatibilityResult,
+      deployment: deploymentResult,
     },
     issues: [],
   };

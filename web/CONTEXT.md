@@ -59,10 +59,10 @@ An AI skill and tool interface that helps an **Extension Publisher** compose a v
 The small stable governance and output envelope that every **Security Extension** satisfies while its company-specific inputs, rules, connectors, and configuration remain open.
 
 **Finding Envelope**:
-The normalized result emitted by a **Security Extension** so KVCH can monitor, display, audit, notify, and report on the result consistently.
+The detailed structured JSON result emitted by a **Security Extension** when it detects a concern. It has a stable KVCH header and open extension-specific detail so KVCH can monitor, display, audit, notify, and generate later reports consistently.
 
 **Extension Evaluation Gate**:
-The isolated pre-publication assessment that validates a **Security Extension** against its declared scope, safety constraints, test scenarios, and shared output contract.
+The isolated pre-deployment assessment that verifies an artifact can build, run, exit safely, and satisfy the shared runtime/output contract. It does not determine whether an extension's domain-specific detection logic is correct.
 
 **Whitelisting Threshold**:
 The management-selected minimum evaluation score an extension must meet before it may be activated for its intended company scope.
@@ -72,6 +72,12 @@ The SHA-256 hash calculated by KVCH over the exact packaged extension artifact t
 
 **Extension Installation**:
 A registered instance of an approved **Security Extension** running in a specific execution environment, such as VS Code or CI.
+
+**Scheduled Extension Run**:
+One KVCH-managed, cron-style invocation of an active **Security Extension** for its configured target and schedule, with recorded start, finish, execution result, and emitted findings.
+
+**Extension Schedule**:
+The creator-declared cron schedule in an **Extension Manifest** that determines when KVCH creates a **Scheduled Extension Run** for that immutable artifact.
 
 **Extension Manifest**:
 The mandatory, hashed declaration of an extension artifact's runtime, monitored scope, capabilities, and shared protocol version.
@@ -142,6 +148,8 @@ An append-only, attributable record of a consequential KVCH action or state tran
 - A **Security Extension** may be activated only when it passes mandatory safety checks and meets its **Whitelisting Threshold**.
 - KVCH calculates and verifies an extension's **Approved Artifact Hash** independently of sandbox evaluation; a changed artifact requires a new evaluation and whitelist decision.
 - An **Extension Installation** sends **Runtime Heartbeats** to KVCH; KVCH derives its healthy, stale, offline, or hash-mismatched status from them.
+- A **Scheduled Extension Run** belongs to one active **Extension Installation** and may emit zero or more **Finding Envelopes**.
+- An **Extension Schedule** belongs to the immutable **Extension Manifest** and determines its **Scheduled Extension Runs**.
 - Every **Security Extension** includes an **Extension Manifest** in its approved artifact.
 - An **Extension Installation** registers a locally generated public signing key using one **Installation Registration Token**.
 - An **Extension Installation** receives one **Ingestion Receipt** for each accepted idempotent submission.

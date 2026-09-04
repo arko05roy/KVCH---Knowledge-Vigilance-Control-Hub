@@ -35,6 +35,10 @@ export interface ExtensionManifest {
     operation_boundaries: string[];
     credentials: "injected_at_runtime";
   };
+  deployment: {
+    /** Five-field cron schedule for KVCH's hosted, low-frequency runtime. */
+    schedule: string;
+  };
 }
 
 export interface ManifestContractItem {

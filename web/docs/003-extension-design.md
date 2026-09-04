@@ -94,6 +94,9 @@ runtime_compatibility:
   supports_graceful_stop: true
   operation_boundaries: [inspect_repository, emit_finding]
   credentials: injected_at_runtime # never embedded | injected_at_runtime
+
+deployment:
+  schedule: "*/5 * * * *" # creator-declared cron schedule for KVCH hosted runs
 ```
 
 Manifest rules:
@@ -113,6 +116,7 @@ Manifest rules:
 - `dependencies` lists non-obvious system tools, credentials, or configuration. Normal package dependencies belong in the language package file too.
 - `runtime_compatibility.operation_boundaries` names safe points between external operations where a future managed runtime can stop a revoked extension before it begins another operation.
 - `credentials` is always `injected_at_runtime`; extension source, fixtures, manifests, and packaged artifacts must never contain long-lived credentials.
+- `deployment.schedule` is the creator-declared cron schedule for KVCH's hosted, low-frequency runtime. It is packaged and hashed with the artifact; changing it creates a new artifact identity.
 
 ## Bridge handoff
 

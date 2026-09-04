@@ -37,3 +37,5 @@ runtime_compatibility:
     - inspect_event
     - emit_finding
   credentials: injected_at_runtime
+deployment:
+  schedule: "*/5 * * * *"
