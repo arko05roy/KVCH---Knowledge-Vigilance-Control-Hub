@@ -3,7 +3,7 @@
 VPN CRYPTO ANALYZER - Combines 3 Security Tools
 Tool 1: PCAP Parser & IKE Extractor (wireshark style)
 Tool 2: Crypto Strength Analyzer (sslscan style)
-Tool 3: Traffic Classifier (metadata analysis)
+Tool 3: Traffic Classifier (packet metadata analysis)
 """
 
 import sys
@@ -43,6 +43,7 @@ class VPNAnalyzer:
         self.ike_exchanges = []
         self.security_associations = []
         self.traffic_classes = []
+        self.traffic_observations = []
         self.weaknesses = []
         self.recommendations = []
         
@@ -92,7 +93,7 @@ class VPNAnalyzer:
         print(f"\n{Colors.DIM}┌─ TOOLS LOADED ────────────────────────────────────────────────┐{Colors.RESET}")
         print(f"{Colors.DIM}│ {Colors.GREEN}🔧 Tool 1: {Colors.WHITE}PCAP Parser & IKE Extractor{Colors.RESET}")
         print(f"{Colors.DIM}│ {Colors.GREEN}🔧 Tool 2: {Colors.WHITE}Crypto Strength Analyzer{Colors.RESET}")
-        print(f"{Colors.DIM}│ {Colors.GREEN}🔧 Tool 3: {Colors.WHITE}Traffic Classifier (ML-based){Colors.RESET}")
+        print(f"{Colors.DIM}│ {Colors.GREEN}🔧 Tool 3: {Colors.WHITE}Traffic Classifier (packet evidence){Colors.RESET}")
         print(f"{Colors.DIM}└──────────────────────────────────────────────────────────────────┘{Colors.RESET}\n")
     
     # ============================================================
@@ -109,7 +110,7 @@ class VPNAnalyzer:
             return
         
         try:
-            cap = pyshark.FileCapture(self.pcap_file, display_filter='isakmp')
+            cap = pyshark.FileCapture(self.pcap_file)
         except Exception as e:
             print(f"{Colors.RED}✖ Error reading PCAP: {e}{Colors.RESET}")
             return
@@ -123,7 +124,11 @@ class VPNAnalyzer:
                 print(f"\r{Colors.CYAN}    Processing packets: {Colors.WHITE}{packet_count}{Colors.RESET}", end='')
             
             try:
-                if hasattr(packet, 'ike'):
+                observation = self._extract_traffic_observation(packet)
+                if observation:
+                    self.traffic_observations.append(observation)
+
+                if hasattr(packet, 'isakmp') or hasattr(packet, 'ike'):
                     ike_count += 1
                     ike_data = self._extract_ike_data(packet)
                     if ike_data:
@@ -142,18 +147,21 @@ class VPNAnalyzer:
         ike_data = {}
         
         try:
-            if hasattr(packet.ike, 'version'):
-                ike_data['version'] = packet.ike.version
-            if hasattr(packet.ike, 'exchange_type'):
-                ike_data['exchange_type'] = packet.ike.exchange_type
-            if hasattr(packet.ike, 'encryption_algorithm'):
-                ike_data['encryption'] = packet.ike.encryption_algorithm
-            if hasattr(packet.ike, 'prf_algorithm'):
-                ike_data['prf'] = packet.ike.prf_algorithm
-            if hasattr(packet.ike, 'dh_group'):
-                ike_data['dh_group'] = packet.ike.dh_group
-            if hasattr(packet.ike, 'sa_lifetime'):
-                ike_data['sa_lifetime'] = packet.ike.sa_lifetime
+            ike_layer = getattr(packet, 'ike', None) or getattr(packet, 'isakmp', None)
+            if ike_layer is None:
+                return None
+            if hasattr(ike_layer, 'version'):
+                ike_data['version'] = ike_layer.version
+            if hasattr(ike_layer, 'exchange_type'):
+                ike_data['exchange_type'] = ike_layer.exchange_type
+            if hasattr(ike_layer, 'encryption_algorithm'):
+                ike_data['encryption'] = ike_layer.encryption_algorithm
+            if hasattr(ike_layer, 'prf_algorithm'):
+                ike_data['prf'] = ike_layer.prf_algorithm
+            if hasattr(ike_layer, 'dh_group'):
+                ike_data['dh_group'] = ike_layer.dh_group
+            if hasattr(ike_layer, 'sa_lifetime'):
+                ike_data['sa_lifetime'] = ike_layer.sa_lifetime
             
             # Extract source/dest
             if hasattr(packet, 'ip'):
@@ -164,6 +172,30 @@ class VPNAnalyzer:
             pass
         
         return ike_data if ike_data else None
+
+    def _extract_traffic_observation(self, packet):
+        """Extract observed network metadata from one captured packet."""
+        observation = {'protocol': str(getattr(packet, 'highest_layer', 'UNKNOWN'))}
+
+        for network_layer in ('ip', 'ipv6'):
+            layer = getattr(packet, network_layer, None)
+            if layer:
+                observation['src_ip'] = getattr(layer, 'src', None)
+                observation['dst_ip'] = getattr(layer, 'dst', None)
+                break
+
+        for transport_layer in ('tcp', 'udp', 'sctp'):
+            layer = getattr(packet, transport_layer, None)
+            if layer:
+                observation['protocol'] = transport_layer.upper()
+                observation['src_port'] = int(getattr(layer, 'srcport', 0))
+                observation['dst_port'] = int(getattr(layer, 'dstport', 0))
+                break
+
+        if hasattr(packet, 'length'):
+            observation['length'] = int(packet.length)
+
+        return observation if 'src_port' in observation or observation.get('src_ip') else None
     
     # ============================================================
     # TOOL 2: CRYPTO STRENGTH ANALYZER
@@ -233,36 +265,41 @@ class VPNAnalyzer:
     # ============================================================
     
     def classify_traffic(self):
-        """Tool 3: Classify traffic from metadata"""
+        """Tool 3: Classify traffic from observed packet metadata"""
         print(f"{Colors.BOLD}{Colors.YELLOW}[*] TOOL 3: Traffic Classifier{Colors.RESET}")
         print(f"{Colors.DIM}    Analyzing traffic patterns...{Colors.RESET}\n")
         
-        # This would normally use ML models, but we'll simulate with heuristics
         traffic_types = {
-            'VOIP': {'pattern': [80, 443, 5060], 'confidence': 0.8},
-            'WEB': {'pattern': [80, 443, 8080], 'confidence': 0.9},
-            'FILE_TRANSFER': {'pattern': [21, 22, 25, 110], 'confidence': 0.7},
-            'VIDEO_STREAMING': {'pattern': [443, 1935, 554], 'confidence': 0.6},
-            'EMAIL': {'pattern': [25, 110, 143, 993, 995], 'confidence': 0.85}
+            'VOIP': [5060, 5061],
+            'WEB': [80, 443, 8080, 8443],
+            'FILE_TRANSFER': [20, 21, 22],
+            'VIDEO_STREAMING': [1935, 554],
+            'EMAIL': [25, 110, 143, 465, 587, 993, 995],
         }
-        
-        # Extract ports from IKE exchanges
-        ports = []
-        for exchange in self.ike_exchanges:
-            if 'src_ip' in exchange:
-                # In a real implementation, we'd analyze the actual traffic
-                pass
-        
-        # Simulate classification
-        for traffic_type, info in traffic_types.items():
-            confidence = info['confidence']
-            if confidence > 0.7:
-                self.traffic_classes.append({
-                    'type': traffic_type,
-                    'confidence': confidence,
-                    'ports': info['pattern']
-                })
-                print(f"{Colors.GREEN}    [+] Classified as: {Colors.WHITE}{traffic_type} {Colors.DIM}({confidence*100:.0f}% confidence){Colors.RESET}")
+        observed_ports = [
+            port for observation in self.traffic_observations
+            for port in (observation.get('src_port'), observation.get('dst_port'))
+            if port
+        ]
+        total_packets = len(self.traffic_observations)
+
+        for traffic_type, candidate_ports in traffic_types.items():
+            matching_packets = [
+                observation for observation in self.traffic_observations
+                if observation.get('src_port') in candidate_ports or observation.get('dst_port') in candidate_ports
+            ]
+            if not matching_packets:
+                continue
+            confidence = len(matching_packets) / total_packets if total_packets else 0
+            observed_matching_ports = sorted(set(observed_ports).intersection(candidate_ports))
+            self.traffic_classes.append({
+                'type': traffic_type,
+                'confidence': round(confidence, 3),
+                'ports': observed_matching_ports,
+                'packet_count': len(matching_packets),
+                'evidence': 'Observed source or destination ports in captured packets',
+            })
+            print(f"{Colors.GREEN}    [+] Observed: {Colors.WHITE}{traffic_type} {Colors.DIM}({confidence*100:.0f}% of captured packets){Colors.RESET}")
         
         print(f"\n{Colors.GREEN}✔ Traffic classification complete!{Colors.RESET}\n")
     
@@ -356,6 +393,7 @@ class VPNAnalyzer:
                 'tshark_available': shutil.which('tshark') is not None,
             },
             'ike_exchanges': self.ike_exchanges,
+            'traffic_observations': self.traffic_observations,
             'security_associations': self.security_associations,
             'traffic_classes': self.traffic_classes,
             'weaknesses': self.weaknesses,

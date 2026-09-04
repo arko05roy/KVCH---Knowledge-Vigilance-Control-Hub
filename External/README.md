@@ -12,7 +12,7 @@
 - PCAP Parsing
 - IKE Extraction
 - Crypto Strength Analysis
-- Traffic Classification
+- Packet-Metadata Traffic Classification
 
 ### 3. Phishing Hunter (3 Tools in 1)
 - Typosquatting Generation
