@@ -18,7 +18,7 @@ Implemented and integrated the KVCH external threat-detection system:
 
 
 
-# Atul, Rohit & Sahil
+# Atul
 Implemented and integrated the KVCH external threat-detection system:
 - Added local-laptop targeting for IP, hostname, interface, live traffic, and local files.
 - Added one aggregate Finding Envelope report per extension while preserving the contract.
@@ -26,3 +26,6 @@ Implemented and integrated the KVCH external threat-detection system:
 - Added netstat -anv socket snapshots and TShark protocol statistics to reports.
 - Added detailed risk, evidence, capability, count, and recommendation sections.
 - Executed and reviewed the five extensions and maintained the web integration.
+
+# Sahil
+# Rohit
