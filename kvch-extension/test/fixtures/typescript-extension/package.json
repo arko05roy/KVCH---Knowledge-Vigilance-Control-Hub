@@ -1,0 +1,10 @@
+{
+  "name": "repository-secret-monitor",
+  "private": true,
+  "scripts": {
+    "start": "node dist/index.js",
+    "test": "node --test",
+    "build": "tsc",
+    "package": "npm pack --ignore-scripts"
+  }
+}

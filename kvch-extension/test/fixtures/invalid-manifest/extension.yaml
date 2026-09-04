@@ -1,0 +1,23 @@
+schema_version: kvch.extension-package/v1
+id: Invalid Extension
+name: Broken
+version: one
+description: Broken manifest fixture.
+implementation:
+  language: typescript
+  runtime: node >=22
+  package_manager: npm
+  entrypoint: ../outside.ts
+commands:
+  install: npm install
+interface:
+  mode: arbitrary
+  inputs: invalid
+  outputs: []
+behavior:
+  normal: works
+dependencies: {}
+runtime_compatibility:
+  supports_graceful_stop: yes
+  operation_boundaries: []
+  credentials: embedded

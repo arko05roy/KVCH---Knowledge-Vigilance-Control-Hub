@@ -1,0 +1,39 @@
+schema_version: kvch.extension-package/v1
+id: repository-secret-monitor
+name: Repository secret monitor
+version: 1.0.0
+description: Finds secret-like values in supplied repository events.
+implementation:
+  language: typescript
+  runtime: node >=22
+  package_manager: npm
+  entrypoint: src/index.ts
+commands:
+  install: npm install
+  run: npm run start
+  test: npm run test
+  build: npm run build
+  package: npm run package
+interface:
+  mode: event
+  inputs:
+    - name: event
+      description: A repository event to inspect.
+  outputs:
+    - name: findings
+      description: Normalized secret exposure findings.
+behavior:
+  normal: Returns no finding when the event has no secret-like value.
+  concern: Emits a finding when an event has a secret-like value.
+  edge_cases:
+    - Placeholder values are not findings.
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries:
+    - inspect_event
+    - emit_finding
+  credentials: injected_at_runtime

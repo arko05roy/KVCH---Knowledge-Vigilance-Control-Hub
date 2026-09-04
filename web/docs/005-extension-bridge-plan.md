@@ -11,7 +11,7 @@ Build the npm package and KVCH application capabilities that turn a standalone e
 ```mermaid
 flowchart LR
   A[AI agent uses 003] --> B[Standalone extension folder]
-  B --> C[@kvch/extension-bridge pack]
+  B --> C[@arko05roy/kvch-extension pack]
   C --> D[KVCH upload and candidate record]
   D --> E[KVCH computes SHA-256]
   E --> F[Evaluate exact artifact]
@@ -27,7 +27,7 @@ The bridge does **not** make all languages/runtimes executable on day one. It ac
 
 ### The npm package
 
-Create one package: `@kvch/extension-bridge`. It is both a library and CLI. It must not contain organization permissions, approval rules, database access, or web UI logic.
+Create one package: `@arko05roy/kvch-extension`. It is both a library and CLI. It must not contain organization permissions, approval rules, database access, or web UI logic.
 
 Initial CLI contract:
 
@@ -135,7 +135,7 @@ The monitoring dashboard shows extension ID/version/hash, activation target, ada
 
 **Type:** AFK. **Blocked by:** none.
 
-Build `@kvch/extension-bridge` with parsing and structural validation for the `003` manifest/folder shape. Include valid TypeScript and Python fixture packages plus invalid-manifest fixtures.
+Build `@arko05roy/kvch-extension` with parsing and structural validation for the `003` manifest/folder shape. Include valid TypeScript and Python fixture packages plus invalid-manifest fixtures.
 
 **Acceptance criteria:**
 
