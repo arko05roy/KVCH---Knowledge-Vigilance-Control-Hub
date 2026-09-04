@@ -56,7 +56,7 @@ export default function PulsePage() {
                </div>
 
                <p className="text-[14.5px] leading-[1.6] text-[#a1a3a6] mb-4">
-                 Consistent progress improving launch times and overall responsiveness in the rider app. Early results are positive and we're focused on validating impact as changes roll out more broadly.
+                 Consistent progress improving launch times and overall responsiveness in the rider app. Early results are positive and we&apos;re focused on validating impact as changes roll out more broadly.
                </p>
 
                <div className="flex items-center gap-2 mt-1">

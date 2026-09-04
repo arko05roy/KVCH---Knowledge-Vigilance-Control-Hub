@@ -44,7 +44,7 @@ export default function NotFound() {
         {/* Top Text Section */}
         <div className="flex flex-col items-center translate-y-[40px]">
           <p className="text-[15px] font-normal text-gray-300 mb-3">
-            Seems you've stepped outside the secure perimeter...
+            Seems you&apos;ve stepped outside the secure perimeter...
           </p>
 
           <div className="relative inline-block mb-3.5">
@@ -54,7 +54,7 @@ export default function NotFound() {
           </div>
 
           <p className="text-[14px] text-gray-300 leading-[1.7] max-w-[470px] mb-7">
-            Return to your <span className="inline-flex bg-white/20 text-white text-[12.5px] font-semibold px-3 py-0.5 rounded-md">dashboard</span> to monitor active threats, policies, and workflows. We'll keep things secure while you <span className="inline-flex bg-white/20 text-white text-[12.5px] font-semibold px-3 py-0.5 rounded-md">realign</span> your coordinates.
+            Return to your <span className="inline-flex bg-white/20 text-white text-[12.5px] font-semibold px-3 py-0.5 rounded-md">dashboard</span> to monitor active threats, policies, and workflows. We&apos;ll keep things secure while you <span className="inline-flex bg-white/20 text-white text-[12.5px] font-semibold px-3 py-0.5 rounded-md">realign</span> your coordinates.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function NotFound() {
               </div>
               <div className="text-left">
                 <div className="text-[15px] font-semibold text-white">Plugin Marketplace</div>
-                <div className="text-[12px] text-gray-400">Extend your armor's capabilities</div>
+                <div className="text-[12px] text-gray-400">Extend your armor&apos;s capabilities</div>
               </div>
             </div>
             <span className="text-gray-400 text-[21px] font-medium group-hover:translate-x-1.5 transition-transform duration-300">&rsaquo;</span>

@@ -154,7 +154,7 @@ export function MarketplacePage({ roleName }: { roleName: string }) {
 
           {/* Footer */}
           <div className="mt-12 text-center text-[13px] text-[#858688]">
-            Can't find what you're looking for? <a href="#" className="text-[#2f80ed] hover:underline ml-1 inline-flex items-center gap-1">Request a plugin <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+            Can&apos;t find what you&apos;re looking for? <a href="#" className="text-[#2f80ed] hover:underline ml-1 inline-flex items-center gap-1">Request a plugin <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
           </div>
 
         </div>

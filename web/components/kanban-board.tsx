@@ -2,8 +2,23 @@
 
 import React, { useState } from "react";
 
+interface TaskTag {
+  label: string;
+  color: string;
+}
+
+interface TaskItem {
+  id: string;
+  title: string;
+  stateTag?: string;
+  icon: string;
+  tags?: TaskTag[];
+  pr?: string;
+  hasAvatars?: boolean;
+}
+
 // Mock data
-const INITIAL_TASKS: Record<string, any> = {
+const INITIAL_TASKS: Record<string, TaskItem> = {
   "ENG-2749": { id: "ENG-2749", title: "Show last known vehicle location", stateTag: "Working...", icon: "yellow-circle", tags: [], hasAvatars: true },
   "ENG-2755": { id: "ENG-2755", title: "Graceful error state when network drops", stateTag: "Working...", icon: "yellow-circle", tags: [{ label: "Design", color: "#5e6ad2" }] },
   "ENG-2692": { id: "ENG-2692", title: "Indicate offline status clearly in the UI", icon: "purple-check", tags: [{ label: "Design", color: "#5e6ad2" }], pr: "#55234", hasAvatars: true },
@@ -177,7 +192,7 @@ export function KanbanBoard() {
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                         <svg className="w-[14px] h-[14px] text-[#424345] shrink-0 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
                         
-                        {task.tags?.map((tag: any, i: number) => (
+                        {task.tags?.map((tag: TaskTag, i: number) => (
                           <div key={i} className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-[#2b2c2e] text-[11px] text-[#858688] bg-[#161718]">
                             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: tag.color }} />
                             <span>{tag.label}</span>

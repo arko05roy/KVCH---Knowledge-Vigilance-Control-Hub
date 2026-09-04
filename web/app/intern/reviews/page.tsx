@@ -75,7 +75,7 @@ export default function ReviewsPage() {
             {/* Group: You're reviewing */}
             <div className="px-4 py-2 text-[12px] font-medium text-[#858688] flex items-center gap-1.5 mt-4 cursor-pointer hover:text-[#c4c5c7]">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-              You're reviewing <span className="ml-1 text-[#858688]">2</span>
+              You&apos;re reviewing <span className="ml-1 text-[#858688]">2</span>
               <span className="text-[10px] ml-1">▼</span>
             </div>
 
@@ -191,37 +191,37 @@ export default function ReviewsPage() {
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">1</div>
                 <div className="w-6 text-center select-none"></div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> React <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">'react'</span></div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> React <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">&apos;react&apos;</span></div>
               </div>
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">2</div>
                 <div className="w-6 text-center select-none"></div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> {'{'} View, ActivityIndicator {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">'react-native'</span></div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> {'{'} View, ActivityIndicator {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">&apos;react-native&apos;</span></div>
               </div>
               
               {/* Removed line */}
               <div className="flex group bg-[#eb5757]/10 hover:bg-[#eb5757]/20">
                 <div className="w-12 text-right pr-4 text-[#eb5757] select-none opacity-80">3</div>
                 <div className="w-6 text-center text-[#eb5757] select-none font-bold">-</div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#e8e8e8]"><span className="text-[#eb5757]">import</span> {'{'} <span className="text-[#c4c5c7]">useVehicleState</span> {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">'@hooks/useVehicleState'</span></div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#e8e8e8]"><span className="text-[#eb5757]">import</span> {'{'} <span className="text-[#c4c5c7]">useVehicleState</span> {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">&apos;@hooks/useVehicleState&apos;</span></div>
               </div>
               
               {/* Added line */}
               <div className="flex group bg-[#2ea043]/10 hover:bg-[#2ea043]/20">
                 <div className="w-12 text-right pr-4 text-[#2ea043] select-none opacity-80">3</div>
                 <div className="w-6 text-center text-[#2ea043] select-none font-bold">+</div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#e8e8e8]"><span className="text-[#eb5757]">import</span> {'{'} <span className="text-[#c4c5c7]">useVehicleState</span>, <span className="text-[#2ea043] bg-[#2ea043]/20 px-1 rounded-sm">SyncStatus</span> {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">'@hooks/useVehicleState'</span></div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#e8e8e8]"><span className="text-[#eb5757]">import</span> {'{'} <span className="text-[#c4c5c7]">useVehicleState</span>, <span className="text-[#2ea043] bg-[#2ea043]/20 px-1 rounded-sm">SyncStatus</span> {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">&apos;@hooks/useVehicleState&apos;</span></div>
               </div>
 
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">4</div>
                 <div className="w-6 text-center select-none"></div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> {'{'} Dashboard {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">'@components/Dashboard'</span></div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> {'{'} Dashboard {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">&apos;@components/Dashboard&apos;</span></div>
               </div>
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">5</div>
                 <div className="w-6 text-center select-none"></div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> {'{'} EmptyState {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">'@components/EmptyState'</span></div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]"><span className="text-[#eb5757]">import</span> {'{'} EmptyState {'}'} <span className="text-[#eb5757]">from</span> <span className="text-[#2ea043]">&apos;@components/EmptyState&apos;</span></div>
               </div>
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">6</div>
@@ -271,7 +271,7 @@ export default function ReviewsPage() {
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">11</div>
                 <div className="w-6 text-center select-none"></div>
-                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]">    <span className="text-[#eb5757]">return</span> &lt;<span className="text-[#5e6ad2]">ActivityIndicator</span> size=<span className="text-[#2ea043]">"large"</span> /&gt;</div>
+                <div className="flex-1 pl-4 whitespace-pre text-[#c4c5c7]">    <span className="text-[#eb5757]">return</span> &lt;<span className="text-[#5e6ad2]">ActivityIndicator</span> size=<span className="text-[#2ea043]">&quot;large&quot;</span> /&gt;</div>
               </div>
               <div className="flex group hover:bg-[#262729]/50">
                 <div className="w-12 text-right pr-4 text-[#858688] select-none opacity-50">12</div>

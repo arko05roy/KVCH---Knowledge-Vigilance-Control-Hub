@@ -2,10 +2,29 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [timeString, setTimeString] = useState("9:47 PM\u00A0 • \u00A014 July 2026");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+      const day = now.getDate();
+      const month = now.toLocaleString('en-US', { month: 'long' });
+      const year = now.getFullYear();
+      setTimeString(`${timeStr}\u00A0 • \u00A0${day} ${month} ${year}`);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -633,7 +652,7 @@ export default function Home() {
           
           <div className="time-panel">
             <span className="time-label">Timezone</span>
-            <span className="time-value">9:47 PM&nbsp; • &nbsp;14 July 2026</span>
+            <span className="time-value">{timeString}</span>
           </div>
           
           <button className="sign-up" onClick={() => setIsModalOpen(true)}>Log in</button>
@@ -651,7 +670,7 @@ export default function Home() {
             <span className="line line-two"><span className="line-reveal">Enterprise Armor.</span></span>
           </h1>
           <p className="hero-copy">
-            Your company's work is scattered across disconnected systems.<br />
+            Your company&apos;s work is scattered across disconnected systems.<br />
             KVCH brings it into one intelligent control plane, so every<br />
             employee gets a workbench and the enterprise gets armor.
           </p>
