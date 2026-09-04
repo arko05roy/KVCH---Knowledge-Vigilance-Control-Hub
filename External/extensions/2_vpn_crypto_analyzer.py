@@ -347,12 +347,31 @@ class VPNAnalyzer:
         findings = []
         
         report_data = {
+            'analysis_metadata': {
+                'pcap_file': self.pcap_file,
+                'started_at': self.start_time.isoformat(),
+                'completed_at': datetime.now().isoformat(),
+                'duration_seconds': round(duration, 3),
+                'tools': ['pcap_parser', 'ike_extractor', 'crypto_analyzer', 'traffic_classifier'],
+                'tshark_available': shutil.which('tshark') is not None,
+            },
             'ike_exchanges': self.ike_exchanges,
             'security_associations': self.security_associations,
             'traffic_classes': self.traffic_classes,
             'weaknesses': self.weaknesses,
             'recommendations': self.recommendations,
             'security_score': self.security_score,
+            'counts': {
+                'ike_exchanges': len(self.ike_exchanges),
+                'security_associations': len(self.security_associations),
+                'traffic_classes': len(self.traffic_classes),
+                'weaknesses': len(self.weaknesses),
+            },
+            'crypto_profiles': {
+                'weak_ciphers': self.weak_ciphers,
+                'weak_dh_groups': self.weak_dh_groups,
+                'strong_ciphers': self.strong_ciphers,
+            },
         }
         envelope = self.generate_finding_envelope('vpn_crypto_analysis', report_data, self.pcap_file)
         envelope.set_summary(f"VPN crypto analysis completed for {self.pcap_file}")

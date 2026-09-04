@@ -15,6 +15,7 @@ import time
 import threading
 import subprocess
 import socket
+import shutil
 import yaml
 from datetime import datetime
 from collections import defaultdict
@@ -517,13 +518,48 @@ class ThreatHunter3000:
         
         findings = []
         
+        serializable_suspicious_ips = {}
+        for ip, data in self.suspicious_ips.items():
+            serializable_suspicious_ips[ip] = {
+                **data,
+                'first_seen': data['first_seen'].isoformat() if data['first_seen'] else None,
+                'last_seen': data['last_seen'].isoformat() if data['last_seen'] else None,
+            }
+
         report_data = {
+            'hunt_metadata': {
+                'target': self.target or 'all_networks',
+                'interface': self.interface,
+                'started_at': self.start_time.isoformat(),
+                'completed_at': datetime.now().isoformat(),
+                'duration_seconds': round(duration, 3),
+                'tools': ['packet_sniffer', 'nmap_scanner', 'threat_intelligence', 'firewall_mapper'],
+                'nmap_available': bool(shutil.which('nmap')) if 'shutil' in globals() else False,
+            },
             'detected_threats': self.detected_threats,
-            'suspicious_ips': dict(self.suspicious_ips),
+            'suspicious_ips': serializable_suspicious_ips,
             'vulnerabilities': self.vulnerabilities,
             'mitre_mappings': self.mitre_mappings,
             'blocked_ips': self.blocked_ips,
             'packet_count': self.packet_count,
+            'counts': {
+                'detected_threats': len(self.detected_threats),
+                'suspicious_ips': len(self.suspicious_ips),
+                'vulnerabilities': len(self.vulnerabilities),
+                'blocked_ips': len(self.blocked_ips),
+                'packets': self.packet_count,
+            },
+            'risk_assessment': {
+                'score': min(risk_score, 100),
+                'level': risk_level,
+                'critical_threats': critical_count,
+                'high_threats': high_count,
+            },
+            'recommendations': [
+                'Investigate critical and high-severity threats immediately',
+                'Restrict exposed services and review firewall rules',
+                'Map confirmed activity to MITRE ATT&CK techniques',
+            ],
         }
         envelope = self.generate_finding_envelope({
             'type': 'threat_hunt_report',

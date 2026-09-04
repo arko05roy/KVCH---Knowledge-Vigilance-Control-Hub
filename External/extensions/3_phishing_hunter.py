@@ -393,10 +393,35 @@ class PhishingHunter:
         findings = []
         
         report_data = {
+            'hunt_metadata': {
+                'target': self.company,
+                'started_at': self.start_time.isoformat(),
+                'completed_at': datetime.now().isoformat(),
+                'duration_seconds': round(duration, 3),
+                'tools': ['typosquatting_generation', 'whois_intelligence', 'dns_reconnaissance', 'ip_reputation'],
+                'tlds_checked': self.tlds,
+            },
             'typosquatting_domains': self.typosquatting_domains,
             'suspicious_domains': self.suspicious_domains,
             'risk_assessments': self.risk_assessments,
             'verified_phishing': self.verified_phishing,
+            'counts': {
+                'generated_domains': len(self.typosquatting_domains),
+                'suspicious_domains': len(self.suspicious_domains),
+                'risk_assessments': len(self.risk_assessments),
+                'verified_phishing': len(self.verified_phishing),
+                'high_risk': len([d for d in self.risk_assessments if d.get('risk_level') in ['CRITICAL', 'HIGH']]),
+            },
+            'risk_model': {
+                'keywords': self.suspicious_keywords,
+                'max_domains_per_lookup': 50,
+                'max_domains_per_dns_check': 30,
+            },
+            'recommendations': [
+                'Block confirmed phishing domains at DNS and web gateways',
+                'Monitor newly registered lookalike domains',
+                'Alert users when suspicious domains impersonate the target',
+            ],
         }
         envelope = self.generate_finding_envelope(report_data, 'REPORT')
         envelope.set_summary(f"Phishing hunt completed for {self.company}")

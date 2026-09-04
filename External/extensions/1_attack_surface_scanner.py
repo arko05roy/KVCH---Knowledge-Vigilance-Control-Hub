@@ -454,12 +454,43 @@ class AttackSurfaceScanner:
         risk_level = 'CRITICAL' if risk_score > 50 else 'HIGH' if risk_score > 30 else 'MEDIUM' if risk_score > 15 else 'LOW'
         
         report_data = {
+            'scan_metadata': {
+                'target': self.domain,
+                'started_at': self.start_time.isoformat(),
+                'completed_at': datetime.now().isoformat(),
+                'duration_seconds': round(duration, 3),
+                'threads': self.threads,
+                'timeout_seconds': self.timeout,
+                'tools': ['dns_enumeration', 'tcp_connect_scan', 'tls_analysis', 'cloud_storage_detection'],
+            },
             'subdomains': self.subdomains,
             'open_ports': self.open_ports,
             'ssl_results': self.ssl_results,
             'cloud_buckets': self.cloud_buckets,
             'technologies': self.technologies,
             'vulnerabilities': self.vulnerabilities,
+            'counts': {
+                'subdomains': len(self.subdomains),
+                'open_ports': len(self.open_ports),
+                'ssl_hosts': len(self.ssl_results),
+                'exposed_buckets': len(self.cloud_buckets),
+                'vulnerabilities': len(self.vulnerabilities),
+            },
+            'risk_assessment': {
+                'score': min(risk_score, 100),
+                'level': risk_level,
+                'factors': [
+                    f'{len(self.open_ports)} open ports',
+                    f'{len(self.cloud_buckets)} exposed cloud buckets',
+                    f'{len(self.vulnerabilities)} vulnerabilities',
+                ],
+            },
+            'recommendations': [
+                'Review discovered hosts and remove unauthorized services',
+                'Restrict exposed ports to required sources',
+                'Renew certificates nearing expiration',
+                'Verify cloud storage access policies',
+            ],
         }
         envelope = self.generate_finding_envelope('attack_surface_scan', report_data, self.domain)
         envelope.set_summary(f"Attack surface scan completed for {self.domain}")

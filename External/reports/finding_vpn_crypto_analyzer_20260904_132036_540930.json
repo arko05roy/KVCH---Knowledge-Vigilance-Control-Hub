@@ -2,10 +2,23 @@
   "extension_id": "vpn_crypto_analyzer",
   "version": "1.0.0",
   "finding_type": "vpn_crypto_analysis",
-  "observed_time": "2026-09-04T13:02:14.302066",
+  "observed_time": "2026-09-04T13:20:36.540865",
   "affected_actor": "/tmp/kvch_sample.pcap",
   "affected_resource": "/tmp/kvch_sample.pcap",
   "result": {
+    "analysis_metadata": {
+      "pcap_file": "/tmp/kvch_sample.pcap",
+      "started_at": "2026-09-04T13:20:33.366297",
+      "completed_at": "2026-09-04T13:20:36.540609",
+      "duration_seconds": 3.174,
+      "tools": [
+        "pcap_parser",
+        "ike_extractor",
+        "crypto_analyzer",
+        "traffic_classifier"
+      ],
+      "tshark_available": true
+    },
     "ike_exchanges": [],
     "security_associations": [],
     "traffic_classes": [
@@ -41,7 +54,31 @@
     ],
     "weaknesses": [],
     "recommendations": [],
-    "security_score": 100
+    "security_score": 100,
+    "counts": {
+      "ike_exchanges": 0,
+      "security_associations": 0,
+      "traffic_classes": 3,
+      "weaknesses": 0
+    },
+    "crypto_profiles": {
+      "weak_ciphers": [
+        "DES",
+        "3DES",
+        "RC4",
+        "MD5"
+      ],
+      "weak_dh_groups": [
+        "1",
+        "2",
+        "5"
+      ],
+      "strong_ciphers": [
+        "AES-256-GCM",
+        "AES-128-GCM",
+        "ChaCha20-Poly1305"
+      ]
+    }
   },
   "evidence_refs": [
     "/tmp/kvch_sample.pcap"
@@ -54,6 +91,19 @@
     "pcap_file": "/tmp/kvch_sample.pcap",
     "security_score": 100,
     "details": {
+      "analysis_metadata": {
+        "pcap_file": "/tmp/kvch_sample.pcap",
+        "started_at": "2026-09-04T13:20:33.366297",
+        "completed_at": "2026-09-04T13:20:36.540609",
+        "duration_seconds": 3.174,
+        "tools": [
+          "pcap_parser",
+          "ike_extractor",
+          "crypto_analyzer",
+          "traffic_classifier"
+        ],
+        "tshark_available": true
+      },
       "ike_exchanges": [],
       "security_associations": [],
       "traffic_classes": [
@@ -89,7 +139,31 @@
       ],
       "weaknesses": [],
       "recommendations": [],
-      "security_score": 100
+      "security_score": 100,
+      "counts": {
+        "ike_exchanges": 0,
+        "security_associations": 0,
+        "traffic_classes": 3,
+        "weaknesses": 0
+      },
+      "crypto_profiles": {
+        "weak_ciphers": [
+          "DES",
+          "3DES",
+          "RC4",
+          "MD5"
+        ],
+        "weak_dh_groups": [
+          "1",
+          "2",
+          "5"
+        ],
+        "strong_ciphers": [
+          "AES-256-GCM",
+          "AES-128-GCM",
+          "ChaCha20-Poly1305"
+        ]
+      }
     },
     "recommendation": "Review VPN configuration"
   },
