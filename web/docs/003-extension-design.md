@@ -86,6 +86,11 @@ dependencies:
   runtime: []
   system: []
   configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [inspect_repository, emit_finding]
+  credentials: injected_at_runtime # never embedded | injected_at_runtime
 ```
 
 Manifest rules:
@@ -100,6 +105,8 @@ Manifest rules:
   - `service`: runs continuously and exposes a documented local interface;
   - `library`: exports code for another application to call.
 - `dependencies` lists non-obvious system tools, credentials, or configuration. Normal package dependencies belong in the language package file too.
+- `runtime_compatibility.operation_boundaries` names safe points between external operations where a future managed runtime can stop a revoked extension before it begins another operation.
+- `credentials` is always `injected_at_runtime`; extension source, fixtures, manifests, and packaged artifacts must never contain long-lived credentials.
 
 ## Composition rules
 
@@ -115,6 +122,17 @@ src/
 This is a recommended internal layout, not a constraint on simple extensions. What must remain stable is the package root, manifest, entrypoint, commands, README, and tests.
 
 Inputs and outputs are the extension's own contract. Define them in the manifest and README clearly enough that a future website, CLI, or another extension can call the package without reading implementation internals. Do not assume a future platform protocol exists yet.
+
+## Future managed-runtime compatibility
+
+The package remains independently runnable, but author it so a future KVCH Runtime Bridge can govern it safely:
+
+- Handle the language/runtime's normal graceful-stop signal and avoid starting a new declared operation after a stop request.
+- Keep external effects behind documented adapters or commands, so `operation_boundaries` are real and testable rather than labels only.
+- Read credentials only from runtime-injected configuration. Never hard-code, package, log, or copy credentials into fixtures.
+- Treat a missing, expired, or denied credential as a normal failure path; return a clear error and do not silently fall back to broader access.
+
+These rules do not require KVCH today. They ensure a later runtime can revoke an extension at its next safe operation boundary and provide only short-lived scoped credentials for that operation.
 
 ## Quality bar
 

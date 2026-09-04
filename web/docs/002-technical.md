@@ -6,6 +6,8 @@ This document defines KVCH's v1 technical architecture for governing company-spe
 
 AI-specific architecture is defined separately in [004 — AI Architecture](./004-AI.md).
 
+The future package-to-platform bridge is planned in [005 — Extension Bridge Agile Plan](./005-extension-bridge-plan.md).
+
 ## Architectural shape
 
 KVCH is a Next.js control plane. It owns company administration, authorization, extension governance, artifact approval, installation registration, finding/case workflows, audit records, role projections, the dashboard inbox, and external notifications.
