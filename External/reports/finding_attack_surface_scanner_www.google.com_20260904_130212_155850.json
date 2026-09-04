@@ -1,0 +1,45 @@
+{
+  "extension_id": "attack_surface_scanner",
+  "version": "1.0.0",
+  "finding_type": "attack_surface_scan",
+  "observed_time": "2026-09-04T13:02:12.155708",
+  "affected_actor": "www.google.com",
+  "affected_resource": "www.google.com",
+  "result": {
+    "subdomains": [],
+    "open_ports": [],
+    "ssl_results": [],
+    "cloud_buckets": [],
+    "technologies": [],
+    "vulnerabilities": []
+  },
+  "evidence_refs": [
+    "reports/attack_scan_www.google.com_20260904_130212_155720.json"
+  ],
+  "enforcement_result": "OBSERVE",
+  "safe_summary": "Attack surface scan completed for www.google.com",
+  "recipient": "security_analyst",
+  "case_id": null,
+  "technical_details": {
+    "domain": "www.google.com",
+    "affected_resource": "www.google.com",
+    "details": {
+      "subdomains": [],
+      "open_ports": [],
+      "ssl_results": [],
+      "cloud_buckets": [],
+      "technologies": [],
+      "vulnerabilities": []
+    },
+    "recommendation": "Review and secure affected resource"
+  },
+  "executive_summary": {
+    "impact": "Potential security risk to company infrastructure",
+    "recommended_action": "Review and secure affected resource",
+    "priority": "MEDIUM",
+    "affected_assets": [
+      "www.google.com",
+      "www.google.com"
+    ]
+  }
+}

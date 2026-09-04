@@ -1,0 +1,22 @@
+# Core dependencies
+scapy>=2.4.5
+pyshark>=0.6
+dnspython>=2.3.0
+requests>=2.28.0
+python-whois>=0.7.3
+netifaces>=0.11.0
+
+# Data processing
+numpy>=1.23.0
+pandas>=1.5.0
+
+# YARA for malware analysis
+yara-python>=4.2.0
+
+# Async
+aiohttp>=3.8.0
+
+# Utilities
+colorama>=0.4.6
+tqdm>=4.64.0
+python-dotenv>=0.21.0

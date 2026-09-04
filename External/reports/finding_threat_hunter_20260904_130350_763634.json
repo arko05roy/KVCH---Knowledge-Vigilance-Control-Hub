@@ -1,0 +1,56 @@
+{
+  "extension_id": "threat_hunter",
+  "version": "1.0.0",
+  "finding_type": "threat_hunt_report",
+  "observed_time": "2026-09-04T13:03:50.762370",
+  "affected_actor": "www.google.com",
+  "affected_resource": "www.google.com",
+  "result": {
+    "type": "threat_hunt_report",
+    "severity": "MEDIUM",
+    "ip": "www.google.com",
+    "report": {
+      "detected_threats": [],
+      "suspicious_ips": {},
+      "vulnerabilities": [],
+      "mitre_mappings": [],
+      "blocked_ips": [],
+      "packet_count": 0
+    }
+  },
+  "evidence_refs": [
+    "reports/threat_hunter_20260904_130350_762392.json"
+  ],
+  "enforcement_result": "OBSERVE",
+  "safe_summary": "Threat hunt completed for www.google.com",
+  "recipient": "security_analyst",
+  "case_id": null,
+  "technical_details": {
+    "threat": {
+      "type": "threat_hunt_report",
+      "severity": "MEDIUM",
+      "ip": "www.google.com",
+      "report": {
+        "detected_threats": [],
+        "suspicious_ips": {},
+        "vulnerabilities": [],
+        "mitre_mappings": [],
+        "blocked_ips": [],
+        "packet_count": 0
+      }
+    },
+    "mitre_attack": "Unknown",
+    "target": "www.google.com",
+    "interface": "en0",
+    "packet_count": 0,
+    "recommendation": "Investigate and contain threat"
+  },
+  "executive_summary": {
+    "impact": "MEDIUM severity threat detected on network",
+    "recommended_action": "Investigate and contain threat immediately",
+    "priority": "MEDIUM",
+    "affected_assets": [
+      "www.google.com"
+    ]
+  }
+}

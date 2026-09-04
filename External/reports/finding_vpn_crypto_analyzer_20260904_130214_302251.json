@@ -1,0 +1,104 @@
+{
+  "extension_id": "vpn_crypto_analyzer",
+  "version": "1.0.0",
+  "finding_type": "vpn_crypto_analysis",
+  "observed_time": "2026-09-04T13:02:14.302066",
+  "affected_actor": "/tmp/kvch_sample.pcap",
+  "affected_resource": "/tmp/kvch_sample.pcap",
+  "result": {
+    "ike_exchanges": [],
+    "security_associations": [],
+    "traffic_classes": [
+      {
+        "type": "VOIP",
+        "confidence": 0.8,
+        "ports": [
+          80,
+          443,
+          5060
+        ]
+      },
+      {
+        "type": "WEB",
+        "confidence": 0.9,
+        "ports": [
+          80,
+          443,
+          8080
+        ]
+      },
+      {
+        "type": "EMAIL",
+        "confidence": 0.85,
+        "ports": [
+          25,
+          110,
+          143,
+          993,
+          995
+        ]
+      }
+    ],
+    "weaknesses": [],
+    "recommendations": [],
+    "security_score": 100
+  },
+  "evidence_refs": [
+    "/tmp/kvch_sample.pcap"
+  ],
+  "enforcement_result": "OBSERVE",
+  "safe_summary": "VPN crypto analysis completed for /tmp/kvch_sample.pcap",
+  "recipient": "network_engineer",
+  "case_id": null,
+  "technical_details": {
+    "pcap_file": "/tmp/kvch_sample.pcap",
+    "security_score": 100,
+    "details": {
+      "ike_exchanges": [],
+      "security_associations": [],
+      "traffic_classes": [
+        {
+          "type": "VOIP",
+          "confidence": 0.8,
+          "ports": [
+            80,
+            443,
+            5060
+          ]
+        },
+        {
+          "type": "WEB",
+          "confidence": 0.9,
+          "ports": [
+            80,
+            443,
+            8080
+          ]
+        },
+        {
+          "type": "EMAIL",
+          "confidence": 0.85,
+          "ports": [
+            25,
+            110,
+            143,
+            993,
+            995
+          ]
+        }
+      ],
+      "weaknesses": [],
+      "recommendations": [],
+      "security_score": 100
+    },
+    "recommendation": "Review VPN configuration"
+  },
+  "executive_summary": {
+    "impact": "MEDIUM severity VPN security issue detected",
+    "recommended_action": "Update VPN cryptographic configuration",
+    "priority": "MEDIUM",
+    "affected_assets": [
+      "VPN Gateway"
+    ]
+  }
+}

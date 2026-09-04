@@ -1,0 +1,31 @@
+identity:
+  name: "VPN Crypto Analyzer"
+  type: "report"
+  creator: "external-threat-team"
+  edit_access: 
+    - "external-threat-team"
+    - "network-team"
+  target_scope: "IPsec VPN gateways, configurations, and traffic captures"
+
+intent:
+  what_is_normal: |
+    - IKEv2 with AES-256-GCM encryption
+    - DH group 14 (2048-bit) or higher
+    - Perfect Forward Secrecy enabled
+    - SHA-256 or stronger for integrity
+  
+  what_is_not_normal: |
+    - Weak encryption: DES, 3DES, RC4
+    - Weak DH groups: 1, 2, 5
+    - Missing PFS
+    - MD5 or SHA-1 for integrity
+
+routing:
+  escalation_route:
+    - "network_engineer"
+    - "security_analyst"
+    - "ciso"
+
+governance:
+  evaluation_threshold: "MEDIUM"
+  approved_artifact_hash: "pending-evaluation"

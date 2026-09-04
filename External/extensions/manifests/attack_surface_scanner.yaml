@@ -1,0 +1,37 @@
+identity:
+  name: "Attack Surface Scanner"
+  type: "report"
+  creator: "external-threat-team"
+  edit_access: 
+    - "external-threat-team"
+    - "security-team"
+  target_scope: "External public assets, subdomains, and cloud resources of company.com"
+
+intent:
+  what_is_normal: |
+    Standard web services running on ports 80 and 443 with valid SSL certificates.
+    Expected subdomains: www, mail, api, admin.
+    Cloud storage buckets should be private and not publicly accessible.
+  
+  what_is_not_normal: |
+    - Open ports beyond 80/443 (SSH, RDP, database ports)
+    - Exposed S3/Azure/GCP buckets with public read access
+    - SSL certificates expiring within 30 days
+    - Weak TLS configurations (TLS 1.0, weak ciphers)
+    - Unexpected subdomains that could indicate shadow IT
+    
+  overlooked_edge_cases: |
+    - CDN services (Cloudflare, Akamai) may mask origin servers
+    - Rate limiting may affect scan results
+    - Web application firewalls may block scanning attempts
+    - Some cloud buckets may have regional restrictions
+
+routing:
+  escalation_route:
+    - "security_analyst"
+    - "network_engineer"
+    - "ciso"
+
+governance:
+  evaluation_threshold: "HIGH"
+  approved_artifact_hash: "pending-evaluation"

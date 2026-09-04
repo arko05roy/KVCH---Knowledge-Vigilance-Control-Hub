@@ -1,0 +1,27 @@
+identity:
+  name: "Phishing Hunter"
+  type: "report"
+  creator: "external-threat-team"
+  edit_access: 
+    - "external-threat-team"
+    - "security-team"
+  target_scope: "Domains and subdomains related to company.com"
+
+intent:
+  what_is_normal: |
+    - Company-owned domains that are properly registered and maintained
+    - Domains that are more than 30 days old
+  
+  what_is_not_normal: |
+    - Typosquatting domains
+    - Domains registered within the last 30 days
+    - Domains containing suspicious keywords (secure, login, verify)
+
+routing:
+  escalation_route:
+    - "security_analyst"
+    - "ciso"
+
+governance:
+  evaluation_threshold: "HIGH"
+  approved_artifact_hash: "pending-evaluation"

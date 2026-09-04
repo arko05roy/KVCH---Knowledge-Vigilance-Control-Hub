@@ -1,0 +1,32 @@
+identity:
+  name: "Threat Hunter 3000"
+  type: "preventive"
+  creator: "external-threat-team"
+  edit_access: 
+    - "external-threat-team"
+    - "security-team"
+    - "network-team"
+  target_scope: "All network traffic, external IPs, and company perimeter"
+
+intent:
+  what_is_normal: |
+    - Expected network traffic patterns (HTTP/HTTPS, DNS, email)
+    - Normal packet rates (< 100 packets per second per IP)
+  
+  what_is_not_normal: |
+    - Port scanning
+    - DDoS attacks
+    - Brute force attempts
+    - Known malicious IPs
+
+routing:
+  escalation_route:
+    - "security_analyst"
+    - "network_engineer"
+    - "incident_response"
+    - "ciso"
+    - "cto"
+
+governance:
+  evaluation_threshold: "CRITICAL"
+  approved_artifact_hash: "pending-evaluation"
