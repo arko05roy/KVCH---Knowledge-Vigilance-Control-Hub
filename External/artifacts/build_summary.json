@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-09-04T16:13:19Z",
+  "artifacts": [
+    {
+      "id": "attack-surface-scanner",
+      "artifact": "attack-surface-scanner.kvch.tgz",
+      "sha256": "5a8982e76d6e5f5a45e3ded77b3a8272863572277188ddb9f908a4ba2c9cf675",
+      "size_bytes": 5658
+    }
+,
+    {
+      "id": "vpn-crypto-analyzer",
+      "artifact": "vpn-crypto-analyzer.kvch.tgz",
+      "sha256": "cffc3911c539d2ccf05e91533257bcd8e8591a2e07c1bca037650a3bfefac8df",
+      "size_bytes": 4549
+    }
+,
+    {
+      "id": "phishing-hunter",
+      "artifact": "phishing-hunter.kvch.tgz",
+      "sha256": "3aad60b27c8933472a4aa2a2dea160e225226a86330dd72af34a97fb544db55e",
+      "size_bytes": 4321
+    }
+,
+    {
+      "id": "threat-hunter-3000",
+      "artifact": "threat-hunter-3000.kvch.tgz",
+      "sha256": "754c802a35a72303a4b36d3cefbf1a9598ae51b91a3e3d4d109d1897bcf8b8bf",
+      "size_bytes": 4536
+    }
+,
+    {
+      "id": "malware-analyzer",
+      "artifact": "malware-analyzer.kvch.tgz",
+      "sha256": "3da3ca6fc2e32d4caa2da46950241f26a5129b9b78ac2af934d073de18cc55aa",
+      "size_bytes": 4775
+    }
+  ]
+}

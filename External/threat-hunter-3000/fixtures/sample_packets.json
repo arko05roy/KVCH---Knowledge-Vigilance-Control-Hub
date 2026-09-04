@@ -1,0 +1,12 @@
+{
+  "target_ip": "192.168.31.204",
+  "interface": "en0",
+  "packets_captured": 42,
+  "detected_threats": [
+    {
+      "type": "port_scan",
+      "src_ip": "192.168.31.1",
+      "mitre_tactic": "T1046 - Network Service Scanning"
+    }
+  ]
+}

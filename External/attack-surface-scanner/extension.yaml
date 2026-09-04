@@ -1,0 +1,48 @@
+schema_version: kvch.extension-package/v1
+id: attack-surface-scanner
+name: Attack Surface Scanner
+version: 1.0.0
+description: Scans your laptop's IP for open ports, SSL certificates, and exposed cloud storage.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: target_ip
+      description: IP address to scan (auto-detects laptop IP if not provided)
+      required: false
+  outputs:
+    - name: findings
+      description: JSON Finding Envelope with scan results
+
+behavior:
+  normal: Laptop has expected services running on standard ports
+  concern: Open ports beyond expected, exposed cloud storage, weak SSL
+  edge_cases:
+    - No network interface found
+    - Permission denied for port scanning
+
+deployment:
+  schedule: "0 * * * *"
+
+dependencies:
+  runtime: []
+  system: [ifconfig, nmap]
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [detect_ip, scan_ports, analyze_ssl, check_cloud]
+  credentials: injected_at_runtime

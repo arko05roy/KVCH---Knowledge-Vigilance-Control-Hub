@@ -1,0 +1,48 @@
+schema_version: kvch.extension-package/v1
+id: phishing-hunter
+name: Phishing Hunter
+version: 1.0.0
+description: Generates typosquatting permutations targeting your laptop's hostname, performs DNS recon, and WHOIS risk scoring.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: company_domain
+      description: Domain or hostname to protect (auto-detects laptop hostname if omitted)
+      required: false
+  outputs:
+    - name: findings
+      description: JSON Finding Envelope with typosquatting and domain risk analysis
+
+behavior:
+  normal: No active typosquatting or phishing domains targeting hostname
+  concern: Newly registered typosquatted domains with suspicious WHOIS data
+  edge_cases:
+    - DNS resolution timeout or rate limit
+    - WHOIS query block
+
+deployment:
+  schedule: "0 * * * *"
+
+dependencies:
+  runtime: [dnspython, python-whois, requests]
+  system: [whois]
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [generate_typosquats, check_dns, query_whois, score_risk]
+  credentials: injected_at_runtime

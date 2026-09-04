@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "attack-surface-scanner"
+version = "1.0.0"
+description = "KVCH Attack Surface Scanner Extension"
+authors = [{ name = "KVCH Team" }]
+dependencies = [
+    "dnspython>=2.0.0",
+    "requests>=2.25.0",
+    "python-whois>=0.7.3",
+    "pyyaml>=5.4.1"
+]
+requires-python = ">=3.11"
