@@ -287,9 +287,25 @@ class AttackSurfaceScanner:
                         
             except Exception as e:
                 print(f"{Colors.DIM}✗ No HTTPS or error{Colors.RESET}")
-        
+
+        # Check HTTP Security Headers on open web ports
+        try:
+            res = requests.get(f"http://{self.domain}", timeout=3)
+            headers = res.headers
+            missing_headers = []
+            for h in ['Strict-Transport-Security', 'Content-Security-Policy', 'X-Frame-Options', 'X-Content-Type-Options']:
+                if h not in headers:
+                    missing_headers.append(h)
+            if missing_headers:
+                self.vulnerabilities.append({
+                    'title': 'Missing HTTP Security Headers',
+                    'missing': missing_headers
+                })
+        except Exception:
+            pass
+
         self.ssl_results = ssl_results
-        print(f"\n{Colors.GREEN}✔ SSL analysis complete! Analyzed {Colors.WHITE}{len(ssl_results)}{Colors.GREEN} hosts{Colors.RESET}\n")
+        print(f"\n{Colors.GREEN}✔ SSL & Header analysis complete! Analyzed {Colors.WHITE}{len(ssl_results)}{Colors.GREEN} hosts{Colors.RESET}\n")
         return ssl_results
     
     # ============================================================

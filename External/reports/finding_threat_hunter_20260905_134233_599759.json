@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-05T08:03:49.631579Z",
+  "observed_at": "2026-09-05T08:12:33.598900Z",
   "severity": "low",
   "category": "threat-hunter-3000",
   "title": "Real-Time Network Threat & Vulnerability Observation",

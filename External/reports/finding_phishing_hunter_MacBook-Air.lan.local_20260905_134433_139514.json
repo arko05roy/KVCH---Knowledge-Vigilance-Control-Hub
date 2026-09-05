@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-05T08:04:00.851998Z",
+  "observed_at": "2026-09-05T08:14:33.138751Z",
   "severity": "low",
   "category": "phishing_hunter",
   "title": "Phishing Typosquatting & Impersonation Scan",
