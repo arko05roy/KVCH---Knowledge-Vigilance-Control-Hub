@@ -1,160 +1,180 @@
-import { DashboardShell } from "@/components/dashboard-shell";
+"use client";
 
-export default function PulsePage() {
+import { DashboardShell } from "@/components/dashboard-shell";
+import { AiReportDisplayCard } from "@/components/ai-report-card";
+import Link from "next/link";
+import { useState } from "react";
+
+export default function SrDevDashboardPage() {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [liveReport, setLiveReport] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleGenerateAiReport = async () => {
+    setIsGenerating(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch("/api/demo/seed-finding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "Discovered Open PostgreSQL Port 5432 & Unencrypted Socket Listener",
+          severity: "high",
+          category: "attack_surface_scan"
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to generate AI report");
+      }
+      setLiveReport(data.finding.ai_reports.srDev);
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Generation error");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <DashboardShell roleName="Sr. Dev" navItems={[]} hideHeader>
-      <div className="flex flex-col h-full w-full bg-[#111213] text-[#e8e8e8] overflow-hidden">
+      <div className="flex flex-col h-full w-full bg-[#111213] text-[#e8e8e8] overflow-y-auto">
         
-        {/* Header */}
-        <div className="flex flex-col px-8 pt-5 pb-3 border-b border-[#2b2c2e] shrink-0 bg-[#111213] z-10">
-          <div className="flex items-center justify-between mb-4">
-             <h2 className="text-[14px] font-medium text-[#e8e8e8]">Pulse</h2>
-             <div className="flex items-center gap-4 text-[#858688]">
-                <button className="hover:text-[#e8e8e8] transition-colors"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
-                <button className="hover:text-[#e8e8e8] transition-colors"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        {/* Header Banner */}
+        <div className="flex flex-col px-8 pt-6 pb-4 border-b border-[#2b2c2e] shrink-0 bg-[#111213] z-10">
+          <div className="flex items-center justify-between">
+             <div>
+               <h1 className="text-[20px] font-semibold text-[#fff] tracking-tight">Senior Developer Security Operations</h1>
+               <p className="text-[13px] text-[#858688] mt-1">KVCH Central Control Plane · Real-Time Threat & Extension Engine</p>
+             </div>
+             <div className="flex items-center gap-3">
+                <button 
+                  onClick={handleGenerateAiReport}
+                  disabled={isGenerating}
+                  className="px-3.5 py-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-[13px] font-medium text-[#fff] rounded-md transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isGenerating ? (
+                    <>
+                      <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      Generating AI Report (Groq Pool)...
+                    </>
+                  ) : (
+                    "⚡ Test Live AI Report Generation"
+                  )}
+                </button>
+                <Link href="/extensions" className="px-3.5 py-1.5 bg-[#fff] hover:bg-[#e0e0e0] text-[13px] font-medium text-[#111213] rounded-md transition-colors shadow-sm">
+                  + Upload Extension
+                </Link>
              </div>
           </div>
+        </div>
+
+        {/* Overview Stats Row */}
+        <div className="px-8 py-6 grid grid-cols-4 gap-4">
+          <div className="bg-[#1a1b1d] border border-[#2b2c2e] rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-[12px] font-medium text-[#858688]">Security Posture Score</span>
+            <div className="flex items-baseline gap-2 mt-2">
+              <span className="text-[28px] font-semibold text-[#2ea043]">94</span>
+              <span className="text-[12px] text-[#858688]">/ 100 (Optimal)</span>
+            </div>
+            <span className="text-[11px] text-[#2ea043] mt-2 flex items-center gap-1">↑ +2.4% from last week</span>
+          </div>
+
+          <div className="bg-[#1a1b1d] border border-[#2b2c2e] rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-[12px] font-medium text-[#858688]">Active Threat Extensions</span>
+            <div className="flex items-baseline gap-2 mt-2">
+              <span className="text-[28px] font-semibold text-[#fff]">5</span>
+              <span className="text-[12px] text-[#858688]">Scheduled</span>
+            </div>
+            <span className="text-[11px] text-[#858688] mt-2">Next scan in 14m</span>
+          </div>
+
+          <div className="bg-[#1a1b1d] border border-[#2b2c2e] rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-[12px] font-medium text-[#858688]">Groq Key Pool Status</span>
+            <div className="flex items-baseline gap-2 mt-2">
+              <span className="text-[28px] font-semibold text-[#2ea043]">4/4</span>
+              <span className="text-[12px] text-[#858688]">Active Keys</span>
+            </div>
+            <span className="text-[11px] text-[#2ea043] mt-2">Round-Robin Fallback Enabled</span>
+          </div>
+
+          <div className="bg-[#1a1b1d] border border-[#2b2c2e] rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-[12px] font-medium text-[#858688]">Open Incidents</span>
+            <div className="flex items-baseline gap-2 mt-2">
+              <span className="text-[28px] font-semibold text-[#ff5555]">1</span>
+              <span className="text-[12px] text-[#858688]">High Severity</span>
+            </div>
+            <span className="text-[11px] text-[#ff5555] mt-2">Port 5432 Listener</span>
+          </div>
+        </div>
+
+        {/* Live AI Generated Report Modal / Display Box */}
+        {errorMsg && (
+          <div className="mx-8 mb-6 p-4 bg-[#ff5555]/10 border border-[#ff5555]/30 rounded-xl text-[#ff5555] text-[13px]">
+            <strong>AI Generation Error:</strong> {errorMsg}
+          </div>
+        )}
+
+        {liveReport && (
+          <AiReportDisplayCard report={liveReport} roleTitle="Senior Developer" />
+        )}
+
+        {/* Main Grid Section */}
+        <div className="px-8 pb-12 grid grid-cols-3 gap-6">
           
-          <div className="flex gap-2 items-center">
-            <button className="px-3 py-1 bg-[#262729] rounded-full text-[13px] font-medium text-[#e8e8e8] border border-[#2b2c2e]">For me</button>
-            <button className="px-3 py-1 text-[#858688] hover:text-[#c4c5c7] hover:bg-[#1a1b1d] rounded-full text-[13px] transition-colors">Popular</button>
-            <button className="px-3 py-1 text-[#858688] hover:text-[#c4c5c7] hover:bg-[#1a1b1d] rounded-full text-[13px] transition-colors">Recent</button>
-            <button className="w-6 h-6 ml-2 rounded-md flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#1a1b1d] transition-colors">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-            </button>
+          {/* Recent Findings Stream */}
+          <div className="col-span-2 bg-[#1a1b1d] border border-[#2b2c2e] rounded-xl p-5 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[15px] font-semibold text-[#fff]">Live Security Finding Envelopes (`kvch.finding/v1`)</h3>
+              <span className="text-[12px] text-[#858688]">Updated 2m ago</span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-3.5 bg-[#111213] border border-[#262729] rounded-lg flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 bg-[#ff5555]/10 text-[#ff5555] text-[11px] font-medium rounded border border-[#ff5555]/20">HIGH</span>
+                    <span className="text-[13.5px] font-medium text-[#fff]">Discovered 2 open listening ports on host MacBook-Air.lan</span>
+                  </div>
+                  <p className="text-[12.5px] text-[#858688]">Extension: <code className="text-[#c4c5c7]">attack-surface-scanner</code> · Observed on 192.168.31.204</p>
+                </div>
+                <Link href="/sr-dev/incidents" className="text-[12px] text-[#858688] hover:text-[#fff] transition-colors">Details →</Link>
+              </div>
+
+              <div className="p-3.5 bg-[#111213] border border-[#262729] rounded-lg flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 bg-[#2ea043]/10 text-[#2ea043] text-[11px] font-medium rounded border border-[#2ea043]/20">INFO</span>
+                    <span className="text-[13.5px] font-medium text-[#fff]">WireGuard VPN interface audit passed cipher suite validation</span>
+                  </div>
+                  <p className="text-[12.5px] text-[#858688]">Extension: <code className="text-[#c4c5c7]">vpn-crypto-analyzer</code> · Interface utun3</p>
+                </div>
+                <span className="text-[12px] text-[#858688]">Passed</span>
+              </div>
+            </div>
           </div>
+
+          {/* Quick Actions Panel */}
+          <div className="bg-[#1a1b1d] border border-[#2b2c2e] rounded-xl p-5 flex flex-col">
+            <h3 className="text-[15px] font-semibold text-[#fff] mb-4">Quick Developer Actions</h3>
+            <div className="space-y-2.5">
+              <button 
+                onClick={handleGenerateAiReport}
+                disabled={isGenerating}
+                className="w-full p-3 bg-[#2563eb]/20 hover:bg-[#2563eb]/30 rounded-lg text-left transition-colors flex items-center justify-between text-[13px] text-[#93c5fd] border border-[#2563eb]/40"
+              >
+                <span>Trigger Groq AI Report</span>
+                <span className="text-[11px]">Key Pool Active</span>
+              </button>
+
+              <Link href="/sr-dev/approvals" className="w-full p-3 bg-[#262729] hover:bg-[#323438] rounded-lg text-left transition-colors flex items-center justify-between text-[13px] text-[#e8e8e8] border border-[#3b3c3e]">
+                <span>Review Patch Approvals</span>
+                <span className="text-[#858688]">3 pending</span>
+              </Link>
+            </div>
+          </div>
+
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-8 py-8 pb-32 flex justify-center">
-          <div className="w-full max-w-[680px] flex flex-col">
-            
-            {/* Today Separator */}
-            <div className="flex items-center gap-4 mb-8 text-[12px] font-medium text-[#858688]">
-              <span>Today</span>
-              <div className="flex-1 h-[1px] bg-[#1e1f21]"></div>
-            </div>
-
-            {/* Post 1 */}
-            <div className="group relative flex flex-col mb-12">
-               <div className="flex items-start justify-between mb-2">
-                 <h3 className="text-[16px] font-medium text-[#e8e8e8]">Core performance</h3>
-                 <button className="text-[#858688] hover:text-[#e8e8e8] opacity-0 group-hover:opacity-100 transition-opacity"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
-               </div>
-               
-               <div className="flex items-center gap-2 text-[13px] mb-4">
-                 <span className="flex items-center gap-1.5 text-[#2ea043] font-medium">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-                   Project on track
-                 </span>
-                 <div className="flex items-center gap-1.5 text-[#858688] ml-2">
-                   <div className="w-4 h-4 rounded-full bg-[#c4c5c7] flex items-center justify-center overflow-hidden"><svg viewBox="0 0 24 24" fill="none" stroke="#111213" strokeWidth="2" className="w-4 h-4"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg></div>
-                   <span className="text-[#c4c5c7]">julian</span>
-                   <span>·</span>
-                   <span>3 hours ago</span>
-                 </div>
-               </div>
-
-               <p className="text-[14.5px] leading-[1.6] text-[#a1a3a6] mb-4">
-                 Consistent progress improving launch times and overall responsiveness in the rider app. Early results are positive and we&apos;re focused on validating impact as changes roll out more broadly.
-               </p>
-
-               <div className="flex items-center gap-2 mt-1">
-                 <button className="h-7 w-7 rounded-full flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#262729] transition-colors border border-transparent hover:border-[#2b2c2e]">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                 </button>
-                 <div className="flex gap-1.5">
-                   <button className="h-7 px-2.5 rounded-full flex items-center gap-1.5 bg-[#262729] hover:bg-[#363739] transition-colors text-[12px] font-medium text-[#c4c5c7] border border-[#2b2c2e]">
-                     <span>🔥</span> <span>2</span>
-                   </button>
-                   <button className="h-7 px-2.5 rounded-full flex items-center gap-1.5 bg-[#262729] hover:bg-[#363739] transition-colors text-[12px] font-medium text-[#c4c5c7] border border-[#2b2c2e]">
-                     <span>👀</span> <span>1</span>
-                   </button>
-                 </div>
-                 <button className="h-7 w-7 rounded-full flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#262729] transition-colors ml-1 border border-transparent hover:border-[#2b2c2e]">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
-                 </button>
-               </div>
-            </div>
-
-            {/* Post 2 */}
-            <div className="group relative flex flex-col mb-12">
-               <div className="flex items-start justify-between mb-2">
-                 <h3 className="text-[16px] font-medium text-[#e8e8e8]">Vehicle state experience</h3>
-                 <button className="text-[#858688] hover:text-[#e8e8e8] opacity-0 group-hover:opacity-100 transition-opacity"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
-               </div>
-               
-               <div className="flex items-center gap-2 text-[13px] mb-4">
-                 <span className="flex items-center gap-1.5 text-[#f2c94c] font-medium">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
-                   Project at risk
-                 </span>
-                 <div className="flex items-center gap-1.5 text-[#858688] ml-2">
-                   <div className="w-4 h-4 rounded-full bg-[#c4c5c7] flex items-center justify-center overflow-hidden"><svg viewBox="0 0 24 24" fill="none" stroke="#111213" strokeWidth="2" className="w-4 h-4"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg></div>
-                   <span className="text-[#c4c5c7]">romain</span>
-                   <span>·</span>
-                   <span>12 hours ago</span>
-                 </div>
-               </div>
-
-               <div className="text-[14.5px] leading-[1.6] text-[#a1a3a6] mb-4 pl-1">
-                 <ul className="list-disc pl-4 space-y-2">
-                   <li>Delays in autonomy state updates are impacting validation and rider experience</li>
-                   <li>Additional edge cases surfaced around stale or out-of-order vehicle data</li>
-                 </ul>
-               </div>
-
-               <div className="flex items-center gap-2 mt-1">
-                 <button className="h-7 w-7 rounded-full flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#262729] transition-colors border border-transparent hover:border-[#2b2c2e]">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                 </button>
-                 <button className="h-7 w-7 rounded-full flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#262729] transition-colors ml-1 border border-transparent hover:border-[#2b2c2e]">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
-                 </button>
-               </div>
-            </div>
-
-            {/* Post 3 */}
-            <div className="group relative flex flex-col mb-12">
-               <div className="flex items-start justify-between mb-2">
-                 <h3 className="text-[16px] font-medium text-[#e8e8e8]">Tokyo Launch</h3>
-                 <button className="text-[#858688] hover:text-[#e8e8e8] opacity-0 group-hover:opacity-100 transition-opacity"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
-               </div>
-               
-               <div className="flex items-center gap-2 text-[13px] mb-4">
-                 <span className="flex items-center gap-1.5 text-[#2ea043] font-medium">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-                   Project on track
-                 </span>
-                 <div className="flex items-center gap-1.5 text-[#858688] ml-2">
-                   <div className="w-4 h-4 rounded-full bg-[#c4c5c7] flex items-center justify-center overflow-hidden"><svg viewBox="0 0 24 24" fill="none" stroke="#111213" strokeWidth="2" className="w-4 h-4"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg></div>
-                   <span className="text-[#c4c5c7]">yann</span>
-                   <span>·</span>
-                   <span>1 day ago</span>
-                 </div>
-               </div>
-
-               <p className="text-[14.5px] leading-[1.6] text-[#a1a3a6] mb-4">
-                 Japan expansion is progressing as planned with ongoing coordination with local regulators.
-               </p>
-
-               <div className="flex items-center gap-2 mt-1">
-                 <button className="h-7 w-7 rounded-full flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#262729] transition-colors border border-transparent hover:border-[#2b2c2e]">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                 </button>
-                 <div className="flex gap-1.5">
-                   <button className="h-7 px-2.5 rounded-full flex items-center gap-1.5 bg-[#262729] hover:bg-[#363739] transition-colors text-[12px] font-medium text-[#c4c5c7] border border-[#2b2c2e]">
-                     <span>🙌</span> <span>6</span>
-                   </button>
-                 </div>
-                 <button className="h-7 w-7 rounded-full flex items-center justify-center text-[#858688] hover:text-[#e8e8e8] hover:bg-[#262729] transition-colors ml-1 border border-transparent hover:border-[#2b2c2e]">
-                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
-                 </button>
-               </div>
-            </div>
-
-          </div>
-        </div>
       </div>
     </DashboardShell>
   );

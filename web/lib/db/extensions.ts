@@ -129,13 +129,37 @@ export class ExtensionRepository implements ArtifactPersistence, EvaluationPersi
     stderr: string | null;
     findings: FindingEnvelope[];
   }) {
+    // Generate AI Reports for all findings concurrently using Groq Key Pool
+    let enrichedFindings = input.findings;
+    if (input.status === "finding" && input.findings.length > 0) {
+      try {
+        const { generateAllRoleReports } = await import("../ai/report-generator");
+        enrichedFindings = await Promise.all(
+          input.findings.map(async (finding) => {
+            try {
+              const aiPackage = await generateAllRoleReports(finding);
+              return {
+                ...finding,
+                ai_reports: aiPackage.reports
+              } as unknown as FindingEnvelope;
+            } catch (err) {
+              console.error("[ExtensionRepository] Error generating AI report:", err);
+              return finding;
+            }
+          })
+        );
+      } catch (err) {
+        console.error("[ExtensionRepository] Failed to load AI report generator:", err);
+      }
+    }
+
     await this.db.$transaction(async (tx) => {
       const changed = await tx.scheduledExtensionRun.updateMany({
         where: { id: input.runId, status: { in: ["queued", "running"] } },
         data: { status: input.status, exitCode: input.exitCode, commandResults: input.commandResults, stdout: input.stdout, stderr: input.stderr, finishedAt: new Date() },
       });
       if (!changed.count || input.status !== "finding") return;
-      await tx.finding.createMany({ data: input.findings.map((finding) => ({
+      await tx.finding.createMany({ data: enrichedFindings.map((finding) => ({
         runId: input.runId, artifactId: input.artifactId, envelope: finding as unknown as Prisma.InputJsonObject,
         severity: finding.severity, category: finding.category, title: finding.title, observedAt: new Date(finding.observed_at),
       })) });

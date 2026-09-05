@@ -1,8 +1,8 @@
 # Ayush
-- **Role-based UI Control Plane**: Next.js App Router interface with dedicated dashboards (`/intern`, `/sr-dev`, `/hr`, `/management`), inbox, marketplace, and initiatives views.
-- **AI Custom Extension Generator**: Added `/sr-dev/custom-extensions` interactive AI prompt interface to generate candidate security extensions, Python analyzers, and YAML manifests.
-- **Real-time Clock Header**: Live dynamic timezone clock integration on landing page header.
-- **Codebase Clean-up & Optimization**: Purged redundant static HTML prototypes, fixed all ESLint/TypeScript errors, and verified clean production builds (`npm run build`).
+- **Cyber Risk Economics & Prompt Engine**: Built Groq LLM key pool (`groq/compound`) translating `kvch.finding/v1` telemetry into Expected Annual Loss (EAL), ROSI, and scenario analysis (No Action vs. Remediated).
+- **Asset Criticality Scaling**: Modeled dynamic financial risk scaling realistically for local developer laptops (₹0–₹10k) vs. production infrastructure (₹10L+).
+- **Regulatory Framework Mapping**: Integrated automated compliance controls mapping findings directly to ISO/IEC 27001, NIST CSF, CIS, RBI, and SEBI CSCRF.
+- **Interactive 4-Role Dashboard Control Plane**: Created `AiReportDisplayCard` and live test triggers across `/sr-dev`, `/intern`, `/hr`, and `/management` portals.
 
 
 

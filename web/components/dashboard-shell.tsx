@@ -24,7 +24,8 @@ interface RoleNavConfig {
 const ROLE_NAVS: Record<string, RoleNavConfig> = {
   "Intern": {
     top: [
-      { label: "Pulse", href: "/intern/dashboard", icon: <PulseIcon /> },
+      { label: "Dashboard", href: "/intern/dashboard", icon: <DashboardIcon /> },
+      { label: "Pulse", href: "/intern/pulse", icon: <PulseIcon /> },
       { label: "Inbox", href: "/intern/inbox", icon: <InboxIcon /> },
       { label: "My issues", href: "/intern/issues", icon: <IssuesIcon /> },
       { label: "Reviews", href: "/intern/reviews", icon: <ReviewsIcon /> },
@@ -43,7 +44,8 @@ const ROLE_NAVS: Record<string, RoleNavConfig> = {
   },
   "Sr. Dev": {
     top: [
-      { label: "Pulse", href: "/sr-dev/dashboard", icon: <PulseIcon /> },
+      { label: "Dashboard", href: "/sr-dev/dashboard", icon: <DashboardIcon /> },
+      { label: "Pulse", href: "/sr-dev/pulse", icon: <PulseIcon /> },
       { label: "Inbox", href: "/sr-dev/inbox", icon: <InboxIcon /> },
       { label: "My issues", href: "/sr-dev/issues", icon: <IssuesIcon /> },
       { label: "Reviews", href: "/sr-dev/reviews", icon: <ReviewsIcon /> },
@@ -64,7 +66,8 @@ const ROLE_NAVS: Record<string, RoleNavConfig> = {
   },
   "HR": {
     top: [
-      { label: "Pulse", href: "/hr/dashboard", icon: <PulseIcon /> },
+      { label: "Dashboard", href: "/hr/dashboard", icon: <DashboardIcon /> },
+      { label: "Pulse", href: "/hr/pulse", icon: <PulseIcon /> },
       { label: "Inbox", href: "/hr/inbox", icon: <InboxIcon /> },
     ],
     sections: [
@@ -79,7 +82,8 @@ const ROLE_NAVS: Record<string, RoleNavConfig> = {
   },
   "Management": {
     top: [
-      { label: "Pulse", href: "/management/dashboard", icon: <PulseIcon /> },
+      { label: "Dashboard", href: "/management/dashboard", icon: <DashboardIcon /> },
+      { label: "Pulse", href: "/management/pulse", icon: <PulseIcon /> },
       { label: "Inbox", href: "/management/inbox", icon: <InboxIcon /> },
     ],
     sections: [
@@ -118,7 +122,7 @@ export function DashboardShell({
                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5z" />
                </svg>
             </div>
-            <span className="font-medium text-[14px]">Linear <span className="text-[#858688] text-[12px] ml-1">▼</span></span>
+            <span className="font-medium text-[14px]">KVCH <span className="text-[#858688] text-[12px] ml-1">▼</span></span>
           </div>
           <div className="flex items-center gap-2 text-[#858688]">
             <button className="hover:text-[#e8e8e8] transition-colors">
@@ -202,6 +206,9 @@ function SidebarItem({ icon, label, href, active }: { icon: React.ReactNode; lab
 }
 
 // Icons
+function DashboardIcon() {
+  return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+}
 function PulseIcon() {
   return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>;
 }

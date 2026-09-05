@@ -62,7 +62,7 @@ export default function InboxPage() {
                     <span className="text-[11px] text-[#858688]">8m</span>
                   </div>
                 </div>
-                <div className="text-[13px] text-[#858688] truncate pr-4 ml-3">Linear finished: Fix delayed UI</div>
+                <div className="text-[13px] text-[#858688] truncate pr-4 ml-3">KVCH finished: Fix delayed UI</div>
               </div>
             </div>
 
@@ -177,7 +177,7 @@ export default function InboxPage() {
                   <div className="absolute -left-[27px] bg-[#161718] w-4 h-4 rounded-full flex items-center justify-center">
                     <svg className="w-3.5 h-3.5 text-[#858688]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg>
                   </div>
-                  <p>Linear created the issue via Slack on behalf of Nan <span className="text-[#5c5d5f] ml-1">· 2min ago</span></p>
+                  <p>KVCH created the issue via Slack on behalf of Nan <span className="text-[#5c5d5f] ml-1">· 2min ago</span></p>
                 </div>
 
                 <div className="flex items-start gap-3 text-[#a1a3a6] relative">
@@ -191,7 +191,7 @@ export default function InboxPage() {
                   <div className="absolute -left-[27px] bg-[#161718] w-4 h-4 rounded-full flex items-center justify-center">
                     <svg className="w-3.5 h-3.5 text-[#858688]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
                   </div>
-                  <p>Linear notified Karri <span className="text-[#5c5d5f] ml-1">· 1min ago</span></p>
+                  <p>KVCH notified Karri <span className="text-[#5c5d5f] ml-1">· 1min ago</span></p>
                 </div>
 
               </div>
