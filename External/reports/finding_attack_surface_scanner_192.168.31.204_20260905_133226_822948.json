@@ -1,22 +1,22 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-05T07:45:41.645354Z",
+  "observed_at": "2026-09-05T08:02:26.822628Z",
   "severity": "high",
   "category": "attack_surface_scanner",
   "title": "Attack Surface Open Ports & Exposure Finding",
-  "summary": "Scanned host 192.168.31.204. Discovered 2 open ports (445/SMB, 5432/PostgreSQL) and 0 exposed storage buckets.",
+  "summary": "Scanned host 192.168.31.204. Discovered 2 open ports (5432/PostgreSQL, 445/SMB) and 0 exposed storage buckets.",
   "resource": {
     "type": "host",
     "id": "192.168.31.204",
     "name": "MacBook-Air.lan"
   },
   "evidence": [
-    "Open ports: 445/SMB, 5432/PostgreSQL",
+    "Open ports: 5432/PostgreSQL, 445/SMB",
     "Exposed cloud buckets: 0"
   ],
   "indicators": [
-    "open_port:445",
-    "open_port:5432"
+    "open_port:5432",
+    "open_port:445"
   ],
   "baseline": {
     "max_allowed_open_ports": 0,
@@ -31,8 +31,8 @@
     "target": "192.168.31.204",
     "open_ports_count": 2,
     "open_ports": [
-      "445/SMB",
-      "5432/PostgreSQL"
+      "5432/PostgreSQL",
+      "445/SMB"
     ],
     "exposed_buckets_count": 0,
     "subdomains_count": 1,
