@@ -310,65 +310,43 @@ class PhishingHunter:
     # FINDING ENVELOPE GENERATION (NEW)
     # ============================================================
     
-    def generate_finding_envelope(self, domain_data, risk_level):
+    def generate_finding_envelope(self, finding_type, domain_data, affected_resource):
         """Generate standardized Finding Envelope for KVCH"""
         envelope = FindingEnvelope()
-        
-        # Set extension info
         envelope.set_extension_info(self.extension_id, "1.0.0")
         
-        # Determine finding type based on risk level
-        if risk_level in ['CRITICAL', 'HIGH']:
-            finding_type = 'phishing_domain_high_risk'
-        elif risk_level == 'MEDIUM':
-            finding_type = 'phishing_domain_medium_risk'
-        else:
-            finding_type = 'phishing_domain_low_risk'
+        high_risk_domains = [d.get('domain') for d in self.risk_assessments if isinstance(d, dict) and d.get('risk_level') in ['CRITICAL', 'HIGH']]
         
-        # Set finding
-        envelope.set_finding(
-            finding_type=finding_type,
-            affected_actor=get_my_ip(),
-            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
-            result=domain_data
-        )
+        severity = "high" if high_risk_domains else "low"
         
-        # Add evidence
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-        envelope.add_evidence(f"reports/phishing_hunt_{self.company}_{timestamp}.json")
+        envelope.severity = severity
+        envelope.category = self.extension_id
+        envelope.title = "Phishing Typosquatting & Impersonation Scan"
+        envelope.summary = f"Phishing hunt completed for target {self.company}. Analyzed {len(self.typosquatting_domains)} typosquatting variations. Found {len(self.suspicious_domains)} suspicious domains and {len(high_risk_domains)} high-risk impersonations."
         
-        # Set enforcement (OBSERVE for report extensions)
-        envelope.set_enforcement("OBSERVE")
+        envelope.resource = {
+            "type": "domain",
+            "id": self.company,
+            "name": get_my_hostname()
+        }
         
-        # Set safe summary
-        safe_summary = f"Suspicious domain detected: {domain_data.get('domain', 'unknown')} "
-        if domain_data.get('days_old') is not None:
-            safe_summary += f"(created {domain_data.get('days_old', 'unknown')} days ago)"
-        if domain_data.get('risk_factors'):
-            safe_summary += f" - {', '.join(domain_data.get('risk_factors', [])[:2])}"
-        envelope.set_summary(f"Analysis of YOUR LAPTOP ({get_my_ip()}) found: {finding_type}")
+        envelope.evidence = [f"Typosquat permutations tested: {len(self.typosquatting_domains)}", f"Suspicious domains: {len(self.suspicious_domains)}"]
+        envelope.indicators = [f"suspicious_domain:{d}" for d in self.suspicious_domains]
+        envelope.baseline = {"active_phishing_tolerance": 0}
         
-        # Set recipient (first in escalation route)
-        route = self.manifest.get('routing', {}).get('escalation_route', ['security_analyst'])
-        envelope.set_recipient(route[0])
+        envelope.recommended_actions = [
+            "Block identified lookalike domains at local DNS resolvers and web proxies",
+            "Monitor domain registrar WHOIS updates for brand impersonation",
+            "Initiate domain takedown requests for confirmed phishing portals"
+        ]
         
-        # Set technical details (for engineers)
-        envelope.set_technical_details({
-            'company': self.company,
-            'domain': domain_data,
-            'risk_factors': domain_data.get('risk_factors', []),
-            'risk_score': domain_data.get('risk_score', 0),
-            'recommendation': 'Block domain, monitor for phishing activity, and update threat feeds'
-        })
-        
-        # Set executive summary (for management)
-        priority = 'CRITICAL' if risk_level in ['CRITICAL', 'HIGH'] else 'MEDIUM' if risk_level == 'MEDIUM' else 'LOW'
-        envelope.set_executive_summary({
-            'impact': f'{priority} risk phishing domain detected targeting {self.company}',
-            'recommended_action': 'Block domain, alert employees, and investigate',
-            'priority': priority,
-            'affected_assets': [domain_data.get('domain', 'unknown')]
-        })
+        envelope.details = {
+            "target": self.company,
+            "typosquats_generated": len(self.typosquatting_domains),
+            "suspicious_domains_count": len(self.suspicious_domains),
+            "high_risk_domains": high_risk_domains,
+            "phishing_risk_level": "HIGH" if high_risk_domains else "LOW"
+        }
         
         return envelope
     
@@ -391,66 +369,11 @@ class PhishingHunter:
         
         duration = (datetime.now() - self.start_time).total_seconds()
         
-        findings = []
-        
-        report_data = {
-            'hunt_metadata': {
-                'target': self.company,
-                'started_at': self.start_time.isoformat(),
-                'completed_at': datetime.now().isoformat(),
-                'duration_seconds': round(duration, 3),
-                'tools': ['typosquatting_generation', 'whois_intelligence', 'dns_reconnaissance', 'ip_reputation'],
-                'tlds_checked': self.tlds,
-            },
-            'typosquatting_domains': self.typosquatting_domains,
-            'suspicious_domains': self.suspicious_domains,
-            'risk_assessments': self.risk_assessments,
-            'verified_phishing': self.verified_phishing,
-            'counts': {
-                'generated_domains': len(self.typosquatting_domains),
-                'suspicious_domains': len(self.suspicious_domains),
-                'risk_assessments': len(self.risk_assessments),
-                'verified_phishing': len(self.verified_phishing),
-                'high_risk': len([d for d in self.risk_assessments if d.get('risk_level') in ['CRITICAL', 'HIGH']]),
-            },
-            'risk_model': {
-                'keywords': self.suspicious_keywords,
-                'max_domains_per_lookup': 50,
-                'max_domains_per_dns_check': 30,
-            },
-            'recommendations': [
-                'Block confirmed phishing domains at DNS and web gateways',
-                'Monitor newly registered lookalike domains',
-                'Alert users when suspicious domains impersonate the target',
-            ],
-        }
-        envelope = self.generate_finding_envelope(report_data, 'REPORT')
-        envelope.set_summary(f"Phishing hunt completed for {self.company}")
+        envelope = self.generate_finding_envelope('phishing_hunt', {}, self.company)
         filename = self.save_finding(envelope)
         findings = [filename]
         print(f"{Colors.GREEN}✔ Report saved: {Colors.WHITE}{filename}{Colors.RESET}")
-        
-        # Display summary
-        high_risk = [d for d in self.risk_assessments if d.get('risk_level') in ['CRITICAL', 'HIGH']]
-        
-        print(f"\n{Colors.BOLD}{Colors.GREEN}  📊 PHISHING HUNT SUMMARY{Colors.RESET}")
-        print("═"*70)
-        print(f"\n{Colors.CYAN}  Target:{Colors.RESET} {self.company}")
-        print(f"{Colors.CYAN}  Duration:{Colors.RESET} {duration:.2f} seconds")
-        print(f"{Colors.CYAN}  Suspicious Domains:{Colors.RESET} {len(self.suspicious_domains)}")
-        print(f"{Colors.CYAN}  High Risk Domains:{Colors.RESET} {len(high_risk)}")
-        print(f"{Colors.CYAN}  Findings Generated:{Colors.RESET} {len(findings)}")
-        
-        if high_risk:
-            print(f"\n{Colors.RED}  ⚠ HIGH RISK DOMAINS:{Colors.RESET}")
-            for domain in high_risk[:5]:
-                print(f"    {Colors.WHITE}• {domain['domain']} {Colors.DIM}(Risk: {domain.get('risk_score', 0)}/100){Colors.RESET}")
-                for factor in domain.get('risk_factors', [])[:2]:
-                    print(f"      {Colors.DIM}→ {factor}{Colors.RESET}")
-        
-        if findings:
-            print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelopes saved to reports/ directory{Colors.RESET}")
-        
+        print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelope saved to reports/ directory{Colors.RESET}")
         return findings
     
     # ============================================================

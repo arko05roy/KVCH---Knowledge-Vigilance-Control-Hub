@@ -376,65 +376,48 @@ class AttackSurfaceScanner:
     def generate_finding_envelope(self, finding_type, details, affected_resource):
         """Generate standardized Finding Envelope for KVCH"""
         envelope = FindingEnvelope()
-        
-        # Set extension info
         envelope.set_extension_info(self.extension_id, "1.0.0")
         
-        # Set finding
-        envelope.set_finding(
-            finding_type=finding_type,
-            affected_actor=get_my_ip(),
-            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
-            result=details
-        )
+        open_ports_list = [p.get('port') for p in self.open_ports if isinstance(p, dict) and 'port' in p]
+        open_services_list = [f"{p.get('port')}/{p.get('service', 'unknown')}" for p in self.open_ports if isinstance(p, dict)]
         
-        # Add evidence
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-        envelope.add_evidence(f"reports/attack_scan_{self.domain}_{timestamp}.json")
+        severity = "high" if (open_ports_list or self.cloud_buckets) else "medium" if self.subdomains else "low"
         
-        # Set enforcement (OBSERVE for report extensions)
-        envelope.set_enforcement("OBSERVE")
+        envelope.severity = severity
+        envelope.category = self.extension_id
+        envelope.title = "Attack Surface Open Ports & Exposure Finding"
+        envelope.summary = f"Scanned host {self.domain}. Discovered {len(self.open_ports)} open ports ({', '.join(open_services_list)}) and {len(self.cloud_buckets)} exposed storage buckets."
         
-        # Set safe summary
-        safe_summaries = {
-            'open_port': f"Open {details.get('service', 'unknown')} port detected on {affected_resource}",
-            'ssl_issue': f"SSL certificate expiring on {affected_resource} ({details.get('days_left', 'unknown')} days left)",
-            'exposed_bucket': f"Exposed storage bucket found: {details.get('name', 'unknown')} on {details.get('provider', 'unknown')}",
-            'subdomain_discovered': f"New subdomain discovered: {details.get('name', 'unknown')}"
+        envelope.resource = {
+            "type": "host",
+            "id": self.domain,
+            "name": get_my_hostname()
         }
-        envelope.set_summary(f"Analysis of YOUR LAPTOP ({get_my_ip()}) found: {finding_type}")
         
-        # Set recipient (first in escalation route)
-        route = self.manifest.get('routing', {}).get('escalation_route', ['security_analyst'])
-        envelope.set_recipient(route[0])
+        envelope.evidence = [
+            f"Open ports: {', '.join(open_services_list) if open_services_list else 'None'}",
+            f"Exposed cloud buckets: {len(self.cloud_buckets)}"
+        ]
         
-        # Set technical details (for engineers)
-        envelope.set_technical_details({
-            'domain': self.domain,
-            'affected_resource': affected_resource,
-            'details': details,
-            'recommendation': self._get_recommendation(finding_type, details)
-        })
+        envelope.indicators = [f"open_port:{p}" for p in open_ports_list]
+        envelope.baseline = {"max_allowed_open_ports": 0, "exposed_buckets_allowed": 0}
         
-        # Set executive summary (for management)
-        envelope.set_executive_summary({
-            'impact': 'Potential security risk to company infrastructure',
-            'recommended_action': 'Review and secure affected resource',
-            'priority': 'HIGH' if finding_type in ['exposed_bucket', 'open_port'] else 'MEDIUM',
-            'affected_assets': [self.domain, affected_resource]
-        })
+        envelope.recommended_actions = [
+            "Restrict open ports to authorized IP ranges using firewall rules",
+            "Close unused background services running on non-standard ports",
+            "Verify cloud storage permissions to ensure no public read access"
+        ]
+        
+        envelope.details = {
+            "target": self.domain,
+            "open_ports_count": len(self.open_ports),
+            "open_ports": open_services_list,
+            "exposed_buckets_count": len(self.cloud_buckets),
+            "subdomains_count": len(self.subdomains),
+            "risk_level": "HIGH" if severity == "high" else "MEDIUM"
+        }
         
         return envelope
-    
-    def _get_recommendation(self, finding_type, details):
-        """Get recommendation for finding type"""
-        recommendations = {
-            'open_port': f"Close port {details.get('port', 'unknown')} if not needed, or restrict access",
-            'ssl_issue': f"Renew SSL certificate for {details.get('hostname', 'unknown')}",
-            'exposed_bucket': f"Make bucket {details.get('name', 'unknown')} private immediately",
-            'subdomain_discovered': f"Verify subdomain {details.get('name', 'unknown')} is intended"
-        }
-        return recommendations.get(finding_type, "Review and secure affected resource")
     
     def save_finding(self, envelope):
         """Save finding envelope to reports folder"""
@@ -455,77 +438,11 @@ class AttackSurfaceScanner:
         
         duration = (datetime.now() - self.start_time).total_seconds()
         
-        # Calculate risk score
-        risk_score = 0
-        risk_score += len(self.cloud_buckets) * 30
-        risk_score += len([s for s in self.ssl_results if s.get('expires_in_days', 365) < 30]) * 15
-        risk_score += len(self.open_ports) * 2
-        
-        risk_level = 'CRITICAL' if risk_score > 50 else 'HIGH' if risk_score > 30 else 'MEDIUM' if risk_score > 15 else 'LOW'
-        
-        report_data = {
-            'scan_metadata': {
-                'target': self.domain,
-                'started_at': self.start_time.isoformat(),
-                'completed_at': datetime.now().isoformat(),
-                'duration_seconds': round(duration, 3),
-                'threads': self.threads,
-                'timeout_seconds': self.timeout,
-                'tools': ['dns_enumeration', 'tcp_connect_scan', 'tls_analysis', 'cloud_storage_detection'],
-            },
-            'subdomains': self.subdomains,
-            'open_ports': self.open_ports,
-            'ssl_results': self.ssl_results,
-            'cloud_buckets': self.cloud_buckets,
-            'technologies': self.technologies,
-            'vulnerabilities': self.vulnerabilities,
-            'netstat_snapshot': self.netstat_snapshot,
-            'counts': {
-                'subdomains': len(self.subdomains),
-                'open_ports': len(self.open_ports),
-                'ssl_hosts': len(self.ssl_results),
-                'exposed_buckets': len(self.cloud_buckets),
-                'vulnerabilities': len(self.vulnerabilities),
-            },
-            'risk_assessment': {
-                'score': min(risk_score, 100),
-                'level': risk_level,
-                'factors': [
-                    f'{len(self.open_ports)} open ports',
-                    f'{len(self.cloud_buckets)} exposed cloud buckets',
-                    f'{len(self.vulnerabilities)} vulnerabilities',
-                ],
-            },
-            'recommendations': [
-                'Review discovered hosts and remove unauthorized services',
-                'Restrict exposed ports to required sources',
-                'Renew certificates nearing expiration',
-                'Verify cloud storage access policies',
-            ],
-        }
-        envelope = self.generate_finding_envelope('attack_surface_scan', report_data, self.domain)
-        envelope.set_summary(f"Attack surface scan completed for {self.domain}")
+        envelope = self.generate_finding_envelope('attack_surface_scan', {}, self.domain)
         filename = self.save_finding(envelope)
         findings = [filename]
         print(f"{Colors.GREEN}✔ Report saved: {Colors.WHITE}{filename}{Colors.RESET}")
-        
-        # Display summary
-        print(f"\n{Colors.BOLD}{Colors.GREEN}  📊 SCAN SUMMARY{Colors.RESET}")
-        print("═"*70)
-        print(f"\n{Colors.CYAN}  Target:{Colors.RESET} {self.domain}")
-        print(f"{Colors.CYAN}  Duration:{Colors.RESET} {duration:.2f} seconds")
-        print(f"{Colors.CYAN}  Subdomains Found:{Colors.RESET} {len(self.subdomains)}")
-        print(f"{Colors.CYAN}  Open Ports Found:{Colors.RESET} {len(self.open_ports)}")
-        print(f"{Colors.CYAN}  SSL Analyzed:{Colors.RESET} {len(self.ssl_results)}")
-        print(f"{Colors.CYAN}  Exposed Buckets:{Colors.RESET} {len(self.cloud_buckets)}")
-        print(f"{Colors.CYAN}  Findings Generated:{Colors.RESET} {len(findings)}")
-        
-        risk_color = Colors.RED if risk_level in ['CRITICAL', 'HIGH'] else Colors.YELLOW if risk_level == 'MEDIUM' else Colors.GREEN
-        print(f"\n{Colors.BOLD}  Risk Score: {risk_color}{min(risk_score, 100)}/100 ({risk_level}){Colors.RESET}")
-        
-        if findings:
-            print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelopes saved to reports/ directory{Colors.RESET}")
-        
+        print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelope saved to reports/ directory{Colors.RESET}")
         return findings
     
     # ============================================================

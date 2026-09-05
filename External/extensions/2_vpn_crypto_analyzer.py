@@ -302,8 +302,6 @@ class VPNAnalyzer:
             ]
             if not matching_packets:
                 continue
-            confidence = len(matching_packets) / total_packets if total_packets else 0
-            observed_matching_ports = sorted(set(observed_ports).intersection(candidate_ports))
             self.traffic_classes.append({
                 'type': traffic_type,
                 'confidence': round(confidence, 3),
@@ -322,53 +320,39 @@ class VPNAnalyzer:
     def generate_finding_envelope(self, finding_type, details, affected_resource):
         """Generate standardized Finding Envelope for KVCH"""
         envelope = FindingEnvelope()
-        
-        # Set extension info
         envelope.set_extension_info(self.extension_id, "1.0.0")
         
-        # Set finding
-        envelope.set_finding(
-            finding_type=finding_type,
-            affected_actor=get_my_ip(),
-            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
-            result=details
-        )
+        severity = "high" if self.weaknesses else "medium" if self.security_score < 80 else "low"
         
-        # Add evidence
-        envelope.add_evidence(self.pcap_file)
+        envelope.severity = severity
+        envelope.category = self.extension_id
+        envelope.title = "VPN Cryptographic Security Analysis"
+        envelope.summary = f"VPN crypto analysis completed for {self.pcap_file}. Security score: {self.security_score}/100. Discovered {len(self.weaknesses)} cryptographic weaknesses."
         
-        # Set enforcement (OBSERVE for report extensions)
-        envelope.set_enforcement("OBSERVE")
-        
-        # Set safe summary
-        safe_summaries = {
-            'WEAK_ENCRYPTION': f"Weak encryption {details.get('algorithm', 'unknown')} detected in VPN traffic",
-            'WEAK_DH_GROUP': f"Weak Diffie-Hellman group {details.get('group', 'unknown')} detected in VPN traffic",
-            'WEAK_PRF': f"Weak PRF {details.get('prf', 'unknown')} detected in VPN traffic",
-            'TRAFFIC_CLASS': f"Traffic classified as {details.get('type', 'unknown')} with {details.get('confidence', 0)*100:.0f}% confidence"
+        envelope.resource = {
+            "type": "pcap_traffic",
+            "id": self.pcap_file,
+            "name": get_my_hostname()
         }
-        envelope.set_summary(f"Analysis of YOUR LAPTOP ({get_my_ip()}) found: {finding_type}")
         
-        # Set recipient (first in escalation route)
-        route = self.manifest.get('routing', {}).get('escalation_route', ['network_engineer'])
-        envelope.set_recipient(route[0])
+        envelope.evidence = [f"PCAP capture: {self.pcap_file}", f"Security score: {self.security_score}/100"]
+        envelope.indicators = [w.get('type') for w in self.weaknesses if isinstance(w, dict) and 'type' in w]
+        envelope.baseline = {"minimum_security_score": 80, "weaknesses_allowed": 0}
         
-        # Set technical details (for engineers)
-        envelope.set_technical_details({
-            'pcap_file': self.pcap_file,
-            'security_score': self.security_score,
-            'details': details,
-            'recommendation': details.get('recommendation', 'Review VPN configuration')
-        })
+        envelope.recommended_actions = self.recommendations or [
+            "Enforce strong AES-GCM encryption ciphers for IPsec proposals",
+            "Disable deprecated Diffie-Hellman groups below DH Group 14",
+            "Ensure secure SHA-256 or SHA-512 PRF functions are used"
+        ]
         
-        # Set executive summary (for management)
-        severity = details.get('severity', 'MEDIUM')
-        envelope.set_executive_summary({
-            'impact': f'{severity} severity VPN security issue detected',
-            'recommended_action': 'Update VPN cryptographic configuration',
-            'priority': severity,
-            'affected_assets': ['VPN Gateway']
-        })
+        envelope.details = {
+            "pcap_file": self.pcap_file,
+            "security_score": self.security_score,
+            "risk_level": "HIGH" if self.security_score < 60 else "MEDIUM" if self.security_score < 80 else "LOW",
+            "weaknesses_count": len(self.weaknesses),
+            "weaknesses": self.weaknesses,
+            "ike_exchanges_count": len(self.ike_exchanges)
+        }
         
         return envelope
     
@@ -391,66 +375,11 @@ class VPNAnalyzer:
         
         duration = (datetime.now() - self.start_time).total_seconds()
         
-        risk_level = 'CRITICAL' if self.security_score < 40 else 'HIGH' if self.security_score < 60 else 'MEDIUM' if self.security_score < 80 else 'LOW'
-        
-        findings = []
-        
-        report_data = {
-            'analysis_metadata': {
-                'pcap_file': self.pcap_file,
-                'started_at': self.start_time.isoformat(),
-                'completed_at': datetime.now().isoformat(),
-                'duration_seconds': round(duration, 3),
-                'tools': ['pcap_parser', 'ike_extractor', 'crypto_analyzer', 'traffic_classifier'],
-                'tshark_available': shutil.which('tshark') is not None,
-            },
-            'ike_exchanges': self.ike_exchanges,
-            'traffic_observations': self.traffic_observations,
-            'tshark_statistics': self.tshark_statistics,
-            'security_associations': self.security_associations,
-            'traffic_classes': self.traffic_classes,
-            'weaknesses': self.weaknesses,
-            'recommendations': self.recommendations,
-            'security_score': self.security_score,
-            'counts': {
-                'ike_exchanges': len(self.ike_exchanges),
-                'security_associations': len(self.security_associations),
-                'traffic_classes': len(self.traffic_classes),
-                'weaknesses': len(self.weaknesses),
-            },
-            'crypto_profiles': {
-                'weak_ciphers': self.weak_ciphers,
-                'weak_dh_groups': self.weak_dh_groups,
-                'strong_ciphers': self.strong_ciphers,
-            },
-        }
-        envelope = self.generate_finding_envelope('vpn_crypto_analysis', report_data, self.pcap_file)
-        envelope.set_summary(f"VPN crypto analysis completed for {self.pcap_file}")
+        envelope = self.generate_finding_envelope('vpn_crypto_analysis', {}, self.pcap_file)
         filename = self.save_finding(envelope)
         findings = [filename]
         print(f"{Colors.GREEN}✔ Report saved: {Colors.WHITE}{filename}{Colors.RESET}")
-        
-        # Display summary
-        print(f"\n{Colors.BOLD}{Colors.GREEN}  📊 VPN ANALYSIS SUMMARY{Colors.RESET}")
-        print("═"*70)
-        print(f"\n{Colors.CYAN}  PCAP File:{Colors.RESET} {self.pcap_file}")
-        print(f"{Colors.CYAN}  Duration:{Colors.RESET} {duration:.2f} seconds")
-        print(f"{Colors.CYAN}  IKE Exchanges:{Colors.RESET} {len(self.ike_exchanges)}")
-        print(f"{Colors.CYAN}  Weaknesses Found:{Colors.RESET} {len(self.weaknesses)}")
-        print(f"{Colors.CYAN}  Findings Generated:{Colors.RESET} {len(findings)}")
-        
-        risk_color = Colors.RED if risk_level in ['CRITICAL', 'HIGH'] else Colors.YELLOW if risk_level == 'MEDIUM' else Colors.GREEN
-        print(f"\n{Colors.BOLD}  Security Score: {risk_color}{self.security_score}/100 ({risk_level}){Colors.RESET}")
-        
-        if self.weaknesses:
-            print(f"\n{Colors.RED}  ⚠ CRITICAL WEAKNESSES:{Colors.RESET}")
-            for w in self.weaknesses[:5]:
-                print(f"    {Colors.WHITE}• {w['type']}: {w.get('algorithm', w.get('group', w.get('prf', 'Unknown')))}")
-                print(f"      {Colors.DIM}→ {w['recommendation']}{Colors.RESET}")
-        
-        if findings:
-            print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelopes saved to reports/ directory{Colors.RESET}")
-        
+        print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelope saved to reports/ directory{Colors.RESET}")
         return findings
     
     # ============================================================
