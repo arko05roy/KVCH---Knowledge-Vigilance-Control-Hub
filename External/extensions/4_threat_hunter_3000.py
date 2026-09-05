@@ -464,11 +464,28 @@ class ThreatHunter3000:
         
         envelope.details = {
             "interface": self.interface,
-            "packets_processed": self.packet_count,
-            "threats_count": len(self.detected_threats),
-            "threats": self.detected_threats,
-            "vulnerabilities_count": len(self.vulnerabilities),
-            "blocked_ips_count": len(self.blocked_ips),
+            "target_hostname": get_my_hostname(),
+            "scan_timestamp": self.start_time.isoformat() + "Z",
+            "execution_metrics": {
+                "duration_seconds": round((datetime.now() - self.start_time).total_seconds(), 3),
+                "packets_processed": self.packet_count
+            },
+            "threat_detection": {
+                "threats_count": len(self.detected_threats),
+                "detected_threats": self.detected_threats,
+                "suspicious_ips_tracked": self.suspicious_ips if hasattr(self, 'suspicious_ips') else {}
+            },
+            "vulnerability_scanner": {
+                "vulnerabilities_count": len(self.vulnerabilities),
+                "vulnerabilities": self.vulnerabilities
+            },
+            "firewall_mitre_mapping": {
+                "blocked_ips_count": len(self.blocked_ips),
+                "blocked_ips": self.blocked_ips,
+                "mitre_techniques": list(set([t.get('mitre') for t in self.detected_threats if isinstance(t, dict) and 'mitre' in t]))
+            },
+            "manifest": self.manifest or {},
+            "escalation_route": get_escalation_route(severity),
             "threat_level": "HIGH" if (critical_count or high_count) else "LOW"
         }
         

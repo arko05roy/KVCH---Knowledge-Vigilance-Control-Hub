@@ -426,11 +426,43 @@ class AttackSurfaceScanner:
         
         envelope.details = {
             "target": self.domain,
-            "open_ports_count": len(self.open_ports),
-            "open_ports": open_services_list,
-            "exposed_buckets_count": len(self.cloud_buckets),
-            "subdomains_count": len(self.subdomains),
-            "risk_level": "HIGH" if severity == "high" else "MEDIUM"
+            "target_hostname": get_my_hostname(),
+            "scan_timestamp": self.start_time.isoformat() + "Z",
+            "execution_metrics": {
+                "threads": self.threads,
+                "timeout_seconds": self.timeout,
+                "duration_seconds": round((datetime.now() - self.start_time).total_seconds(), 3)
+            },
+            "subdomain_enumeration": {
+                "subdomains_count": len(self.subdomains),
+                "discovered_subdomains": self.subdomains,
+                "tested_wordlist_size": len(self.common_subdomains),
+                "tested_subdomains_sample": self.common_subdomains[:15]
+            },
+            "port_scanner": {
+                "open_ports_count": len(self.open_ports),
+                "open_ports": open_services_list,
+                "open_port_records": self.open_ports,
+                "scanned_ports_total": len(self.ports),
+                "scanned_ports_list": self.ports
+            },
+            "ssl_analysis": {
+                "analyzed_endpoints_count": len(self.ssl_results),
+                "ssl_results": self.ssl_results
+            },
+            "cloud_storage": {
+                "exposed_buckets_count": len(self.cloud_buckets),
+                "cloud_buckets": self.cloud_buckets
+            },
+            "netstat_snapshot": self.netstat_snapshot,
+            "manifest": self.manifest or {},
+            "escalation_route": get_escalation_route(severity),
+            "risk_assessment": {
+                "risk_level": "HIGH" if severity == "high" else "MEDIUM" if severity == "medium" else "LOW",
+                "severity": severity,
+                "open_ports_risk": len(open_ports_list) > 0,
+                "cloud_exposure_risk": len(self.cloud_buckets) > 0
+            }
         }
         
         return envelope

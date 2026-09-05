@@ -353,11 +353,29 @@ class VPNAnalyzer:
         
         envelope.details = {
             "pcap_file": self.pcap_file,
-            "security_score": self.security_score,
-            "risk_level": "HIGH" if self.security_score < 60 else "MEDIUM" if self.security_score < 80 else "LOW",
-            "weaknesses_count": len(self.weaknesses),
-            "weaknesses": self.weaknesses,
-            "ike_exchanges_count": len(self.ike_exchanges)
+            "target_hostname": get_my_hostname(),
+            "scan_timestamp": self.start_time.isoformat() + "Z",
+            "execution_metrics": {
+                "duration_seconds": round((datetime.now() - self.start_time).total_seconds(), 3)
+            },
+            "cryptographic_assessment": {
+                "security_score": self.security_score,
+                "risk_level": "HIGH" if self.security_score < 60 else "MEDIUM" if self.security_score < 80 else "LOW",
+                "weaknesses_count": len(self.weaknesses),
+                "weaknesses": self.weaknesses,
+                "recommendations": self.recommendations if hasattr(self, 'recommendations') else []
+            },
+            "ike_analysis": {
+                "ike_exchanges_count": len(self.ike_exchanges),
+                "ike_exchanges": self.ike_exchanges
+            },
+            "traffic_classification": {
+                "classified_flows_count": len(self.traffic_classes) if hasattr(self, 'traffic_classes') else 0,
+                "traffic_classes": self.traffic_classes if hasattr(self, 'traffic_classes') else [],
+                "traffic_observations": self.traffic_observations if hasattr(self, 'traffic_observations') else []
+            },
+            "manifest": self.manifest or {},
+            "escalation_route": get_escalation_route(severity)
         }
         
         return envelope

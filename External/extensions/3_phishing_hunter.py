@@ -180,7 +180,7 @@ class PhishingHunter:
         
         suspicious = []
         
-        for i, domain in enumerate(domains[:50]):  # Limit to 50 to avoid rate limiting
+        for i, domain in enumerate(domains[:5]):  # Limit to 5 for quick execution
             if i % 10 == 0:
                 progress = int((i / 50) * 50)
                 bar = '█' * progress + '░' * (50 - progress)
@@ -243,7 +243,7 @@ class PhishingHunter:
         
         risk_assessments = []
         
-        for domain in domains[:30]:  # Limit to 30
+        for domain in domains[:5]:  # Limit to 5 for quick execution
             try:
                 # Check if domain resolves
                 answers = dns.resolver.resolve(domain, 'A')
@@ -341,10 +341,27 @@ class PhishingHunter:
         ]
         
         envelope.details = {
-            "target": self.company,
-            "typosquats_generated": len(self.typosquatting_domains),
-            "suspicious_domains_count": len(self.suspicious_domains),
-            "high_risk_domains": high_risk_domains,
+            "target_domain": self.company,
+            "target_hostname": get_my_hostname(),
+            "scan_timestamp": self.start_time.isoformat() + "Z",
+            "execution_metrics": {
+                "duration_seconds": round((datetime.now() - self.start_time).total_seconds(), 3)
+            },
+            "typosquatting_generation": {
+                "typosquats_generated_count": len(self.typosquatting_domains),
+                "typosquatting_sample": self.typosquatting_domains[:25] if hasattr(self, 'typosquatting_domains') else []
+            },
+            "suspicious_domains_analysis": {
+                "suspicious_domains_count": len(self.suspicious_domains),
+                "suspicious_domains": self.suspicious_domains,
+                "high_risk_domains_count": len(high_risk_domains),
+                "high_risk_domains": high_risk_domains
+            },
+            "whois_intelligence": self.whois_results if hasattr(self, 'whois_results') else {},
+            "dns_reconnaissance": self.dns_results if hasattr(self, 'dns_results') else {},
+            "risk_assessments": self.risk_assessments if hasattr(self, 'risk_assessments') else [],
+            "manifest": self.manifest or {},
+            "escalation_route": get_escalation_route(severity),
             "phishing_risk_level": "HIGH" if high_risk_domains else "LOW"
         }
         
