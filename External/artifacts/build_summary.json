@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05T08:13:42Z",
+  "timestamp": "2026-09-05T08:17:44Z",
   "artifacts": [
     {
       "id": "attack-surface-scanner",
@@ -21,19 +21,3 @@
       "sha256": "dd3b1196c950888e76b037a47cc6069d5f55bf18a42d65bf799ccd2b98aff440",
       "size_bytes": 5134
     }
-,
-    {
-      "id": "threat-hunter-3000",
-      "artifact": "threat-hunter-3000.kvch.tgz",
-      "sha256": "9d89c61c8eaa66e9a54ad5346cb4834b38a823fa0c29e9c28b3c1f6b4f092293",
-      "size_bytes": 5352
-    }
-,
-    {
-      "id": "malware-analyzer",
-      "artifact": "malware-analyzer.kvch.tgz",
-      "sha256": "e9450c494d716abc760eeb183db632ee8f9ed210268e95cf1a94e9a61dc3b0e2",
-      "size_bytes": 5612
-    }
-  ]
-}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-05T08:17:30.224980Z",
+  "severity": "low",
+  "category": "vpn_crypto_analyzer",
+  "title": "VPN Cryptographic Security Analysis",
+  "summary": "VPN crypto analysis completed for /tmp/kvch_laptop_traffic.pcap. Security score: 100/100. Discovered 0 cryptographic weaknesses.",
+  "resource": {
+    "type": "pcap_traffic",
+    "id": "/tmp/kvch_laptop_traffic.pcap",
+    "name": "MacBook-Air.lan"
+  },
+  "evidence": [
+    "PCAP capture: /tmp/kvch_laptop_traffic.pcap",
+    "Security score: 100/100"
+  ],
+  "indicators": [],
+  "baseline": {
+    "minimum_security_score": 80,
+    "weaknesses_allowed": 0
+  },
+  "recommended_actions": [
+    "Enforce strong AES-GCM encryption ciphers for IPsec proposals",
+    "Disable deprecated Diffie-Hellman groups below DH Group 14",
+    "Ensure secure SHA-256 or SHA-512 PRF functions are used"
+  ],
+  "details": {
+    "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
+    "security_score": 100,
+    "risk_level": "LOW",
+    "weaknesses_count": 0,
+    "weaknesses": [],
+    "ike_exchanges_count": 0
+  }
+}

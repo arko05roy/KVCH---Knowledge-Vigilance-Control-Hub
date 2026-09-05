@@ -302,6 +302,12 @@ class VPNAnalyzer:
             ]
             if not matching_packets:
                 continue
+            observed_matching_ports = list(set([
+                p for observation in matching_packets
+                for p in (observation.get('src_port'), observation.get('dst_port'))
+                if p in candidate_ports
+            ]))
+            confidence = len(matching_packets) / total_packets if total_packets > 0 else 1.0
             self.traffic_classes.append({
                 'type': traffic_type,
                 'confidence': round(confidence, 3),
