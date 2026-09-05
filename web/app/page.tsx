@@ -481,14 +481,15 @@ export default function Home() {
     }
 
     .modal-content {
-      background: linear-gradient(145deg, rgba(24,22,20,.90), rgba(5,12,14,.95));
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,1);
-      width: 100%;
-      max-width: 500px;
+      background: linear-gradient(145deg, rgba(18, 16, 15, 0.95), rgba(8, 14, 18, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      padding: 44px 36px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      width: 92%;
+      max-width: 920px;
       text-align: center;
+      position: relative;
       transform: translateY(20px) scale(0.95);
       transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -502,37 +503,95 @@ export default function Home() {
       font-weight: 500;
       color: #fff;
       margin-top: 0;
-      margin-bottom: 24px;
-      font-size: 24px;
+      margin-bottom: 6px;
+      font-size: 28px;
       letter-spacing: -0.5px;
+    }
+
+    .modal-subtitle {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 32px;
+      font-weight: 350;
     }
 
     .roles-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
+      width: 100%;
     }
 
     .role-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 32px 16px;
       color: #fff;
       text-decoration: none;
-      font-weight: 450;
-      font-size: 15px;
-      transition: all 150ms;
+      font-weight: 500;
+      font-size: 16px;
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      gap: 14px;
+      min-height: 220px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.15), transparent 70%);
+      opacity: 0;
+      transition: opacity 250ms ease;
     }
 
     .role-card:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.2);
-      transform: translateY(-2px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .role-card:hover::before {
+      opacity: 1;
+    }
+
+    .role-card .role-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: transform 250ms ease, background 250ms ease;
+    }
+
+    .role-card:hover .role-icon {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .role-card .role-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .role-card .role-desc {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 400;
+      line-height: 1.35;
+      text-align: center;
     }
 
     .modal-close {
@@ -544,9 +603,12 @@ export default function Home() {
       color: #858688;
       cursor: pointer;
       padding: 8px;
+      border-radius: 50%;
+      transition: color 150ms, background 150ms;
     }
     .modal-close:hover {
       color: #fff;
+      background: rgba(255,255,255,0.1);
     }
 
     /* ANIMATIONS */
@@ -674,7 +736,7 @@ export default function Home() {
             KVCH brings it into one intelligent control plane, so every<br />
             employee gets a workbench and the enterprise gets armor.
           </p>
-          <button className="primary-cta">
+          <button className="primary-cta" onClick={() => setIsModalOpen(true)}>
             <span className="label">Get Started</span>
             <span className="arrow-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -702,23 +764,36 @@ export default function Home() {
       <button className="modal-close" onClick={() => setIsModalOpen(false)}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <h2>Select your role</h2>
+      <h2>Select Your Portal</h2>
+      <p className="modal-subtitle">Choose your role to access the KVCH Control Hub</p>
       <div className="roles-grid">
         <a href="/intern/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Intern
+          <div className="role-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span className="role-title">Intern</span>
+          <span className="role-desc">Triage Queue & Fix Lab Workspace</span>
         </a>
         <a href="/sr-dev/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Senior Dev
+          <div className="role-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span className="role-title">Senior Dev</span>
+          <span className="role-desc">Sandbox Evaluator & Patch Approvals</span>
         </a>
         <a href="/hr/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          HR
+          <div className="role-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span className="role-title">HR</span>
+          <span className="role-desc">Policy Compliance & Access Governance</span>
         </a>
         <a href="/management/dashboard" className="role-card">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-          Management
+          <div className="role-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <span className="role-title">Management</span>
+          <span className="role-desc">CISO Posture & Crisis Escalations</span>
         </a>
       </div>
     </div>
