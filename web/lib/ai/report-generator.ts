@@ -100,6 +100,16 @@ INPUT TELEMETRY ENVELOPE (kvch.finding/v1):
 ${JSON.stringify(finding, null, 2)}
 
 ---------------------------------------------------
+EXTENSIONS TELEMETRY CORRELATION:
+---------------------------------------------------
+Incorporate evidence, indicators, baseline, and extension-specific details for the 5 KVCH modules:
+1. attack-surface-scanner: Parse open_ports (e.g. 445/SMB, 5432/PostgreSQL), exposed_buckets_count, subdomains, SSL/TLS certificates.
+2. vpn-crypto-analyzer: Parse PCAP traffic, IKE negotiations, weak ciphers, unencrypted socket listeners.
+3. phishing-hunter: Parse typosquatting domains, WHOIS intelligence, DNS recon, ML risk scores.
+4. threat-hunter-3000: Parse packet sniffers, threat intel IOCs, MITRE ATT&CK mappings, auto-firewall rules.
+5. malware-analyzer: Parse MD5/SHA-256 hashes, YARA rule matches, PE/ELF executable headers, Shannon entropy.
+
+---------------------------------------------------
 ASSET CRITICALITY & FINANCIAL SCALING RULES (CRITICAL):
 ---------------------------------------------------
 Inspect the 'resource' object in the finding envelope:
@@ -212,7 +222,7 @@ Required JSON Structure per role:
         {
           role: "system",
           content:
-            "You are the KVCH Cyber Risk Economics & Financial Quantification Engine. You translate technical telemetry into monetary risk (EAL, ROSI), regulatory compliance (ISO 27001, NIST, CIS, RBI, SEBI), asset criticality modeling (Developer Laptop ₹0-₹10,000 vs Production Server ₹10L+), and actionable 4-role security reports. Output strictly valid raw JSON without markdown codeblocks or conversational text."
+            "You are the KVCH Cyber Risk Economics & Financial Quantification Engine. You translate technical telemetry into monetary risk (EAL, ROSI), regulatory compliance (ISO 27001, NIST, CIS, RBI, SEBI), extension correlation (attack-surface, vpn-crypto, phishing, threat-hunter, malware), asset criticality modeling (Developer Laptop ₹0-₹10,000 vs Production Server ₹10L+), and actionable 4-role security reports. Output strictly valid raw JSON without markdown codeblocks or conversational text."
         },
         { role: "user", content: userPrompt }
       ],
