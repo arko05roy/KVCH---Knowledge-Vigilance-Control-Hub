@@ -5,20 +5,38 @@ import type { ArtifactPersistence } from "../extensions/artifacts";
 import type { EvaluationPersistence } from "../extensions/evaluations";
 import type { DeploymentPersistence } from "../extensions/deployments";
 import type { RunPersistence } from "../extensions/runs";
+import type { DeploymentControlPersistence } from "../extensions/deployment-control";
 import type { FindingEnvelope } from "../judge/findings";
 
-export class ExtensionRepository implements ArtifactPersistence, EvaluationPersistence, DeploymentPersistence, RunPersistence {
+export class ExtensionRepository implements ArtifactPersistence, EvaluationPersistence, DeploymentPersistence, RunPersistence, DeploymentControlPersistence {
   constructor(private readonly db: PrismaClient) {}
 
   async findArtifact(companyId: string, artifactId: string) {
     return this.db.artifact.findFirst({
       where: { id: artifactId, companyId },
-      include: { extension: true, evaluations: { orderBy: { createdAt: "desc" } }, deployments: { orderBy: { createdAt: "desc" } } },
+      include: {
+        extension: true,
+        evaluations: { orderBy: { createdAt: "desc" } },
+        deployments: { orderBy: { createdAt: "desc" }, include: { runs: { orderBy: { dueAt: "desc" }, take: 20, include: { findings: true } } } },
+        findings: { orderBy: { observedAt: "desc" }, take: 50 },
+      },
     });
   }
 
   async findArtifactByHash(companyId: string, sha256: string) {
     return this.db.artifact.findUnique({ where: { companyId_sha256: { companyId, sha256 } } });
+  }
+
+  async listArtifacts(companyId: string) {
+    return this.db.artifact.findMany({
+      where: { companyId },
+      include: {
+        extension: true,
+        evaluations: { orderBy: { createdAt: "desc" }, take: 1 },
+        deployments: { where: { status: { in: ["active", "paused"] } }, orderBy: { createdAt: "desc" }, take: 1 },
+      },
+      orderBy: { createdAt: "desc" },
+    });
   }
 
   async getArtifactForEvaluation(artifactId: string) {
@@ -71,6 +89,12 @@ export class ExtensionRepository implements ArtifactPersistence, EvaluationPersi
       const deployment = await tx.deployment.create({ data: { artifactId: input.artifactId, schedule: input.schedule, nextRunAt: input.nextRunAt } });
       return { deployment, created: true };
     });
+  }
+
+  async setDeploymentStatus(input: { artifactId: string; deploymentId: string; status: "active" | "paused" | "failed"; nextRunAt: Date | null }) {
+    const updated = await this.db.deployment.updateMany({ where: { id: input.deploymentId, artifactId: input.artifactId }, data: { status: input.status, nextRunAt: input.nextRunAt } });
+    if (!updated.count) return null;
+    return this.db.deployment.findUnique({ where: { id: input.deploymentId }, select: { id: true, status: true, nextRunAt: true } });
   }
 
   async getDeploymentForRun(deploymentId: string) {

@@ -11,6 +11,7 @@ export interface KvchConfig {
   shellCommand: string;
   commandTimeoutMs: number;
   logLimitBytes: number;
+  maxArtifactBytes: number;
 }
 
 type Environment = Record<string, string | undefined>;
@@ -54,6 +55,7 @@ export function readKvchConfig(environment: Environment = process.env): KvchConf
     shellCommand: required(environment, "KVCH_SHELL_COMMAND"),
     commandTimeoutMs: positiveInteger(environment, "KVCH_COMMAND_TIMEOUT_MS"),
     logLimitBytes: positiveInteger(environment, "KVCH_LOG_LIMIT_BYTES"),
+    maxArtifactBytes: positiveInteger(environment, "KVCH_MAX_ARTIFACT_BYTES"),
   };
 }
 

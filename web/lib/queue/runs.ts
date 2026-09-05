@@ -20,7 +20,7 @@ export async function enqueueDeploymentRun(boss: PgBoss, input: { deploymentId: 
 export async function registerRunWorker(boss: PgBoss, config: KvchConfig): Promise<void> {
   const service = new ExtensionRunService(
     new ExtensionRepository(prisma),
-    new KvchJudge(new LocalArtifactStorage(config.artifactStorageDir), config),
+    new KvchJudge(new LocalArtifactStorage(config.artifactStorageDir, config.maxArtifactBytes), config),
   );
   await boss.work<RunDeploymentJob>(RUN_DEPLOYMENT_JOB, async ([job]) => {
     if (!job || typeof job.data?.deploymentId !== "string" || typeof job.data.dueAt !== "string") throw new Error("Invalid run-deployment job payload");

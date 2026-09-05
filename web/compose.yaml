@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: kvch
       POSTGRES_PASSWORD: kvch
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - kvch-postgres:/var/lib/postgresql/data
     healthcheck:

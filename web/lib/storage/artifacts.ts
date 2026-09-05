@@ -2,7 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
-import { Readable } from "node:stream";
+import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
 export interface StoredArtifact {
@@ -26,7 +26,9 @@ function assertKey(key: string): void {
 }
 
 export class LocalArtifactStorage implements ArtifactStorage {
-  constructor(private readonly root: string) {}
+  constructor(private readonly root: string, private readonly maxBytes = 100 * 1024 * 1024) {
+    if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) throw new Error("Artifact storage requires a positive byte limit");
+  }
 
   private destination(key: string): string {
     assertKey(key);
@@ -40,14 +42,19 @@ export class LocalArtifactStorage implements ArtifactStorage {
     const output = await fs.open(staging, "wx", 0o600);
     const hash = createHash("sha256");
     let size = 0;
+    const limit = this.maxBytes;
     const sink = output.createWriteStream();
-    source.on("data", (chunk: Buffer) => {
-      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      hash.update(bytes);
-      size += bytes.byteLength;
+    const meter = new Transform({
+      transform(chunk: Buffer, _encoding, callback) {
+        const bytes = Buffer.from(chunk);
+        size += bytes.byteLength;
+        if (size > limit) { callback(new Error(`Artifact exceeds configured ${limit} byte limit`)); return; }
+        hash.update(bytes);
+        callback(null, bytes);
+      },
     });
     try {
-      await pipeline(source, sink);
+      await pipeline(source, meter, sink);
       const sha256 = hash.digest("hex");
       const key = `artifacts/${companyId}/${sha256}.kvch.tgz`;
       const target = this.destination(key);

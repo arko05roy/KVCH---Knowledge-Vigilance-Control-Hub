@@ -14,6 +14,8 @@ Slice 4 evaluation service and worker handler are present. Each queued artifact 
 
 Slice 5 backend is present: the worker schedules durable due-deployment dispatch every minute through pg-boss, atomically advances a deployment's `nextRunAt`, enqueues a unique run by deployment and due timestamp, and persists healthy/finding/failed normal-run outcomes. Website controls and an integration run against configured Postgres remain next.
 
+Slice 6 operational UI is present at `/extensions`: authenticated server-context data provides a registry, upload action, immutable artifact detail, evaluation/deploy actions, pause/resume controls, latest evaluation evidence, deployment state, runs, and expandable finding envelopes. Development uses `KVCH_DEVELOPMENT_COMPANY_ID`; production must replace that resolver with the existing identity provider before serving requests.
+
 ## Product outcome
 
 Someone who has packaged an extension can upload its `.kvch.tgz` file to KVCH. KVCH stores those exact bytes, calculates the authoritative SHA-256 tracking ID, evaluates the package through KVCH Judge, and—if it passes—runs the same hash on the creator-declared cron schedule. A healthy run is silent. A run that detects a concern emits detailed JSONL findings that KVCH records against the artifact and run.

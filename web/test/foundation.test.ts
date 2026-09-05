@@ -18,6 +18,7 @@ test("configuration requires explicit database, storage, workspace, runtime, and
     KVCH_SHELL_COMMAND: "/bin/sh",
     KVCH_COMMAND_TIMEOUT_MS: "60000",
     KVCH_LOG_LIMIT_BYTES: "1048576",
+    KVCH_MAX_ARTIFACT_BYTES: "104857600",
   };
   assert.equal(readKvchConfig(environment).logLimitBytes, 1048576);
   assert.throws(() => readKvchConfig({ ...environment, KVCH_WORKSPACE_ROOT: environment.KVCH_ARTIFACT_STORAGE_DIR }), /must differ/);

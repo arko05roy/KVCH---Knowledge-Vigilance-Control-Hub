@@ -16,7 +16,7 @@ export async function enqueueEvaluation(boss: PgBoss, artifactId: string): Promi
 
 export async function registerEvaluationWorker(boss: PgBoss, config: KvchConfig): Promise<void> {
   const repository = new ExtensionRepository(prisma);
-  const judge = new KvchJudge(new LocalArtifactStorage(config.artifactStorageDir), config);
+  const judge = new KvchJudge(new LocalArtifactStorage(config.artifactStorageDir, config.maxArtifactBytes), config);
   const service = new EvaluationService(repository, judge);
   await boss.work<EvaluateArtifactJob>(EVALUATE_ARTIFACT_JOB, async ([job]) => {
     if (!job || typeof job.data?.artifactId !== "string") throw new Error("Invalid evaluate-artifact job payload");
