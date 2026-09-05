@@ -1,0 +1,36 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-05T08:12:33.598900Z",
+  "severity": "low",
+  "category": "threat-hunter-3000",
+  "title": "Real-Time Network Threat & Vulnerability Observation",
+  "summary": "Threat hunt on interface en0. Processed 0 packets. Observed 0 threats and 0 vulnerabilities.",
+  "resource": {
+    "type": "network_interface",
+    "id": "en0",
+    "name": "MacBook-Air.lan"
+  },
+  "evidence": [
+    "Packets analyzed: 0",
+    "Threat events: 0"
+  ],
+  "indicators": [],
+  "baseline": {
+    "threat_threshold": 0,
+    "vulnerabilities_allowed": 0
+  },
+  "recommended_actions": [
+    "Maintain active firewall protection on public network interfaces",
+    "Investigate any high-rate TCP connection bursts or port scanning behavior",
+    "Keep system network services patched against known CVE vulnerabilities"
+  ],
+  "details": {
+    "interface": "en0",
+    "packets_processed": 0,
+    "threats_count": 0,
+    "threats": [],
+    "vulnerabilities_count": 0,
+    "blocked_ips_count": 0,
+    "threat_level": "LOW"
+  }
+}

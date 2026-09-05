@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05T07:31:15Z",
+  "timestamp": "2026-09-05T08:25:42Z",
   "artifacts": [
     {
       "id": "attack-surface-scanner",
@@ -32,8 +32,8 @@
     {
       "id": "malware-analyzer",
       "artifact": "malware-analyzer.kvch.tgz",
-      "sha256": "e9450c494d716abc760eeb183db632ee8f9ed210268e95cf1a94e9a61dc3b0e2",
-      "size_bytes": 5612
+      "sha256": "c00509ca1fcff9bee3be3d45bc47108d4e3e1c9efccc5e0b173e2527d3bb0c1e",
+      "size_bytes": 5622
     }
   ]
 }

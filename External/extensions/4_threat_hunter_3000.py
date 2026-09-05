@@ -431,80 +431,48 @@ class ThreatHunter3000:
     # FINDING ENVELOPE GENERATION (NEW)
     # ============================================================
     
-    def generate_finding_envelope(self, threat, enforcement_result="OBSERVE"):
+    def generate_finding_envelope(self, threat):
         """Generate standardized Finding Envelope for KVCH"""
         envelope = FindingEnvelope()
+        envelope.set_extension_info("threat-hunter-3000", "1.0.0")
         
-        # Set extension info
-        envelope.set_extension_info(self.extension_id, "1.0.0")
+        critical_count = len([t for t in self.detected_threats if isinstance(t, dict) and t.get('severity') == 'CRITICAL'])
+        high_count = len([t for t in self.detected_threats if isinstance(t, dict) and t.get('severity') == 'HIGH'])
         
-        # Determine finding type
-        finding_type = threat.get('type', 'unknown_threat')
+        severity = "critical" if critical_count > 0 else "high" if (high_count > 0 or self.vulnerabilities) else "low"
         
-        # Set finding
-        envelope.set_finding(
-            finding_type=finding_type,
-            affected_actor=self.my_ip,
-            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
-            result=threat
-        )
+        envelope.severity = severity
+        envelope.category = "threat-hunter-3000"
+        envelope.title = "Real-Time Network Threat & Vulnerability Observation"
+        envelope.summary = f"Threat hunt on interface {self.interface}. Processed {self.packet_count} packets. Observed {len(self.detected_threats)} threats and {len(self.vulnerabilities)} vulnerabilities."
         
-        # Add evidence
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-        envelope.add_evidence(f"reports/threat_hunter_{timestamp}.json")
+        envelope.resource = {
+            "type": "network_interface",
+            "id": self.interface or "en0",
+            "name": get_my_hostname()
+        }
         
-        # Set enforcement based on severity
-        severity = threat.get('severity', 'MEDIUM')
-        if severity == 'CRITICAL':
-            enforcement_result = "BLOCK"
-        elif severity == 'HIGH':
-            enforcement_result = "HOLD"
-        else:
-            enforcement_result = "OBSERVE"
-        envelope.set_enforcement(enforcement_result)
+        envelope.evidence = [f"Packets analyzed: {self.packet_count}", f"Threat events: {len(self.detected_threats)}"]
+        envelope.indicators = [t.get('type') for t in self.detected_threats if isinstance(t, dict) and 'type' in t]
+        envelope.baseline = {"threat_threshold": 0, "vulnerabilities_allowed": 0}
         
-        # Set safe summary
-        safe_summary = f"Threat detected: {threat.get('type', 'unknown')} from {threat.get('ip', 'unknown')}"
-        if threat.get('mitre'):
-            safe_summary += f" (MITRE: {threat['mitre']})"
-        envelope.set_summary(f"Analysis of YOUR LAPTOP ({self.my_ip}) found: {finding_type}")
+        envelope.recommended_actions = [
+            "Maintain active firewall protection on public network interfaces",
+            "Investigate any high-rate TCP connection bursts or port scanning behavior",
+            "Keep system network services patched against known CVE vulnerabilities"
+        ]
         
-        # Set recipient (first in escalation route)
-        route = self.manifest.get('routing', {}).get('escalation_route', ['security_analyst'])
-        envelope.set_recipient(route[0])
-        
-        # Set technical details (for engineers)
-        envelope.set_technical_details({
-            'threat': threat,
-            'mitre_attack': threat.get('mitre', 'Unknown'),
-            'target': self.target,
-            'interface': self.interface,
-            'packet_count': self.packet_count,
-            'recommendation': self._get_recommendation(threat.get('type', 'unknown'))
-        })
-        
-        # Set executive summary (for management)
-        priority = 'CRITICAL' if severity in ['CRITICAL', 'HIGH'] else 'MEDIUM' if severity == 'MEDIUM' else 'LOW'
-        envelope.set_executive_summary({
-            'impact': f'{priority} severity threat detected on network',
-            'recommended_action': 'Investigate and contain threat immediately',
-            'priority': priority,
-            'affected_assets': [threat.get('ip', 'unknown')]
-        })
+        envelope.details = {
+            "interface": self.interface,
+            "packets_processed": self.packet_count,
+            "threats_count": len(self.detected_threats),
+            "threats": self.detected_threats,
+            "vulnerabilities_count": len(self.vulnerabilities),
+            "blocked_ips_count": len(self.blocked_ips),
+            "threat_level": "HIGH" if (critical_count or high_count) else "LOW"
+        }
         
         return envelope
-    
-    def _get_recommendation(self, threat_type):
-        """Get recommendation for threat type"""
-        recommendations = {
-            'port_scan': 'Block scanning IP and review firewall rules',
-            'brute_force': 'Block IP and enforce strong passwords, enable MFA',
-            'ddos': 'Enable DDoS protection and rate limiting on edge devices',
-            'known_malicious_ip': 'Block IP immediately and investigate for compromise',
-            'vulnerability': 'Patch affected system immediately following CVE guidance',
-            'open_port': 'Close port if not needed, or restrict access with firewall rules'
-        }
-        return recommendations.get(threat_type, 'Investigate and contain threat')
     
     def save_finding(self, envelope):
         """Save finding envelope to reports folder"""
@@ -523,93 +491,11 @@ class ThreatHunter3000:
         print(f"\n{Colors.BOLD}{Colors.CYAN}[*] GENERATING FINDING ENVELOPES{Colors.RESET}")
         print("═"*70)
         
-        duration = (datetime.now() - self.start_time).total_seconds()
-        
-        # Calculate risk score
-        critical_count = len([t for t in self.detected_threats if t.get('severity') == 'CRITICAL'])
-        high_count = len([t for t in self.detected_threats if t.get('severity') == 'HIGH'])
-        risk_score = (critical_count * 30) + (high_count * 15) + len(self.vulnerabilities) * 5
-        risk_level = 'CRITICAL' if risk_score > 50 else 'HIGH' if risk_score > 30 else 'MEDIUM' if risk_score > 15 else 'LOW'
-        
-        findings = []
-        
-        serializable_suspicious_ips = {}
-        for ip, data in self.suspicious_ips.items():
-            serializable_suspicious_ips[ip] = {
-                **data,
-                'first_seen': data['first_seen'].isoformat() if data['first_seen'] else None,
-                'last_seen': data['last_seen'].isoformat() if data['last_seen'] else None,
-            }
-
-        report_data = {
-            'hunt_metadata': {
-                'target': self.target or 'all_networks',
-                'interface': self.interface,
-                'started_at': self.start_time.isoformat(),
-                'completed_at': datetime.now().isoformat(),
-                'duration_seconds': round(duration, 3),
-                'tools': ['packet_sniffer', 'nmap_scanner', 'threat_intelligence', 'firewall_mapper'],
-                'nmap_available': bool(shutil.which('nmap')) if 'shutil' in globals() else False,
-            },
-            'detected_threats': self.detected_threats,
-            'suspicious_ips': serializable_suspicious_ips,
-            'vulnerabilities': self.vulnerabilities,
-            'mitre_mappings': self.mitre_mappings,
-            'blocked_ips': self.blocked_ips,
-            'packet_count': self.packet_count,
-            'counts': {
-                'detected_threats': len(self.detected_threats),
-                'suspicious_ips': len(self.suspicious_ips),
-                'vulnerabilities': len(self.vulnerabilities),
-                'blocked_ips': len(self.blocked_ips),
-                'packets': self.packet_count,
-            },
-            'risk_assessment': {
-                'score': min(risk_score, 100),
-                'level': risk_level,
-                'critical_threats': critical_count,
-                'high_threats': high_count,
-            },
-            'recommendations': [
-                'Investigate critical and high-severity threats immediately',
-                'Restrict exposed services and review firewall rules',
-                'Map confirmed activity to MITRE ATT&CK techniques',
-            ],
-            'netstat_snapshot': get_netstat_snapshot(),
-        }
-        envelope = self.generate_finding_envelope({
-            'type': 'threat_hunt_report',
-            'severity': 'CRITICAL' if risk_level == 'CRITICAL' else 'HIGH' if risk_level == 'HIGH' else 'MEDIUM',
-            'ip': self.target or 'network',
-            'report': report_data,
-        })
-        envelope.set_summary(f"Threat hunt completed for {self.target or 'network'}")
+        envelope = self.generate_finding_envelope({})
         filename = self.save_finding(envelope)
         findings = [filename]
         print(f"{Colors.GREEN}✔ Report saved: {Colors.WHITE}{filename}{Colors.RESET}")
-        
-        # Display summary
-        print(f"\n{Colors.BOLD}{Colors.GREEN}  📊 THREAT HUNT SUMMARY{Colors.RESET}")
-        print("═"*70)
-        print(f"\n{Colors.CYAN}  Interface:{Colors.RESET} {self.interface}")
-        print(f"{Colors.CYAN}  Duration:{Colors.RESET} {duration:.2f} seconds")
-        print(f"{Colors.CYAN}  Packets Analyzed:{Colors.RESET} {self.packet_count}")
-        print(f"{Colors.CYAN}  Suspicious IPs:{Colors.RESET} {len(self.suspicious_ips)}")
-        print(f"{Colors.CYAN}  Blocked IPs:{Colors.RESET} {len(self.blocked_ips)}")
-        print(f"{Colors.CYAN}  Total Threats:{Colors.RESET} {len(self.detected_threats)}")
-        print(f"    {Colors.RED}🔴 Critical: {critical_count}{Colors.RESET}")
-        print(f"    {Colors.YELLOW}🟡 High: {high_count}{Colors.RESET}")
-        print(f"    {Colors.BLUE}🔵 Medium: {len([t for t in self.detected_threats if t.get('severity') == 'MEDIUM'])}{Colors.RESET}")
-        print(f"    {Colors.DIM}⚪ Low: {len([t for t in self.detected_threats if t.get('severity') == 'LOW'])}{Colors.RESET}")
-        print(f"{Colors.CYAN}  Vulnerabilities:{Colors.RESET} {len(self.vulnerabilities)}")
-        print(f"{Colors.CYAN}  Findings Generated:{Colors.RESET} {len(findings)}")
-        
-        risk_color = Colors.RED if risk_level in ['CRITICAL', 'HIGH'] else Colors.YELLOW if risk_level == 'MEDIUM' else Colors.GREEN
-        print(f"\n{Colors.BOLD}  Risk Score: {risk_color}{min(risk_score, 100)}/100 ({risk_level}){Colors.RESET}")
-        
-        if findings:
-            print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelopes saved to reports/ directory{Colors.RESET}")
-        
+        print(f"\n{Colors.GREEN}✅ {len(findings)} finding envelope saved to reports/ directory{Colors.RESET}")
         return findings
     
     def stop(self, signum=None, frame=None):
