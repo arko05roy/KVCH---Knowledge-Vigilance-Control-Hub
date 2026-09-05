@@ -24,7 +24,7 @@ It deliberately defers connector implementation, model selection, extension runt
 
 - **Security Extension** — company-governed code that detects, reports, holds, or blocks a company-specific cyber-risk pattern.
 - **Extension Publisher** — a delegated senior developer or equivalent who can create and target extensions within management-approved scope.
-- **Extension Evaluation Gate** — a Judge0-like isolated evaluator that tests an extension before it can be whitelisted.
+- **Extension Evaluation Gate** — KVCH Judge's hosted preflight for an exact stored artifact, as defined in [006](./006-judge0-eval.md) and [007](./007-kvch-judge-agile-plan.md). Broader governance and distributed-runtime flows in this document are future product direction.
 - **Approved Artifact Hash** — the immutable hash of the exact evaluated and whitelisted extension artifact.
 - **Extension Tracking ID** — the SHA-256 hash of the exact evaluated artifact, used by the website, monitoring, audit trail, and cases.
 - **Finding Envelope** — the common parseable result emitted by all extensions, independent of how their code is written.

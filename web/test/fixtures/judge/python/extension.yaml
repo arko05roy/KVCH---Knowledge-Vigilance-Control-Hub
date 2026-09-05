@@ -1,0 +1,37 @@
+schema_version: kvch.extension-package/v1
+id: python-hosted-concern
+name: Python hosted concern fixture
+version: 1.0.0
+description: Offline fixture with silent preflight and two deterministic concerns.
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+commands:
+  install: python3 -c "pass"
+  build: python3 -c "pass"
+  run: python3 src/main.py
+  test: python3 src/main.py
+  package: python3 -c "pass"
+interface:
+  mode: cli
+  inputs: []
+  outputs:
+    - name: findings
+      description: Two kvch.finding/v1 JSONL concerns; silent during evaluation.
+behavior:
+  normal: Evaluation succeeds silently.
+  concern: Emits two deterministic synthetic threshold findings during normal invocation.
+  edge_cases: []
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries:
+    - emit_finding
+  credentials: injected_at_runtime
+deployment:
+  schedule: "*/5 * * * *"

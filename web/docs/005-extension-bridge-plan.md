@@ -1,5 +1,7 @@
 # 005 — Extension Bridge Agile Plan
 
+> Package slices 1–2 are complete in published @arko05roy/kvch-extension@0.1.2. All hosted slices and runtime contracts below are historical and superseded by [006](./006-judge0-eval.md) and [007](./007-kvch-judge-agile-plan.md). Continue building from 007. Hosted adapter keys are typescript/node and python/python3, with separate implementation version 1; interface mode is not part of the key. The artifact owns commands and schedule.
+
 ## Goal
 
 Build the npm package and KVCH application capabilities that turn a standalone extension package created with [003 — Extension Design](./003-extension-design.md) into an official, hash-tracked KVCH extension.

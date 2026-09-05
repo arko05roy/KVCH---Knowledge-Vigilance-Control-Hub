@@ -1,5 +1,7 @@
 # 002 — Technical Architecture
 
+> Historical architecture, superseded for hosted V1 by [006](./006-judge0-eval.md) and [007](./007-kvch-judge-agile-plan.md). The sections below retain earlier product direction, not active implementation requirements. V1 uses KVCH Judge inside the backend, Node/Python fresh-workspace execution, manifest-owned cron schedules, and pg-boss. Distributed installations, Judge0, heartbeats, and notifications below are deferred.
+
 ## Purpose
 
 This document defines KVCH's v1 technical architecture for governing company-specific Security Extensions, receiving their distributed runtime evidence, creating cases, and delivering authorized notifications. The domain lifecycle is defined in [001 — Internal Security Control Flow](./001-internal-flow.md); standalone extension-package authoring is defined in [003 — Extension Design](./003-extension-design.md).

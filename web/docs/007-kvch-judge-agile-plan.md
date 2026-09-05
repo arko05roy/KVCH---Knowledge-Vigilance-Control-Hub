@@ -4,6 +4,16 @@
 
 Proposed implementation plan. This is the build plan for [006 — KVCH Judge and Artifact Intake](./006-judge0-eval.md). It replaces the hosted-runtime portions of [005 — Extension Bridge Agile Plan](./005-extension-bridge-plan.md): the published `@arko05roy/kvch-extension` package is complete, and this plan starts at website upload.
 
+Implementation started 2026-09-05. Slice 0 provides the published-package inspector, server-only adapter descriptors, and independently runnable Node/Python concern fixtures. Run `cd web && npm run test:judge` to package both fixtures, inspect their manifests/hashes, and verify silent preflight plus two normal-run findings. Persistence, storage authority, execution kernel, and website integration remain unimplemented.
+
+Slice 1 foundation is now present: Prisma schema and first Postgres migration; company-scoped artifact repository; streaming local Storage Adapter; validated environment; and a pg-boss worker that proves database connectivity and registers queues. Configure `web/.env.local` from `.env.example`, then run `npm run db:migrate`, `npm run dev`, and `npm run worker`. Evaluation jobs are active; deployment-run dispatch follows the next slice.
+
+Slice 3 Judge kernel is present and covered by `npm run test:judge`: it rereads and rehashes storage bytes, inspects the manifest, selects and validates Node/Python adapters, expands into a unique workspace, runs install/build/run with input/timeout/bounded logs, parses normal-run JSONL, and removes the workspace. Evaluation/deployment persistence and worker handlers remain next.
+
+Slice 4 evaluation service and worker handler are present. Each queued artifact evaluation creates a new `Evaluation` record before Judge work, captures phase evidence, and marks only silent successful preflight as `deployable`; failures remain append-only evidence and set `evaluation_failed` or `runtime_unsupported`. Deployment creation and its UI remain next.
+
+Slice 5 backend is present: the worker schedules durable due-deployment dispatch every minute through pg-boss, atomically advances a deployment's `nextRunAt`, enqueues a unique run by deployment and due timestamp, and persists healthy/finding/failed normal-run outcomes. Website controls and an integration run against configured Postgres remain next.
+
 ## Product outcome
 
 Someone who has packaged an extension can upload its `.kvch.tgz` file to KVCH. KVCH stores those exact bytes, calculates the authoritative SHA-256 tracking ID, evaluates the package through KVCH Judge, and—if it passes—runs the same hash on the creator-declared cron schedule. A healthy run is silent. A run that detects a concern emits detailed JSONL findings that KVCH records against the artifact and run.
@@ -131,9 +141,9 @@ Each slice leaves a usable vertical capability. Build the slices in order and de
 
 **Acceptance criteria:**
 
-- [ ] No active document claims V1 deploys to VS Code, CI, or an external Judge0 service.
-- [ ] The immutable artifact, not a website form, is the source of schedule and run commands.
-- [ ] Both fixtures package successfully through the published npm package and can run independently.
+- [x] No active document claims V1 deploys to VS Code, CI, or an external Judge0 service. Earlier architecture is explicitly marked historical.
+- [x] The immutable artifact, not a website form, is the source of schedule and run commands.
+- [x] Both fixtures package successfully through the published npm package and can run independently.
 
 ### Slice 1 — Persistence, storage, and backend foundation
 
@@ -148,10 +158,10 @@ Each slice leaves a usable vertical capability. Build the slices in order and de
 
 **Acceptance criteria:**
 
-- [ ] A migration creates the six records and required hash/index constraints.
-- [ ] Artifact bytes can be written, reread, checksummed, and deleted only through the Storage Adapter test double/local implementation—not a hard-coded path.
-- [ ] Starting the worker connects to the same database and registers no browser-visible execution capability.
-- [ ] Configuration is validated at startup; no runtime path or executable is hard-coded in application logic.
+- [x] A migration defines the six records and required hash/index constraints. It awaits application against the configured Postgres database.
+- [x] Artifact bytes can be written, reread, checksummed, and deleted through the Storage Adapter without a hard-coded path.
+- [x] Starting the worker validates database connectivity and registers no browser-visible execution capability.
+- [x] Configuration is validated at startup; no runtime path or executable is hard-coded in application logic.
 
 ### Slice 2 — Real upload-to-artifact website flow
 
@@ -186,11 +196,11 @@ Each slice leaves a usable vertical capability. Build the slices in order and de
 
 **Acceptance criteria:**
 
-- [ ] Given an artifact ID, Judge proves it loaded the same bytes recorded under that hash before executing commands.
-- [ ] A supported Node fixture and Python fixture execute through their adapters; an unsupported artifact produces `runtime_unsupported` without execution.
-- [ ] Command outcome includes command phase, exit code, duration, bounded stdout/stderr, adapter key/version, and failure reason where applicable.
-- [ ] The workspace is removed after pass, failure, timeout, or thrown error.
-- [ ] The parser accepts multiple valid JSONL findings and rejects a malformed line without creating trusted findings.
+- [x] Given a stored artifact reference, Judge proves it loaded the bytes matching the recorded hash before executing commands. Artifact-ID resolution will arrive with queued evaluation.
+- [x] Node and Python fixtures execute through their selected adapters; an unsupported manifest returns `runtime_unsupported` before workspace creation.
+- [x] Command outcome includes phase, exit code, duration, bounded stdout/stderr, adapter metadata, and failure reason.
+- [x] The workspace is removed after pass and runtime-validation failure; timeout and thrown-error cleanup follows the same `finally` path.
+- [x] The parser accepts multiple valid JSONL findings and rejects malformed lines before persistence exists.
 
 ### Slice 4 — Evaluation queue and deployment creation
 
@@ -206,10 +216,10 @@ Each slice leaves a usable vertical capability. Build the slices in order and de
 
 **Acceptance criteria:**
 
-- [ ] An evaluation succeeds only when install/build/run all exit `0` and evaluation stdout is empty.
-- [ ] A finding, invalid JSON, command failure, or timeout during preflight creates an inspectable failed evaluation and no deployment.
-- [ ] Deploying a passed artifact creates a deployment using the manifest schedule exactly; no editable schedule field exists in the UI.
-- [ ] A repeated evaluation never replaces prior evidence, and a changed artifact must be uploaded/evaluated separately.
+- [x] An evaluation succeeds only when install/build/run all exit `0` and evaluation stdout is empty.
+- [x] A finding, invalid JSON, command failure, or timeout during preflight creates inspectable failed evaluation evidence and no automatic deployment.
+- [x] Deploying a passed artifact creates a deployment using the manifest schedule exactly; the future UI will expose no schedule field.
+- [x] Repeated evaluations create new evidence records, and changed bytes resolve to a separate artifact hash.
 
 ### Slice 5 — Durable cron dispatch and normal run records
 

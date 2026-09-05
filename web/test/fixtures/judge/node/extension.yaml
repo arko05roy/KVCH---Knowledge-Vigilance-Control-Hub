@@ -1,0 +1,37 @@
+schema_version: kvch.extension-package/v1
+id: node-hosted-concern
+name: Node hosted concern fixture
+version: 1.0.0
+description: Offline fixture with silent preflight and two deterministic concerns.
+implementation:
+  language: typescript
+  runtime: node >=22.18
+  package_manager: npm
+  entrypoint: src/main.ts
+commands:
+  install: node -e "process.exit(0)"
+  build: node -e "process.exit(0)"
+  run: node --experimental-strip-types src/main.ts
+  test: node --experimental-strip-types src/main.ts
+  package: node -e "process.exit(0)"
+interface:
+  mode: cli
+  inputs: []
+  outputs:
+    - name: findings
+      description: Two kvch.finding/v1 JSONL concerns; silent during evaluation.
+behavior:
+  normal: Evaluation succeeds silently.
+  concern: Emits two deterministic synthetic threshold findings during normal invocation.
+  edge_cases: []
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries:
+    - emit_finding
+  credentials: injected_at_runtime
+deployment:
+  schedule: "*/5 * * * *"

@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kvch
+      POSTGRES_USER: kvch
+      POSTGRES_PASSWORD: kvch
+    ports:
+      - "5432:5432"
+    volumes:
+      - kvch-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kvch -d kvch"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  kvch-postgres:

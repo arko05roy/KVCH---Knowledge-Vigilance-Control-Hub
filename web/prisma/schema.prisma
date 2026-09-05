@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ArtifactState {
+  uploaded
+  evaluating
+  deployable
+  evaluation_failed
+  runtime_unsupported
+}
+
+enum EvaluationStatus {
+  queued
+  running
+  passed
+  failed
+}
+
+enum DeploymentStatus {
+  active
+  paused
+  failed
+}
+
+enum RunStatus {
+  queued
+  running
+  healthy
+  finding
+  failed
+}
+
+model Extension {
+  id         String     @id @default(cuid())
+  companyId  String
+  manifestId String
+  name       String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  artifacts  Artifact[]
+
+  @@unique([companyId, manifestId])
+  @@index([companyId, createdAt])
+}
+
+model Artifact {
+  id          String        @id @default(cuid())
+  extensionId String
+  companyId   String
+  sha256      String
+  storageKey  String
+  size        Int
+  manifest    Json
+  adapterKey  String?
+  state       ArtifactState @default(uploaded)
+  createdAt   DateTime      @default(now())
+  extension   Extension     @relation(fields: [extensionId], references: [id], onDelete: Restrict)
+  evaluations Evaluation[]
+  deployments Deployment[]
+  runs        ScheduledExtensionRun[]
+  findings    Finding[]
+
+  @@unique([companyId, sha256])
+  @@unique([storageKey])
+  @@index([extensionId, createdAt])
+}
+
+model Evaluation {
+  id             String           @id @default(cuid())
+  artifactId     String
+  adapterKey     String?
+  adapterVersion String?
+  status         EvaluationStatus @default(queued)
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  commandResults Json?
+  stdout         String?
+  stderr         String?
+  createdAt      DateTime         @default(now())
+  artifact       Artifact         @relation(fields: [artifactId], references: [id], onDelete: Restrict)
+
+  @@index([artifactId, createdAt])
+}
+
+model Deployment {
+  id        String           @id @default(cuid())
+  artifactId String
+  schedule  String
+  status    DeploymentStatus @default(active)
+  nextRunAt DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  artifact  Artifact         @relation(fields: [artifactId], references: [id], onDelete: Restrict)
+  runs      ScheduledExtensionRun[]
+
+  @@index([artifactId, status])
+  @@index([status, nextRunAt])
+}
+
+model ScheduledExtensionRun {
+  id           String    @id @default(cuid())
+  deploymentId String
+  artifactId   String
+  dueAt        DateTime
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  status       RunStatus @default(queued)
+  exitCode     Int?
+  commandResults Json?
+  stdout       String?
+  stderr       String?
+  createdAt    DateTime  @default(now())
+  deployment   Deployment @relation(fields: [deploymentId], references: [id], onDelete: Restrict)
+  artifact     Artifact   @relation(fields: [artifactId], references: [id], onDelete: Restrict)
+  findings     Finding[]
+
+  @@unique([deploymentId, dueAt])
+  @@index([artifactId, createdAt])
+}
+
+model Finding {
+  id         String                @id @default(cuid())
+  runId      String
+  artifactId String
+  envelope   Json
+  severity   String
+  category   String
+  title      String
+  observedAt DateTime
+  createdAt  DateTime              @default(now())
+  run        ScheduledExtensionRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+  artifact   Artifact              @relation(fields: [artifactId], references: [id], onDelete: Restrict)
+
+  @@index([artifactId, observedAt])
+  @@index([runId])
+}
