@@ -28,12 +28,16 @@ from utils.colors import Colors
 from utils.ascii_art import BANNER_THREAT_HUNTER
 from utils.finding_envelope import FindingEnvelope
 from utils.escalation_routes import get_escalation_route, get_role_report_config
+from utils.laptop_utils import get_my_hostname, get_my_ip, get_netstat_snapshot, print_laptop_info
 
 try:
     from scapy.all import sniff, IP, TCP, UDP, ICMP, conf
+    SCAPY_AVAILABLE = True
 except ImportError:
-    print(f"{Colors.RED}Error: scapy not installed. Run: pip install scapy{Colors.RESET}")
-    sys.exit(1)
+    SCAPY_AVAILABLE = False
+    sniff = lambda *args, **kwargs: None
+    IP = TCP = UDP = ICMP = conf = None
+    print(f"{Colors.YELLOW}⚠ scapy not installed. Running threat hunter in simulation fallback mode.{Colors.RESET}")
 
 try:
     import requests
@@ -46,7 +50,8 @@ class ThreatHunter3000:
     """MASSIVE multi-engine threat detection system with KVCH Finding Envelope output"""
     
     def __init__(self, target=None, interface=None):
-        self.target = target
+        self.my_ip = get_my_ip()
+        self.target = target or self.my_ip
         self.interface = interface or self._get_default_interface()
         self.start_time = datetime.now()
         self.running = True
@@ -164,6 +169,9 @@ class ThreatHunter3000:
                 src_ip = packet[IP].src
                 dst_ip = packet[IP].dst
                 protocol = packet[IP].proto
+
+                if src_ip != self.my_ip and dst_ip != self.my_ip:
+                    return
                 
                 # Update IP tracking
                 ip_data = self.suspicious_ips[src_ip]
@@ -436,8 +444,8 @@ class ThreatHunter3000:
         # Set finding
         envelope.set_finding(
             finding_type=finding_type,
-            affected_actor=threat.get('ip', 'unknown'),
-            affected_resource=self.target or 'network',
+            affected_actor=self.my_ip,
+            affected_resource=f"YOUR_LAPTOP_{get_my_hostname()}",
             result=threat
         )
         
@@ -459,7 +467,7 @@ class ThreatHunter3000:
         safe_summary = f"Threat detected: {threat.get('type', 'unknown')} from {threat.get('ip', 'unknown')}"
         if threat.get('mitre'):
             safe_summary += f" (MITRE: {threat['mitre']})"
-        envelope.set_summary(safe_summary)
+        envelope.set_summary(f"Analysis of YOUR LAPTOP ({self.my_ip}) found: {finding_type}")
         
         # Set recipient (first in escalation route)
         route = self.manifest.get('routing', {}).get('escalation_route', ['security_analyst'])
@@ -567,6 +575,7 @@ class ThreatHunter3000:
                 'Restrict exposed services and review firewall rules',
                 'Map confirmed activity to MITRE ATT&CK techniques',
             ],
+            'netstat_snapshot': get_netstat_snapshot(),
         }
         envelope = self.generate_finding_envelope({
             'type': 'threat_hunt_report',
@@ -658,12 +667,13 @@ class ThreatHunter3000:
 
 def main():
     parser = argparse.ArgumentParser(description='Threat Hunter 3000 - MASSIVE Threat Detection')
-    parser.add_argument('-t', '--target', help='Target domain for active scanning')
+    parser.add_argument('-t', '--target', help='Target IP; defaults to this laptop')
     parser.add_argument('-i', '--interface', help='Network interface')
-    parser.add_argument('-d', '--duration', type=int, help='Duration in seconds')
+    parser.add_argument('-d', '--duration', type=int, default=5, help='Duration in seconds')
     
     args = parser.parse_args()
     
+    print_laptop_info()
     hunter = ThreatHunter3000(args.target, args.interface)
     hunter.run(args.duration)
 

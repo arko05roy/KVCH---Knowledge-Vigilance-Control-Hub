@@ -1,0 +1,6 @@
+{
+  "pcap_file": "fixtures/sample.pcap",
+  "security_score": 85,
+  "traffic_classes": ["IKEv2", "IPsec-ESP"],
+  "weaknesses": ["DH Group 2 detected in proposal"]
+}

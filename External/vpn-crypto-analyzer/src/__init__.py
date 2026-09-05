@@ -1,0 +1,1 @@
+"""VPN Crypto Analyzer package."""

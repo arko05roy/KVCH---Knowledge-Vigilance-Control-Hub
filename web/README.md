@@ -1,5 +1,30 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## KVCH Judge local foundation
+
+Copy `.env.example` to `.env.local` and set `DATABASE_URL` to a PostgreSQL database. The artifact and workspace paths must be absolute, distinct paths outside `public/` and source control. For a local database, `npm run db:up` starts the included PostgreSQL 16 service, which matches the example URL.
+
+```bash
+npm run db:generate
+npm run db:migrate
+npm run dev
+```
+
+In a second terminal, with the same environment:
+
+```bash
+npm run worker
+```
+
+The worker validates required configuration, creates only the configured artifact/workspace directories, verifies Postgres connectivity, and registers the future evaluation/run queues. It does not execute extension code until the Judge kernel is implemented.
+
+```bash
+npm run test:foundation
+npm run test:judge
+```
+
+The first test covers configuration and the local storage adapter. The second packages real Node/Python fixtures with the published package, confirms authoritative byte hashes and manifest selection, and exercises their preflight/JSONL contract in disposable test directories.
+
 ## Getting Started
 
 First, run the development server:

@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "threat-hunter-3000"
+version = "1.0.0"
+description = "KVCH Threat Hunter 3000 Extension"
+authors = [{ name = "KVCH Team" }]
+dependencies = [
+    "scapy>=2.4.5",
+    "requests>=2.25.0",
+    "pyyaml>=5.4.1"
+]
+requires-python = ">=3.11"

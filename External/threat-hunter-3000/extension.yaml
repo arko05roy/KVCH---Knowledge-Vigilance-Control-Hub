@@ -1,0 +1,51 @@
+schema_version: kvch.extension-package/v1
+id: threat-hunter-3000
+name: Threat Hunter 3000
+version: 1.0.0
+description: Multi-engine live packet sniffer, vulnerability analyzer, threat intelligence query, and MITRE ATT&CK mapper.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: interface
+      description: Network interface to capture (auto-detects laptop interface if omitted)
+      required: false
+    - name: duration
+      description: Capture duration in seconds
+      required: false
+  outputs:
+    - name: findings
+      description: JSON Finding Envelope with threat detection results
+
+behavior:
+  normal: Laptop network interface receives clean traffic without anomalous port scans
+  concern: Rapid port scan bursts, connections to malicious IPs, MITRE mapped tactics
+  edge_cases:
+    - Non-root permission for raw socket packet capture
+    - Interface unassigned or offline
+
+deployment:
+  schedule: "0 * * * *"
+
+dependencies:
+  runtime: [scapy, requests]
+  system: [tcpdump, nmap]
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [sniff_packets, query_intel, map_mitre, generate_firewall]
+  credentials: injected_at_runtime

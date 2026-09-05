@@ -1,0 +1,41 @@
+schema_version: kvch.extension-package/v1
+id: log-retention-checker
+name: Log retention checker
+version: 1.0.0
+description: Checks supplied log metadata against a retention policy.
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+commands:
+  install: python -m pip install -r requirements.txt
+  run: python src/main.py
+  test: python -m unittest discover -s tests
+  build: python -m compileall src
+  package: python -m build
+interface:
+  mode: cli
+  inputs:
+    - name: log_metadata
+      description: Metadata for the log being checked.
+  outputs:
+    - name: findings
+      description: Retention policy findings.
+behavior:
+  normal: Reports policy compliance for valid retention metadata.
+  concern: Reports a finding when retention is below policy.
+  edge_cases:
+    - Missing optional metadata.
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries:
+    - read_input
+    - emit_finding
+  credentials: injected_at_runtime
+deployment:
+  schedule: "*/10 * * * *"

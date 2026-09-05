@@ -1,0 +1,5 @@
+dnspython>=2.0.0
+python-whois>=0.7.3
+requests>=2.25.0
+pyyaml>=5.4.1
+pytest>=7.0.0

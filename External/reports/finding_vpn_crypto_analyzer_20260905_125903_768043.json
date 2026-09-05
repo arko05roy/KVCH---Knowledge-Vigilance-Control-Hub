@@ -1,0 +1,138 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-05T07:29:03.757945Z",
+  "severity": "medium",
+  "category": "vpn_crypto_analyzer",
+  "title": "Vpn Crypto Analysis",
+  "summary": "VPN crypto analysis completed for /tmp/kvch_laptop_traffic.pcap",
+  "resource": {
+    "type": "resource",
+    "id": "YOUR_LAPTOP_MacBook-Air.lan",
+    "name": "192.168.31.204"
+  },
+  "evidence": [
+    "/tmp/kvch_laptop_traffic.pcap"
+  ],
+  "indicators": [],
+  "baseline": {},
+  "recommended_actions": [],
+  "details": {
+    "analysis_metadata": {
+      "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
+      "started_at": "2026-09-05T12:59:00.108577",
+      "completed_at": "2026-09-05T12:59:03.747249",
+      "duration_seconds": 3.639,
+      "tools": [
+        "pcap_parser",
+        "ike_extractor",
+        "crypto_analyzer",
+        "traffic_classifier"
+      ],
+      "tshark_available": true
+    },
+    "ike_exchanges": [],
+    "traffic_observations": [],
+    "tshark_statistics": {
+      "return_code": 0,
+      "output": "\n===================================================================\nProtocol Hierarchy Statistics\nFilter: \n\n===================================================================\n",
+      "error": ""
+    },
+    "security_associations": [],
+    "traffic_classes": [],
+    "weaknesses": [],
+    "recommendations": [],
+    "security_score": 100,
+    "counts": {
+      "ike_exchanges": 0,
+      "security_associations": 0,
+      "traffic_classes": 0,
+      "weaknesses": 0
+    },
+    "crypto_profiles": {
+      "weak_ciphers": [
+        "DES",
+        "3DES",
+        "RC4",
+        "MD5"
+      ],
+      "weak_dh_groups": [
+        "1",
+        "2",
+        "5"
+      ],
+      "strong_ciphers": [
+        "AES-256-GCM",
+        "AES-128-GCM",
+        "ChaCha20-Poly1305"
+      ]
+    },
+    "extension_id": "vpn_crypto_analyzer",
+    "version": "1.0.0",
+    "enforcement_result": "OBSERVE",
+    "recipient": "network_engineer",
+    "technical_details": {
+      "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
+      "security_score": 100,
+      "details": {
+        "analysis_metadata": {
+          "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
+          "started_at": "2026-09-05T12:59:00.108577",
+          "completed_at": "2026-09-05T12:59:03.747249",
+          "duration_seconds": 3.639,
+          "tools": [
+            "pcap_parser",
+            "ike_extractor",
+            "crypto_analyzer",
+            "traffic_classifier"
+          ],
+          "tshark_available": true
+        },
+        "ike_exchanges": [],
+        "traffic_observations": [],
+        "tshark_statistics": {
+          "return_code": 0,
+          "output": "\n===================================================================\nProtocol Hierarchy Statistics\nFilter: \n\n===================================================================\n",
+          "error": ""
+        },
+        "security_associations": [],
+        "traffic_classes": [],
+        "weaknesses": [],
+        "recommendations": [],
+        "security_score": 100,
+        "counts": {
+          "ike_exchanges": 0,
+          "security_associations": 0,
+          "traffic_classes": 0,
+          "weaknesses": 0
+        },
+        "crypto_profiles": {
+          "weak_ciphers": [
+            "DES",
+            "3DES",
+            "RC4",
+            "MD5"
+          ],
+          "weak_dh_groups": [
+            "1",
+            "2",
+            "5"
+          ],
+          "strong_ciphers": [
+            "AES-256-GCM",
+            "AES-128-GCM",
+            "ChaCha20-Poly1305"
+          ]
+        }
+      },
+      "recommendation": "Review VPN configuration"
+    },
+    "executive_summary": {
+      "impact": "MEDIUM severity VPN security issue detected",
+      "recommended_action": "Update VPN cryptographic configuration",
+      "priority": "MEDIUM",
+      "affected_assets": [
+        "VPN Gateway"
+      ]
+    }
+  }
+}
