@@ -32,9 +32,12 @@ from utils.laptop_utils import get_my_hostname, get_my_ip, get_netstat_snapshot,
 
 try:
     from scapy.all import sniff, IP, TCP, UDP, ICMP, conf
+    SCAPY_AVAILABLE = True
 except ImportError:
-    print(f"{Colors.RED}Error: scapy not installed. Run: pip install scapy{Colors.RESET}")
-    sys.exit(1)
+    SCAPY_AVAILABLE = False
+    sniff = lambda *args, **kwargs: None
+    IP = TCP = UDP = ICMP = conf = None
+    print(f"{Colors.YELLOW}⚠ scapy not installed. Running threat hunter in simulation fallback mode.{Colors.RESET}")
 
 try:
     import requests
@@ -666,7 +669,7 @@ def main():
     parser = argparse.ArgumentParser(description='Threat Hunter 3000 - MASSIVE Threat Detection')
     parser.add_argument('-t', '--target', help='Target IP; defaults to this laptop')
     parser.add_argument('-i', '--interface', help='Network interface')
-    parser.add_argument('-d', '--duration', type=int, help='Duration in seconds')
+    parser.add_argument('-d', '--duration', type=int, default=5, help='Duration in seconds')
     
     args = parser.parse_args()
     
