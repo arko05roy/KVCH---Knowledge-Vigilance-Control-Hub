@@ -66,24 +66,36 @@ class TestEDRDaemon(unittest.TestCase):
         for f in test_dir.glob("finding_*.json"):
             f.unlink()
 
-    def test_file_system_watcher_detection(self):
-        """Test FileSystemWatcher file change detection."""
+    def test_file_system_watcher_rich_envelope(self):
+        """Test FileSystemWatcher constructs full kvch.finding/v1 JSON envelope."""
         received = []
 
         async def dummy_callback(envelope):
             received.append(envelope)
 
         watcher = FileSystemWatcher(callback=dummy_callback, poll_interval=0.1)
-        watcher._known_mtimes = {}
-        watcher._snapshot()
-        
-        # Create a test file in /tmp
-        test_file = Path("/tmp/kvch_test_edr_watch.txt")
-        test_file.write_text("suspicious content")
-        
+        test_file = Path("/tmp/kvch_test_edr_watch.sh")
+        test_file.write_text("echo test")
+
         try:
-            changed = watcher._detect_changes()
-            self.assertIn(test_file, changed)
+            asyncio.run(watcher._process_file_event(test_file))
+            self.assertTrue(len(received) > 0, "Expected generated finding envelope")
+            env = received[0]
+            
+            # Verify ALL required fields in kvch.finding/v1 envelope schema
+            required_keys = [
+                "schema_version", "observed_at", "severity", "category",
+                "title", "summary", "resource", "evidence", "indicators",
+                "baseline", "recommended_actions", "details"
+            ]
+            for key in required_keys:
+                self.assertIn(key, env, f"Missing required envelope field: {key}")
+                
+            self.assertEqual(env["schema_version"], "kvch.finding/v1")
+            self.assertEqual(env["category"], "malware_analyzer")
+            self.assertIn("type", env["resource"])
+            self.assertIn("id", env["resource"])
+            self.assertIn("name", env["resource"])
         finally:
             if test_file.exists():
                 test_file.unlink()
@@ -100,7 +112,6 @@ class TestEDRDaemon(unittest.TestCase):
     def test_run_extension_async(self):
         """Test async invocation of extension scanner engine."""
         async def run_test():
-            # Run extension 5 (Malware Analyzer)
             env = await run_extension_async(5)
             if env:
                 self.assertEqual(env["schema_version"], "kvch.finding/v1")

@@ -195,17 +195,30 @@ All 8 extensions format findings into the standardized `kvch.finding/v1` envelop
 
 ---
 
-## 4. 24/7 EDR Background Daemon Architecture
+## 4. 24/7 EDR Background Daemon Architecture & Event-Driven JSON Envelopes
 
 The background daemon agent (`External/edr_daemon/`) runs continuously on the system without requiring manual CLI invocation:
 
 - **Entrypoint**: `External/edr_daemon/agent.py`
+- **Monitors & Engines**: `External/edr_daemon/event_monitors.py`
 - **Control Script**: `External/scripts/kvch_edr_control.sh`
 
-### Background Event Monitors (`event_monitors.py`):
-1. **`FileSystemWatcher`**: Asynchronously monitors sensitive paths (`/tmp`, `Downloads`, `~/.ssh`, `~/.aws`, project lockfiles). On file creation or edit, automatically runs Extensions 5, 6, 7, and 8.
-2. **`ProcessAndSocketMonitor`**: Polls process table count and socket changes every 10 seconds. On process tree deltas, automatically runs Extensions 2, 3, and 4.
-3. **`NetworkSurfaceScanner`**: Runs periodic network surface scans (Extension 1) every 60 seconds.
+### Event Scenarios That Trigger Full `kvch.finding/v1` JSON Envelopes:
+
+#### 1. File System Events (`FileSystemWatcher`):
+- `/tmp` creation/edit -> Generates `malware_analyzer` envelope (`category: "malware_analyzer"`, `title: "Suspicious File Event in /tmp"`).
+- `~/Downloads` creation/edit -> Generates `malware_analyzer` envelope (`category: "malware_analyzer"`, `title: "New Binary File Downloaded"`).
+- `~/.ssh` creation/edit -> Generates `credential_exposure_auditor` envelope (`category: "credential_exposure_auditor"`, `title: "SSH Key Store Modification"`).
+- `~/.aws` creation/edit -> Generates `credential_exposure_auditor` envelope (`category: "credential_exposure_auditor"`, `title: "AWS Cloud Credentials Modification"`).
+- `package-lock.json` creation/edit -> Generates `supply_chain_auditor` envelope (`category: "supply_chain_auditor"`, `title: "Project Lockfile Modification"`).
+
+#### 2. Process & Socket Events (`ProcessAndSocketMonitor`):
+- New process executing in `/tmp` -> Generates `threat_hunter_3000` envelope (`category: "threat_hunter_3000"`, `title: "Unauthorized Execution in /tmp"`).
+- New process with crypto wallet name -> Generates `vpn_crypto_analyzer` envelope (`category: "vpn_crypto_analyzer"`, `title: "Crypto Wallet Process Launch"`).
+- New network socket delta / connection -> Generates `phishing_hunter` envelope (`category: "phishing_hunter"`, `title: "Suspicious Remote Socket Connection"`).
+
+#### 3. Network Events (`NetworkSurfaceScanner`):
+- New open TCP port or service header change -> Generates `attack_surface_scanner` envelope (`category: "attack_surface_scanner"`, `title: "Open Network Port / Service Header Exposure"`).
 
 ### Daemon Control Commands:
 ```bash
