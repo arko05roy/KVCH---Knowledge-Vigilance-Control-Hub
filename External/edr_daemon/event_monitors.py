@@ -169,6 +169,7 @@ async def run_extension_async(ext_num: int) -> Optional[Dict[str, Any]]:
         5: "5_malware_analyzer.py",
         6: "6_credential_exposure_auditor.py",
         7: "7_supply_chain_auditor.py",
+        8: "8_cookie_xss_analyzer.py",
     }
     
     filename = ext_files.get(ext_num)

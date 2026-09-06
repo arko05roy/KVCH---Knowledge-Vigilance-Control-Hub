@@ -1,0 +1,48 @@
+schema_version: kvch.extension-package/v1
+id: cookie-xss-auditor
+name: Cookie Security, XSS & Session Hijacking Auditor
+version: 1.0.0
+description: Real-time security auditor for browser cookie posture, sub-domain cookie tossing, DOM-based Cross-Site Scripting (XSS), and session token theft.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: target_path
+      description: Target directory or browser profile path to audit for cookie posture and XSS vectors (defaults to local browser profiles and web fixtures)
+      required: false
+  outputs:
+    - name: findings
+      description: Standardized kvch.finding/v1 JSON envelope with Cookie and XSS security audit findings
+
+behavior:
+  normal: Browser profiles enforce Secure, HttpOnly, and SameSite cookie attributes with no unencrypted JWT session tokens or dangerous DOM XSS sinks.
+  concern: Detection of missing HttpOnly/Secure flags, wildcard cookie domains, unencrypted JWT tokens in storage, or dangerous innerHTML/eval DOM sinks.
+  edge_cases:
+    - No browser profiles installed
+    - Obfuscated content scripts
+
+deployment:
+  schedule: "0 * * * *"
+
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [audit_cookie_flags, audit_cookie_tossing, audit_dom_xss_sinks, audit_session_theft]
+  credentials: injected_at_runtime

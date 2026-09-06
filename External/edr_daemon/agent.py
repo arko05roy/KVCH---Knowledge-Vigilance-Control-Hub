@@ -56,11 +56,11 @@ class KVCHAgent:
         await self.ws_client.send_finding(envelope)
 
     async def run_initial_baseline_scan(self):
-        """Runs baseline audit across all 7 extensions upon daemon startup."""
-        logger.info("Executing initial baseline EDR scan across all 7 extension engines...")
-        for ext_num in range(1, 8):
+        """Runs baseline audit across all 8 extensions upon daemon startup."""
+        logger.info("Executing initial baseline EDR scan across all 8 extension engines...")
+        for ext_num in range(1, 9):
             try:
-                logger.info(f"Running baseline extension {ext_num}/7...")
+                logger.info(f"Running baseline extension {ext_num}/8...")
                 env = await run_extension_async(ext_num)
                 if env:
                     await self.handle_finding(env)

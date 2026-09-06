@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-06T08:55:00Z",
+  "timestamp": "2026-09-06T09:29:55Z",
   "artifacts": [
     {
       "id": "attack-surface-scanner",
@@ -48,6 +48,13 @@
       "artifact": "supply-chain-auditor.kvch.tgz",
       "sha256": "fef269637469d5df61259809debe6eb7f6a83f21517f7d4bd0e0ab3acd7dbff2",
       "size_bytes": 9418
+    }
+,
+    {
+      "id": "cookie-xss-auditor",
+      "artifact": "cookie-xss-auditor.kvch.tgz",
+      "sha256": "2bafa699c2c71fa0ac31e76490d3c6a2c7cc96790154c6672722f0c1fdadb3c2",
+      "size_bytes": 5539
     }
   ]
 }

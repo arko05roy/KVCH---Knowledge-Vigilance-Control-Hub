@@ -20,10 +20,11 @@ EXTENSIONS=(
   "malware-analyzer"
   "credential-exposure-auditor"
   "supply-chain-auditor"
+  "cookie-xss-auditor"
 )
 
 echo "=========================================================================="
-echo "KVCH EXTENSION BUILDER - BUILDING ALL 7 EXTENSIONS"
+echo "KVCH EXTENSION BUILDER - BUILDING ALL 8 EXTENSIONS"
 echo "=========================================================================="
 echo "Output Artifacts Directory: $ARTIFACTS_DIR"
 echo ""
@@ -91,4 +92,4 @@ echo "SUMMARY OF PACKAGED KVCH EXTENSIONS"
 echo "=========================================================================="
 cat "$SUMMARY_FILE"
 echo ""
-echo "✔ All 5 extensions built, validated, packed, and hashed successfully!"
+echo "✔ All 8 extensions built, validated, packed, and hashed successfully!"
