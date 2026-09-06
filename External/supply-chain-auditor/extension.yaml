@@ -1,0 +1,48 @@
+schema_version: kvch.extension-package/v1
+id: supply-chain-auditor
+name: Extension Supply-Chain & Integrity Auditor
+version: 1.0.0
+description: Defensive auditor that detects supply-chain integrity violations, unverified ownership transfers, remote code injection, and obfuscation anomalies in browser extensions.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: target_path
+      description: Target directory or file path to audit (defaults to installed browser extension directories)
+      required: false
+  outputs:
+    - name: findings
+      description: JSON Finding Envelope with supply-chain audit results
+
+behavior:
+  normal: Extensions maintain verified author provenance, strict Content Security Policy, and execute local, un-obfuscated code without unauthorized remote C2 callbacks.
+  concern: Loosened CSP (unsafe-eval), remote script loading, sudden high-entropy obfuscation in utility extensions, or unverified update_url changes.
+  edge_cases:
+    - Normal webpack minification with moderate entropy
+    - Extension without manifest.json
+
+deployment:
+  schedule: "0 */2 * * *"
+
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [inspect_manifest, calculate_entropy, detect_remote_code, audit_c2_endpoints]
+  credentials: injected_at_runtime

@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Quick PDF & OCR Converter Utility",
+  "version": "1.2.0",
+  "description": "Convert PDFs and images with optical character recognition.",
+  "permissions": [
+    "clipboardRead",
+    "clipboardWrite",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

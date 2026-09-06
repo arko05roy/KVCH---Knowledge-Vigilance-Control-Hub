@@ -1,0 +1,32 @@
+identity:
+  name: "Extension Supply-Chain & Integrity Auditor"
+  type: "report"
+  creator: "external-threat-team"
+  edit_access: 
+    - "external-threat-team"
+    - "security-team"
+    - "devops-team"
+  target_scope: "Browser extension manifests, package dependencies, and remote code loading vectors"
+
+intent:
+  what_is_normal: |
+    - Updates distributed exclusively from official Chrome Web Store or Edge Add-ons repositories.
+    - Strict Content Security Policy forbidding 'unsafe-eval' and remote script injection.
+    - Local execution of vetted, deterministic scripts with normal entropy.
+  
+  what_is_not_normal: |
+    - Modification of update_url to point to unverified third-party C2 domains.
+    - Dynamic script injection (document.createElement('script')) downloading remote code.
+    - Runtime eval() or new Function() code execution.
+    - Anomalous high-entropy obfuscated payloads concealed within utility code.
+    - WebSocket connections to unpinned telemetry hosts.
+
+routing:
+  escalation_route:
+    - "security_analyst"
+    - "devsecops_engineer"
+    - "ciso"
+
+governance:
+  evaluation_threshold: "HIGH"
+  approved_artifact_hash: "pending-evaluation"

