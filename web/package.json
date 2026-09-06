@@ -14,7 +14,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
-    "worker": "node --conditions=react-server --import tsx scripts/kvch-worker.ts"
+    "worker": "node --conditions=react-server --import tsx scripts/kvch-worker.ts",
+    "ws:server": "node --conditions=react-server --import tsx scripts/kvch-ws-server.ts"
   },
   "dependencies": {
     "@arko05roy/kvch-extension": "^0.1.2",
