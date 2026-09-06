@@ -1,0 +1,54 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-06T08:59:58.471799Z",
+  "severity": "critical",
+  "category": "supply_chain_auditor",
+  "title": "Extension Supply-Chain & Remote Execution Audit",
+  "summary": "Audited 2 extensions on MacBook-Air.lan. Risk score: 100/100. De-obfuscation and MV3 deep inspection applied.",
+  "resource": {
+    "type": "resource",
+    "id": "External/fixtures",
+    "name": "MacBook-Air.lan"
+  },
+  "evidence": [],
+  "indicators": [],
+  "baseline": {},
+  "recommended_actions": [],
+  "details": {
+    "evidence": [
+      "manifest.update_url:https://unverified-third-party-c2.com/updates.xml",
+      "manifest.csp:unsafe-eval",
+      "dynamic_script:background.js",
+      "eval_call:background.js",
+      "raw_ip_beacon:background.js",
+      "websocket_c2:background.js"
+    ],
+    "indicators": [
+      "Unverified update_url in 'Pro Color Picker & Palette EyeDropper': https://unverified-third-party-c2.com/updates.xml",
+      "Loosened CSP ('unsafe-eval') in 'Pro Color Picker & Palette EyeDropper'",
+      "Dynamic remote script injection in background.js",
+      "Runtime eval() invocation in background.js",
+      "Hardcoded raw IP C2 beacon in background.js",
+      "WebSocket C2 connection initialized in background.js"
+    ],
+    "risk_score": 100,
+    "audited_count": 2,
+    "ai_role_projection": {
+      "hold_required": true,
+      "sr_dev": {
+        "technical_action": "Check update_url in manifest.json, verify code hashes against original vendor repository."
+      },
+      "management": {
+        "business_impact": "Severe \u2014 backdoored endpoint, remote command execution, and network pivoting risk."
+      },
+      "hr": {
+        "compliance_action": "Issue internal security advisory warning employees against reinstalling the flagged tool."
+      },
+      "intern": {
+        "learning_guidance": "Threat actors buy legitimate extensions and push malicious backend code updates."
+      }
+    },
+    "extension_id": "supply_chain_auditor",
+    "version": "1.1.0"
+  }
+}

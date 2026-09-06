@@ -18,10 +18,12 @@ EXTENSIONS=(
   "phishing-hunter"
   "threat-hunter-3000"
   "malware-analyzer"
+  "credential-exposure-auditor"
+  "supply-chain-auditor"
 )
 
 echo "=========================================================================="
-echo "KVCH EXTENSION BUILDER - BUILDING ALL 5 EXTENSIONS"
+echo "KVCH EXTENSION BUILDER - BUILDING ALL 7 EXTENSIONS"
 echo "=========================================================================="
 echo "Output Artifacts Directory: $ARTIFACTS_DIR"
 echo ""

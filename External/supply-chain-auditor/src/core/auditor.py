@@ -17,7 +17,7 @@ class Deobfuscator:
     UNICODE_ESCAPE_PATTERN = re.compile(r'\\u([0-9a-fA-F]{4})')
     CHAR_CODE_PATTERN = re.compile(r'String\.fromCharCode\s*\(([\d\s,]+)\)')
     BASE64_CANDIDATE_PATTERN = re.compile(r'[\'"]([A-Za-z0-9+/]{28,}={0,2})[\'"]')
-    COMPUTED_PROP_PATTERN = re.compile(r'\[\s*[\'"]([a-zA-Z0-9_]+)[\'"]\s*\]')
+    COMPUTED_PROP_PATTERN = re.compile(r'\[\s*\\?[\'"]([a-zA-Z0-9_]+)\\?[\'"]\s*\]')
 
     @classmethod
     def normalize(cls, content: str) -> str:

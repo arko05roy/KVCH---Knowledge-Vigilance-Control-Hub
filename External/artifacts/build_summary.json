@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05T08:25:42Z",
+  "timestamp": "2026-09-06T08:55:00Z",
   "artifacts": [
     {
       "id": "attack-surface-scanner",
@@ -34,6 +34,20 @@
       "artifact": "malware-analyzer.kvch.tgz",
       "sha256": "c00509ca1fcff9bee3be3d45bc47108d4e3e1c9efccc5e0b173e2527d3bb0c1e",
       "size_bytes": 5622
+    }
+,
+    {
+      "id": "credential-exposure-auditor",
+      "artifact": "credential-exposure-auditor.kvch.tgz",
+      "sha256": "9ffca20cdd7cc4ed02f6331adfd9460c47eca36bec8172da6a682fe083ef91f9",
+      "size_bytes": 9780
+    }
+,
+    {
+      "id": "supply-chain-auditor",
+      "artifact": "supply-chain-auditor.kvch.tgz",
+      "sha256": "fef269637469d5df61259809debe6eb7f6a83f21517f7d4bd0e0ab3acd7dbff2",
+      "size_bytes": 9418
     }
   ]
 }

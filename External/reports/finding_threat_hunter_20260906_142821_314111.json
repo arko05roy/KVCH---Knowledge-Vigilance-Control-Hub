@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-05T09:39:38.312713Z",
+  "observed_at": "2026-09-06T08:58:21.309734Z",
   "severity": "low",
   "category": "threat-hunter-3000",
   "title": "Real-Time Network Threat & Vulnerability Observation",
@@ -27,9 +27,9 @@
   "details": {
     "interface": "en0",
     "target_hostname": "MacBook-Air.lan",
-    "scan_timestamp": "2026-09-05T15:09:20.281548Z",
+    "scan_timestamp": "2026-09-06T14:28:01.267532Z",
     "execution_metrics": {
-      "duration_seconds": 18.032,
+      "duration_seconds": 20.046,
       "packets_processed": 0
     },
     "threat_detection": {

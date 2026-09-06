@@ -30,7 +30,7 @@ class Deobfuscator:
     UNICODE_ESCAPE_PATTERN = re.compile(r'\\u([0-9a-fA-F]{4})')
     CHAR_CODE_PATTERN = re.compile(r'String\.fromCharCode\s*\(([\d\s,]+)\)')
     BASE64_CANDIDATE_PATTERN = re.compile(r'[\'"]([A-Za-z0-9+/]{28,}={0,2})[\'"]')
-    COMPUTED_PROP_PATTERN = re.compile(r'\[\s*[\'"]([a-zA-Z0-9_]+)[\'"]\s*\]')
+    COMPUTED_PROP_PATTERN = re.compile(r'\[\s*\\?[\'"]([a-zA-Z0-9_]+)\\?[\'"]\s*\]')
 
     @classmethod
     def normalize(cls, content: str) -> str:
@@ -128,8 +128,9 @@ class SupplyChainAuditor:
                     print(f"{Colors.WHITE}  → Scanning {b_name}: {b_path}{Colors.RESET}")
                     self._scan_directory(Path(b_path))
             else:
-                print(f"{Colors.YELLOW}[!] No local browser profiles discovered. Auditing current workspace...{Colors.RESET}")
-                self._scan_directory(Path.cwd())
+                print(f"{Colors.YELLOW}[!] No local browser profiles discovered. Auditing External/fixtures...{Colors.RESET}")
+                fixtures_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "fixtures")
+                self._scan_directory(Path(fixtures_dir))
         else:
             p = Path(target)
             if p.is_file():

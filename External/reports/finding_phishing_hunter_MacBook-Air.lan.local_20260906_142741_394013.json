@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-05T09:38:49.025678Z",
+  "observed_at": "2026-09-06T08:57:41.393787Z",
   "severity": "low",
   "category": "phishing_hunter",
   "title": "Phishing Typosquatting & Impersonation Scan",
@@ -26,38 +26,38 @@
   "details": {
     "target_domain": "MacBook-Air.lan.local",
     "target_hostname": "MacBook-Air.lan",
-    "scan_timestamp": "2026-09-05T15:08:39.454602Z",
+    "scan_timestamp": "2026-09-06T14:27:27.629732Z",
     "execution_metrics": {
-      "duration_seconds": 9.576
+      "duration_seconds": 13.764
     },
     "typosquatting_generation": {
       "typosquats_generated_count": 900,
       "typosquatting_sample": [
-        "MacBoor-Aik.com",
-        "MacBoor-Aik.net",
-        "MacBoor-Aik.org",
-        "MacBoor-Aik.io",
-        "MacBoor-Aik.co",
-        "MacBoor-Aik.uk",
-        "MacBoor-Aik.de",
-        "MacBoor-Aik.fr",
-        "MacBoor-Aik.au",
-        "MacBoor-Aik.ca",
-        "-acBookMAir.com",
-        "-acBookMAir.net",
-        "-acBookMAir.org",
-        "-acBookMAir.io",
-        "-acBookMAir.co",
-        "-acBookMAir.uk",
-        "-acBookMAir.de",
-        "-acBookMAir.fr",
-        "-acBookMAir.au",
-        "-acBookMAir.ca",
-        "www-MacBook-Air-secure.com",
-        "www-MacBook-Air-secure.net",
-        "www-MacBook-Air-secure.org",
-        "www-MacBook-Air-secure.io",
-        "www-MacBook-Air-secure.co"
+        "MacBook-Air.com",
+        "MacBook-Air.net",
+        "MacBook-Air.org",
+        "MacBook-Air.io",
+        "MacBook-Air.co",
+        "MacBook-Air.uk",
+        "MacBook-Air.de",
+        "MacBook-Air.fr",
+        "MacBook-Air.au",
+        "MacBook-Air.ca",
+        "AacBook-Mir.com",
+        "AacBook-Mir.net",
+        "AacBook-Mir.org",
+        "AacBook-Mir.io",
+        "AacBook-Mir.co",
+        "AacBook-Mir.uk",
+        "AacBook-Mir.de",
+        "AacBook-Mir.fr",
+        "AacBook-Mir.au",
+        "AacBook-Mir.ca",
+        "MaABook-cir.com",
+        "MaABook-cir.net",
+        "MaABook-cir.org",
+        "MaABook-cir.io",
+        "MaABook-cir.co"
       ]
     },
     "suspicious_domains_analysis": {
@@ -68,7 +68,22 @@
     },
     "whois_intelligence": {},
     "dns_reconnaissance": {},
-    "risk_assessments": [],
+    "risk_assessments": [
+      {
+        "domain": "MacBook-Air.com",
+        "ip": "5.161.47.86",
+        "risk_score": 0,
+        "risk_factors": [],
+        "risk_level": "LOW"
+      },
+      {
+        "domain": "MacBook-Air.net",
+        "ip": "160.191.77.50",
+        "risk_score": 0,
+        "risk_factors": [],
+        "risk_level": "LOW"
+      }
+    ],
     "manifest": {
       "identity": {
         "name": "Phishing Hunter",

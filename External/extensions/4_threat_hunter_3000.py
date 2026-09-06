@@ -493,9 +493,10 @@ class ThreatHunter3000:
     
     def save_finding(self, envelope):
         """Save finding envelope to reports folder"""
-        os.makedirs('reports', exist_ok=True)
+        reports_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports")
+        os.makedirs(reports_dir, exist_ok=True)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-        filename = f"reports/finding_{self.extension_id}_{timestamp}.json"
+        filename = os.path.join(reports_dir, f"finding_{self.extension_id}_{timestamp}.json")
         envelope.save(filename)
         return filename
     
