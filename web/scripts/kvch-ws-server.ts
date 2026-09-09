@@ -98,7 +98,8 @@ const server = http.createServer((req, res) => {
   res.end();
 });
 
-server.on("upgrade", (req, socket, head) => {
+server.on("upgrade", (req, socket: any, head) => {
+  const clientIp = req.headers["x-forwarded-for"] || socket.remoteAddress || "127.0.0.1";
   const secKey = req.headers["sec-websocket-key"];
   if (!secKey) {
     socket.destroy();
@@ -111,7 +112,7 @@ server.on("upgrade", (req, socket, head) => {
 
   console.info(`[KVCH WS] Client connected (Agent: ${client.isAgent}) from ${socket.remoteAddress}`);
 
-  socket.on("data", (chunk) => {
+  socket.on("data", (chunk: Buffer) => {
     const frame = decodeWsFrame(chunk);
     if (!frame) return;
 
@@ -154,7 +155,7 @@ server.on("upgrade", (req, socket, head) => {
     console.info(`[KVCH WS] Client disconnected.`);
   });
 
-  socket.on("error", (err) => {
+  socket.on("error", (err: Error) => {
     clients.delete(client);
     console.error(`[KVCH WS] Socket error: ${err.message}`);
   });

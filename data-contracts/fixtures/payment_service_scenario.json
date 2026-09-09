@@ -1,0 +1,74 @@
+{
+  "scenario_id": "SCENARIO-PAYMENT-001",
+  "title": "Payment Gateway API Vulnerability Exploitation",
+  "finding": {
+    "finding_id": "FINDING-7742",
+    "source_extension": "7_supply_chain_auditor",
+    "category": "malicious_dependency",
+    "cve_id": "CVE-2026-3891",
+    "package_name": "pay-auth-crypto",
+    "asset_id": "ASSET-PAY-API-01",
+    "observed_at": "2026-09-09T08:00:00Z",
+    "internet_reachable": true,
+    "authentication_required": false,
+    "compensating_controls": ["rate_limiter"],
+    "epss_score": 0.72,
+    "cisa_kev": true,
+    "cvss_score": 9.8
+  },
+  "asset_profile": {
+    "asset_id": "ASSET-PAY-API-01",
+    "asset_name": "Payment Gateway API Cluster",
+    "business_service_id": "SVC-DIGITAL-PAYMENTS",
+    "business_service_name": "Digital Payments & Merchant Checkout",
+    "environment": "production",
+    "downtime_cost_per_hour_inr": 1250000.0,
+    "avg_incident_response_cost_inr": 2500000.0,
+    "data_breach_cost_per_record_inr": 450.0,
+    "records_exposed_estimate": 50000,
+    "rto_hours": 4.0,
+    "active_users": 250000
+  },
+  "candidate_mitigations": [
+    {
+      "action_id": "ACT-01",
+      "name": "Immediate Package Patching & Dependency Upgrade",
+      "cost_inr": 150000.0,
+      "lead_time_days": 1,
+      "risk_reduction_factor": 0.85,
+      "technique": "Patch Management"
+    },
+    {
+      "action_id": "ACT-02",
+      "name": "WAF & API Gateway Virtual Patch Rule Deployment",
+      "cost_inr": 50000.0,
+      "lead_time_days": 0.5,
+      "risk_reduction_factor": 0.60,
+      "technique": "Network Shielding"
+    },
+    {
+      "action_id": "ACT-03",
+      "name": "Enforce Strict mTLS & Certificate Pinning",
+      "cost_inr": 400000.0,
+      "lead_time_days": 5,
+      "risk_reduction_factor": 0.40,
+      "technique": "Zero Trust Auth"
+    },
+    {
+      "action_id": "ACT-04",
+      "name": "Automated Failover & Micro-segmentation Upgrade",
+      "cost_inr": 1200000.0,
+      "lead_time_days": 14,
+      "risk_reduction_factor": 0.75,
+      "technique": "Network Segmentation"
+    },
+    {
+      "action_id": "ACT-05",
+      "name": "24/7 Managed EDR & SOC Threat Hunting Tier",
+      "cost_inr": 800000.0,
+      "lead_time_days": 3,
+      "risk_reduction_factor": 0.50,
+      "technique": "Continuous Monitoring"
+    }
+  ]
+}
