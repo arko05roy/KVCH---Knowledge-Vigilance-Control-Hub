@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-11T20:10:59.843059Z",
+  "observed_at": "2026-09-11T20:23:33.676759Z",
   "severity": "CRITICAL",
   "category": "cookie-xss-auditor",
   "title": "Cookie Security Posture, DOM XSS & Session Theft Finding",

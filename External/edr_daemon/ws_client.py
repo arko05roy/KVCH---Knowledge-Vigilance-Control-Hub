@@ -155,10 +155,14 @@ class WebSocketClient:
             category = str(envelope.get("category", "")).lower()
             category_map = {
                 "attack_surface_scanner": "finding_1_attack_surface_scanner.json",
+                "network_surface_scanner": "finding_1_attack_surface_scanner.json",
                 "vpn_crypto_analyzer": "finding_2_vpn_crypto_analyzer.json",
                 "phishing_hunter": "finding_3_phishing_hunter.json",
                 "threat_hunter_3000": "finding_4_threat_hunter_3000.json",
+                "threat-hunter-3000": "finding_4_threat_hunter_3000.json",
+                "process_monitor": "finding_4_threat_hunter_3000.json",
                 "malware_analyzer": "finding_5_malware_analyzer.json",
+                "file_system_watcher": "finding_5_malware_analyzer.json",
                 "credential_exposure_auditor": "finding_6_credential_exposure_auditor.json",
                 "supply_chain_auditor": "finding_7_supply_chain_auditor.json",
                 "cookie_xss_analyzer": "finding_8_cookie_xss_analyzer.json",
