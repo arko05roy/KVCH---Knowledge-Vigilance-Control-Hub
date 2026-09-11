@@ -1,0 +1,96 @@
+{
+  "role": "intern",
+  "title": "Triage Walkthrough: Supply Chain Poisoning & Reverse Shell (Incident #INC-2026-8891)",
+  "summary": "Educational breakdown and step-by-step triage guide for Incident #INC-2026-8891. A malicious npm package (@kvch-internal/crypto-utils) was introduced into the project repository. When executed, it opened a reverse shell to an external attacker IP. This report guides junior analysts through verifying the indicators of compromise (IOCs), understanding the vulnerability chain, and documenting triage findings.",
+  "metrics": {
+    "likelihoodScore": 92,
+    "businessImpactScore": 88,
+    "financialExposure": {
+      "min": "₹15,00,000",
+      "mostLikely": "₹48,00,000",
+      "max": "₹1,20,00,000",
+      "eal": "₹38,40,000"
+    },
+    "riskTrend": "Increasing"
+  },
+  "keyFindings": [
+    "Concept 1: What is Typosquatting? Attacker registered a package name closely matching internal library name.",
+    "Concept 2: What is a Reverse Shell? Network connection originating from host outward to attacker control server.",
+    "Hash Verification: Binary SHA-256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 triggered YARA rule MALW_JS_REVERSE_SHELL.",
+    "MITRE ATT&CK Mapping: T1195.001 (Supply Chain Compromise) & T1059.001 (JavaScript Interpreter Execution)."
+  ],
+  "businessImpact": {
+    "operational": "Educational walkthrough: Learn how compromised dependencies bypass naive code review.",
+    "financial": "Demonstrates why supply chain security impacts organizational risk exposure.",
+    "compliance": "Teaches verification procedures under CIS Controls v8 (Inventory & Control of Software Assets).",
+    "reputational": "Highlights risk of third-party package reliance."
+  },
+  "aiInsights": [
+    "Key Learning Point: Always check `package-lock.json` registry integrity when pulling external dependencies.",
+    "Triage Practice: Practice matching process ID (PID) to open network sockets using `lsof` and `ss` commands."
+  ],
+  "recommendedActions": [
+    {
+      "action": "Complete step-by-step verification checklist: Identify PID 14209 and match foreign IP 185.220.101.5",
+      "riskReductionPercent": 50,
+      "estimatedCost": "₹0 (Learning Exercise)",
+      "estimatedEffort": "15 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Immediate",
+      "rosi": "N/A (Triage Training)",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Query file hash e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 in threat intelligence sandbox",
+      "riskReductionPercent": 40,
+      "estimatedCost": "₹0",
+      "estimatedEffort": "10 minutes",
+      "priority": "MEDIUM",
+      "timeToImplement": "Today",
+      "rosi": "N/A",
+      "type": "Quick Win"
+    }
+  ],
+  "investmentOptimization": "Guided educational triage flow to build junior security engineering capabilities.",
+  "complianceMappings": [
+    {
+      "framework": "CIS Controls",
+      "controlId": "CIS-2.1",
+      "status": "Partial",
+      "impactDescription": "Maintain inventory of authorized software dependencies"
+    },
+    {
+      "framework": "NIST CSF",
+      "controlId": "DE.CM-1",
+      "status": "Partial",
+      "impactDescription": "Network perimeter and process anomaly detection training"
+    }
+  ],
+  "scenarios": {
+    "scenarioA_NoAction": {
+      "residualRisk": "High (Unresolved learner query)",
+      "financialExposure": "N/A",
+      "complianceImpact": "Incomplete triage record"
+    },
+    "scenarioB_Remediated": {
+      "residualRisk": "Minimal (Triage completed & documented)",
+      "financialExposure": "₹0 Residual Risk",
+      "complianceImpact": "Triage log verified by Senior Lead",
+      "expectedLossReduction": "100% triage task completion"
+    }
+  },
+  "finalVerdict": "Execute guided triage checklist, verify SHA-256 hash match, and document telemetry findings in incident ticket.",
+  "keyInsights": [
+    "Supply chain attacks execute code automatically during `npm install` postinstall hooks",
+    "Reverse shells connect outbound on port 443 to bypass naive inbound firewall rules",
+    "Hash comparison against threat intelligence feeds provides quick confirmation"
+  ],
+  "actionItems": [
+    "Run `ps aux | grep node` to observe suspicious background process",
+    "Compare SHA-256 hash against YARA rule database",
+    "Document outbound IP 185.220.101.5 in incident report draft",
+    "Submit completed triage verification to Senior Developer"
+  ],
+  "roleSpecificDetail": "### JUNIOR ANALYST TRIAGE & LEARNING WALKTHROUGH\n\n#### 1. Attack Lifecycle Diagram\n1. **Developer Pulls Code**: Developer executed `npm install` without package hash verification.\n2. **Post-Install Trigger**: `package.json` had `\"postinstall\": \"node dist/telemetry_worker.js\"`.\n3. **C2 Connection Established**: Node process spawned `/bin/sh` and initiated outbound TCP to `185.220.101.5:443`.\n4. **Data Exfiltration**: Attacker queried local environment variables (`process.env.DATABASE_URL`, `process.env.GROQ_API_KEYS`).\n\n#### 2. Verification Checklist for Interns\n- [ ] **Check Process List**: Run `ps aux | grep node` and look for unknown scripts in `node_modules`.\n- [ ] **Check Active Connections**: Run `lsof -i :443` or `ss -tupn` to identify foreign IP addresses.\n- [ ] **Verify Hash against Threat Feed**: Take SHA-256 of `dist/telemetry_worker.js` and query threat feed API.\n- [ ] **Inspect npm Lockfile**: Check `package-lock.json` for resolved URLs pointing outside standard npm registry.\n\n#### 3. Learning Notes: MITRE ATT&CK Mapping\n- **T1195.001 (Supply Chain Compromise)**: How malicious dependencies enter the build pipeline.\n- **T1059.001 (Command and Scripting Interpreter: JavaScript)**: Abuse of Node.js runtime to execute system commands.\n- **T1041 (Exfiltration Over C2 Channel)**: Sending stolen env secrets over an established reverse connection.",
+  "generatedAt": "2026-09-11T17:40:00.000Z"
+}

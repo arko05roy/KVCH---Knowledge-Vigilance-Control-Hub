@@ -1,7 +1,7 @@
-
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { IntelligentPerformanceStage } from '@/components/intelligent-performance-stage';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,27 +65,26 @@ export default function Home() {
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       background: #000;
       width: 100%;
-      height: 100%;
+      min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
 
     .viewport {
-      position: fixed;
-      inset: 0;
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
       isolation: isolate;
       background: #000;
     }
 
     .screen {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+      position: relative;
       width: 100%;
-      height: 100%;
+      min-height: 100vh;
       background: #000;
       
       --gutter-start: clamp(36px, 4.177vw, 96px);
@@ -131,6 +130,7 @@ export default function Home() {
       object-position: center;
       pointer-events: none;
       user-select: none;
+      background: #000000 url("https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/5c3ec08f-2dbf-4c0a-8588-f6106a789443.webp") center / cover no-repeat;
     }
 
     /* HEADER */
@@ -402,13 +402,6 @@ export default function Home() {
       justify-content: center;
     }
 
-    .demo-visual img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(.89) saturate(.93) contrast(1.03);
-    }
-
     .demo-visual button.play {
       position: absolute;
       width: 29cqw;
@@ -657,7 +650,7 @@ export default function Home() {
     /* RESPONSIVE */
     @media (max-width: 790px), (min-width: 620px) and (max-width: 1100px) and (orientation: portrait) {
       .header-actions {
-        display: none; /* In a real implementation, this would be a glass dropdown. Simplified here as requested for desktop mostly */
+        display: none;
       }
       .menu-toggle {
         display: block;
@@ -673,7 +666,7 @@ export default function Home() {
     }
     @media (max-width: 619px) {
       .hero-content {
-        bottom: 24px; /* --mobile-gutter roughly */
+        bottom: 24px;
       }
       .hero-title .line-one { transform: scaleX(.78); }
       .hero-title .line-two { transform: scaleX(.55); }
@@ -686,119 +679,133 @@ export default function Home() {
     }
   ` }} />
       
-  <main className="viewport">
-    <section className="screen" id="screen">
-      <video className="background" autoPlay muted loop playsInline disablePictureInPicture aria-hidden="true">
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
-      </video>
-      
-      <header className="header">
-        <a className="brand" aria-label="Vantage home">
-          <svg viewBox="0 0 25 25" fill="none">
-            <clipPath id="circleClip"><circle cx="12.5" cy="12.5" r="12.5"/></clipPath>
-            <g clipPath="url(#circleClip)">
-              <rect width="25" height="25" fill="#ededed"/>
-              <path d="M12.5 5 L20 12.5 L12.5 20 L5 12.5 Z" fill="#050606" opacity="0.9"/>
-              <path d="M12.5 5 L20 12.5 L12.5 12.5 Z" fill="#737778"/>
-            </g>
-          </svg>
-        </a>
+  <div className="landing-page-wrapper w-full min-h-screen bg-[#000000]">
+    <main className="viewport">
+      <section className="screen" id="screen">
+        <video 
+          className="background" 
+          autoPlay 
+          muted 
+          loop 
+          playsInline 
+          preload="auto" 
+          disablePictureInPicture 
+          aria-hidden="true"
+          poster="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/5c3ec08f-2dbf-4c0a-8588-f6106a789443.webp"
+          onCanPlay={(e) => { e.currentTarget.play().catch(() => {}); }}
+        >
+          <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
+        </video>
         
-        <div className="header-actions" id="tablet-navigation">
-          <nav className="nav">
-            <a href="#" className="active">Home</a>
-            <a href="#">About</a>
-            <a href="#">Services</a>
-            <a href="#">Contact</a>
-          </nav>
+        <header className="header">
+          <a className="brand" aria-label="Vantage home">
+            <svg viewBox="0 0 25 25" fill="none">
+              <clipPath id="circleClip"><circle cx="12.5" cy="12.5" r="12.5"/></clipPath>
+              <g clipPath="url(#circleClip)">
+                <rect width="25" height="25" fill="#ededed"/>
+                <path d="M12.5 5 L20 12.5 L12.5 20 L5 12.5 Z" fill="#050606" opacity="0.9"/>
+                <path d="M12.5 5 L20 12.5 L12.5 12.5 Z" fill="#737778"/>
+              </g>
+            </svg>
+          </a>
           
-          <div className="time-panel">
-            <span className="time-label">Timezone</span>
-            <span className="time-value">{timeString}</span>
+          <div className="header-actions" id="tablet-navigation">
+            <nav className="nav">
+              <a href="#" className="active">Home</a>
+              <a href="#">About</a>
+              <a href="#">Services</a>
+              <a href="#">Contact</a>
+            </nav>
+            
+            <div className="time-panel">
+              <span className="time-label">Timezone</span>
+              <span className="time-value">{timeString}</span>
+            </div>
+            
+            <button className="sign-up" onClick={() => setIsModalOpen(true)}>Log in</button>
           </div>
           
-          <button className="sign-up" onClick={() => setIsModalOpen(true)}>Log in</button>
-        </div>
-        
-        <button className="menu-toggle" aria-label="Toggle menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
-      </header>
-
-      <section className="hero">
-        <div className="hero-content">
-          <h1 className="hero-title">
-            <span className="line line-one"><span className="line-reveal">Sovereign AI.</span></span>
-            <span className="line line-two"><span className="line-reveal">Enterprise Armor.</span></span>
-          </h1>
-          <p className="hero-copy">
-            Your company&apos;s work is scattered across disconnected systems.<br />
-            KVCH brings it into one intelligent control plane, so every<br />
-            employee gets a workbench and the enterprise gets armor.
-          </p>
-          <button className="primary-cta" onClick={() => setIsModalOpen(true)}>
-            <span className="label">Get Started</span>
-            <span className="arrow-box">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </span>
+          <button className="menu-toggle" aria-label="Toggle menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
-        </div>
+        </header>
 
-        <article className="demo-card">
-          <div className="demo-visual">
-            {/* Using CSS gradient fallback for image as instructed to embed or use local */}
-            <div style={{width: '100%', height: '100%', background: 'radial-gradient(circle at top right, #9b2c3a, #1a2a3a)', filter: 'brightness(.89) saturate(.93) contrast(1.03)'}}></div>
-            <button className="play" aria-label="Play demo">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <section className="hero">
+          <div className="hero-content">
+            <h1 className="hero-title">
+              <span className="line line-one"><span className="line-reveal">Sovereign AI.</span></span>
+              <span className="line line-two"><span className="line-reveal">Enterprise Armor.</span></span>
+            </h1>
+            <p className="hero-copy">
+              Your company&apos;s work is scattered across disconnected systems.<br />
+              KVCH brings it into one intelligent control plane, so every<br />
+              employee gets a workbench and the enterprise gets armor.
+            </p>
+            <button className="primary-cta" onClick={() => setIsModalOpen(true)}>
+              <span className="label">Get Started</span>
+              <span className="arrow-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
             </button>
           </div>
-          <button className="watch-button">Watch Demo</button>
-        </article>
-      </section>
-    </section>
-  </main>
 
-  {/* Login Modal */}
-  <div className={`login-modal ${isModalOpen ? 'active' : ''}`} id="loginModal">
-    <div className="modal-content">
-      <button className="modal-close" onClick={() => setIsModalOpen(false)}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <h2>Select Your Portal</h2>
-      <p className="modal-subtitle">Choose your role to access the KVCH Control Hub</p>
-      <div className="roles-grid">
-        <a href="/intern/dashboard" className="role-card">
-          <div className="role-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <span className="role-title">Intern</span>
-          <span className="role-desc">Triage Queue & Fix Lab Workspace</span>
-        </a>
-        <a href="/sr-dev/dashboard" className="role-card">
-          <div className="role-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <span className="role-title">Senior Dev</span>
-          <span className="role-desc">Sandbox Evaluator & Patch Approvals</span>
-        </a>
-        <a href="/hr/dashboard" className="role-card">
-          <div className="role-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <span className="role-title">HR</span>
-          <span className="role-desc">Policy Compliance & Access Governance</span>
-        </a>
-        <a href="/management/dashboard" className="role-card">
-          <div className="role-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-          </div>
-          <span className="role-title">Management</span>
-          <span className="role-desc">CISO Posture & Crisis Escalations</span>
-        </a>
+          <article className="demo-card">
+            <div className="demo-visual">
+              <div style={{width: '100%', height: '100%', background: 'radial-gradient(circle at top right, #9b2c3a, #1a2a3a)', filter: 'brightness(.89) saturate(.93) contrast(1.03)'}}></div>
+              <button className="play" aria-label="Play demo">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+            </div>
+            <button className="watch-button">Watch Demo</button>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    {/* SCROLLABLE STAGE SECTION: Built for Intelligent Performance */}
+    <IntelligentPerformanceStage />
+
+    {/* Login Modal */}
+    <div className={`login-modal ${isModalOpen ? 'active' : ''}`} id="loginModal">
+      <div className="modal-content">
+        <button className="modal-close" onClick={() => setIsModalOpen(false)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <h2>Select Your Portal</h2>
+        <p className="modal-subtitle">Choose your role to access the KVCH Control Hub</p>
+        <div className="roles-grid">
+          <a href="/intern/dashboard" className="role-card">
+            <div className="role-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span className="role-title">Intern</span>
+            <span className="role-desc">Triage Queue & Fix Lab Workspace</span>
+          </a>
+          <a href="/sr-dev/dashboard" className="role-card">
+            <div className="role-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span className="role-title">Senior Dev</span>
+            <span className="role-desc">Sandbox Evaluator & Patch Approvals</span>
+          </a>
+          <a href="/hr/dashboard" className="role-card">
+            <div className="role-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span className="role-title">HR</span>
+            <span className="role-desc">Policy Compliance & Access Governance</span>
+          </a>
+          <a href="/management/dashboard" className="role-card">
+            <div className="role-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            </div>
+            <span className="role-title">Management</span>
+            <span className="role-desc">CISO Posture & Crisis Escalations</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
-
-    </>
+  </>
   );
 }

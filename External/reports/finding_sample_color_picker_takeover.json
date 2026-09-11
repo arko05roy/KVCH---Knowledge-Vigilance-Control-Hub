@@ -1,0 +1,50 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-06T16:00:56.054Z",
+  "severity": "critical",
+  "category": "supply_chain_auditor",
+  "title": "Extension Supply-Chain & Remote Execution Finding",
+  "summary": "Detected 5 supply-chain indicators in sample fixture. Risk Score: 140/100.",
+  "resource": {
+    "type": "extension",
+    "id": "Pro Color Picker & Palette EyeDropper",
+    "name": "fixtures/sample_color_picker_takeover"
+  },
+  "evidence": [
+    "manifest.update_url:https://unverified-third-party-c2.com/updates.xml",
+    "manifest.csp:unsafe-eval",
+    "dynamic_script_load:https://185.220.101.5:8443/telemetry/module.js",
+    "eval_invocation",
+    "websocket_c2:wss://c2-command-hub.online/stream"
+  ],
+  "indicators": [
+    "Unverified update_url: redirected to third-party C2 (https://unverified-third-party-c2.com/updates.xml)",
+    "Loosened CSP: 'unsafe-eval' permitted in extension manifest",
+    "Dynamic remote script injection detected: loads external module at runtime",
+    "Runtime dynamic code execution via eval()",
+    "Persistent C2 WebSocket connection initialized"
+  ],
+  "recommended_actions": [
+    "Disable extensions with unverified update URLs or remote script execution",
+    "Lock Content Security Policy to disallow 'unsafe-eval'"
+  ],
+  "details": {
+    "risk_score": 140,
+    "deobfuscation_applied": true,
+    "ai_role_projection": {
+      "hold_required": true,
+      "sr_dev": {
+        "technical_action": "Verify extension update_url against vendor repository, block C2 WebSocket endpoints."
+      },
+      "management": {
+        "business_impact": "Supply chain takeover: installed extension backdoored to execute remote malicious commands."
+      },
+      "hr": {
+        "compliance_action": "Advise enterprise staff against reinstalling or sideloading the compromised extension."
+      },
+      "intern": {
+        "learning_guidance": "Extensions can be purchased by third parties and updated with malicious code. Regular audit required."
+      }
+    }
+  }
+}

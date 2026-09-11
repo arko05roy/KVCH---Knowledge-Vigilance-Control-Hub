@@ -72,34 +72,69 @@ export class GroqKeyPoolManager {
     // If all keys are in cooldown, pick the one closest to expiry
     let minExpiry = Infinity;
     let bestKey = this.keys[0];
-    for (const key of this.keys) {
+    let bestIndex = 0;
+    for (let i = 0; i < this.keys.length; i++) {
+      const key = this.keys[i];
       const expiry = this.coolDowns.get(key) || 0;
       if (expiry < minExpiry) {
         minExpiry = expiry;
         bestKey = key;
+        bestIndex = i;
       }
     }
 
-    return { client: new Groq({ apiKey: bestKey }), keyIndex: 0, key: bestKey };
+    this.currentIndex = (bestIndex + 1) % this.keys.length;
+    return { client: new Groq({ apiKey: bestKey }), keyIndex: bestIndex, key: bestKey };
   }
 
-  /** Generate chat completion with failover retry across the key pool */
-  async createCompletion(params: Groq.Chat.CompletionCreateParamsNonStreaming): Promise<Groq.Chat.Completions.ChatCompletion> {
+  /** Extract delay from 429 error message (e.g. "try again in 176ms") or compute exponential backoff */
+  private getRetryDelayMs(error: any, attempt: number): number {
+    const errorMsg = String(error?.message || error?.error?.error?.message || "");
+    const match = errorMsg.match(/try again in (\d+)(ms|s)/i);
+    if (match) {
+      const amount = parseInt(match[1], 10);
+      const unit = match[2].toLowerCase();
+      const delay = unit === "s" ? amount * 1000 : amount;
+      return Math.min(Math.max(delay + 100, 300), 5000);
+    }
+
+    // Exponential backoff: 600ms, 1200ms, 2400ms...
+    return Math.min(600 * Math.pow(1.8, attempt), 4000);
+  }
+
+  /** Generate chat completion with failover retry across the key pool and smart rate-limit backoff */
+  async createCompletion(params: Parameters<Groq["chat"]["completions"]["create"]>[0]): Promise<Groq.Chat.Completions.ChatCompletion> {
     let lastError: unknown;
-    const maxAttempts = Math.max(this.keys.length, 1);
+    // Allow up to 6 retry attempts to handle rate limit resets
+    const maxAttempts = Math.max(this.keys.length * 2, 6);
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const { client, key } = this.getNextClient();
+
+      // Fallback model if primary model repeatedly hits rate limits
+      const requestParams = { ...params };
+      if (attempt >= 3 && requestParams.model === "groq/compound") {
+        requestParams.model = "llama-3.1-8b-instant";
+      }
+
       try {
-        return await client.chat.completions.create(params);
+        return (await client.chat.completions.create({ ...requestParams, stream: false })) as Groq.Chat.Completions.ChatCompletion;
       } catch (error: any) {
         lastError = error;
         const statusCode = error?.status || error?.statusCode;
-        
+
         // Handle rate limits (429) or transient server errors (5xx)
         if (statusCode === 429 || (statusCode >= 500 && statusCode < 600)) {
-          this.coolDowns.set(key, Date.now() + 60000); // 60s cooldown
-          console.warn(`[Groq Key Pool] Key ending in ...${key.slice(-6)} hit ${statusCode}. Retrying with next key (Attempt ${attempt + 1}/${maxAttempts})`);
+          const delayMs = this.getRetryDelayMs(error, attempt);
+          // Set short cooldown (3s for 429, 10s for 5xx) so keys don't stay locked for a full minute
+          const cooldownDuration = statusCode === 429 ? 3000 : 10000;
+          this.coolDowns.set(key, Date.now() + cooldownDuration);
+
+          console.warn(
+            `[Groq Key Pool] Key ending in ...${key.slice(-6)} hit ${statusCode}. Waiting ${delayMs}ms before retry (Attempt ${attempt + 1}/${maxAttempts})...`
+          );
+
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
           continue;
         }
         throw error;

@@ -1,0 +1,113 @@
+{
+  "role": "hr",
+  "title": "Compliance Audit & Access Governance Report (Incident #INC-2026-8891)",
+  "summary": "Human resource access audit and regulatory compliance analysis for Incident #INC-2026-8891. The investigation traced the malicious dependency commit to a developer credentials leak on git commit hash 7a8f9c1b. This report provides team responsibility mapping, access scope review, compliance failure points under ISO 27001 / SEBI CSCRF / DPDP Act 2023, and policy remediation steps.",
+  "metrics": {
+    "likelihoodScore": 92,
+    "businessImpactScore": 88,
+    "financialExposure": {
+      "min": "₹15,00,000",
+      "mostLikely": "₹48,00,000",
+      "max": "₹1,20,00,000",
+      "eal": "₹38,40,000"
+    },
+    "riskTrend": "Increasing"
+  },
+  "keyFindings": [
+    "Committer Identified: Rohit Debnath (Senior Frontend Engineer - Employee ID: EMP-4029)",
+    "Commit Hash: 7a8f9c1b3d2e1f pushed on 2026-09-09 12:50:45 IST",
+    "Pull Request: PR #4 ('implemented ml model') merged without mandatory security reviewer approval",
+    "Team Ownership: Core Product Web Engineering Team",
+    "Policy Deficiencies: Breach of Policy EP-SEC-09 (Third-Party Dependency Approval & Lockfile Integrity)"
+  ],
+  "businessImpact": {
+    "operational": "Required HR governance intervention: Temporary credential restriction and mandatory engineering protocol review.",
+    "financial": "Exposure to regulatory penalty under DPDP Act 2023 if unmitigated data breach occurs.",
+    "compliance": "Deficiencies flagged under ISO 27001 A.8.28 (Secure Coding) & SEBI CSCRF Section 3.2.",
+    "reputational": "Internal trust audit and employee compliance training required."
+  },
+  "aiInsights": [
+    "Root cause analysis shows commit was pushed from developer laptop without GPG commit signing.",
+    "Lack of mandatory 2-person security review on PR #4 enabled unvetted package inclusion."
+  ],
+  "recommendedActions": [
+    {
+      "action": "Enforce mandatory GPG commit signing and GitHub branch protection requiring 2-person security signoff on PRs",
+      "riskReductionPercent": 95,
+      "estimatedCost": "₹0 (Policy Configuration)",
+      "estimatedEffort": "30 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Immediate",
+      "rosi": "Infinite",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Conduct access scope review for EMP-4029 and rotate all associated developer credentials",
+      "riskReductionPercent": 80,
+      "estimatedCost": "₹0",
+      "estimatedEffort": "1 hour",
+      "priority": "HIGH",
+      "timeToImplement": "Within 24 hours",
+      "rosi": "High ROI Action",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Schedule mandatory Secure Supply Chain & Dependency Hygiene training for Web Engineering Team",
+      "riskReductionPercent": 70,
+      "estimatedCost": "₹50,000 (Training Workshop)",
+      "estimatedEffort": "1 day",
+      "priority": "MEDIUM",
+      "timeToImplement": "Next 7 Days",
+      "rosi": "340% ROI",
+      "type": "Long-Term Investment"
+    }
+  ],
+  "investmentOptimization": "Zero-cost immediate HR policy enforcement (branch protection rules & GPG signing) combined with targeted security hygiene training.",
+  "complianceMappings": [
+    {
+      "framework": "ISO/IEC 27001",
+      "controlId": "A.8.28",
+      "status": "Deficient",
+      "impactDescription": "Secure coding rules and dependency review mechanisms"
+    },
+    {
+      "framework": "SEBI CSCRF",
+      "controlId": "CSCRF-Sec-3.2",
+      "status": "Deficient",
+      "impactDescription": "Access control governance and privilege separation for developers"
+    },
+    {
+      "framework": "RBI Framework",
+      "controlId": "RBI-CS-G2",
+      "status": "Partial",
+      "impactDescription": "Third-party risk management and vendor component audit"
+    }
+  ],
+  "scenarios": {
+    "scenarioA_NoAction": {
+      "residualRisk": "High (Policy violation unaddressed)",
+      "financialExposure": "₹1,20,00,000 Maximum Fine Exposure under DPDP Act",
+      "complianceImpact": "Audit failure during ISO 27001 recertification"
+    },
+    "scenarioB_Remediated": {
+      "residualRisk": "Compliant (GPG signing & branch protection active)",
+      "financialExposure": "₹0 Regulatory Penalty Risk",
+      "complianceImpact": "Full regulatory compliance restored",
+      "expectedLossReduction": "95% reduction in compliance risk exposure"
+    }
+  },
+  "finalVerdict": "Update access policies, enforce GPG commit signing and 2-reviewer PR protection immediately.",
+  "keyInsights": [
+    "Developer EMP-4029 committed malicious dependency without secondary approval",
+    "ISO 27001 A.8.28 secure coding baseline requires automated PR dependency checks",
+    "Branch protection policy enforcement prevents unreviewed code merges"
+  ],
+  "actionItems": [
+    "Audit access scopes for Employee EMP-4029 (Rohit Debnath)",
+    "Enable GitHub Branch Protection rule requiring 2 security approvals on main branch",
+    "Enforce mandatory GPG signed commits across repository settings",
+    "Schedule Secure Supply Chain Security training session"
+  ],
+  "roleSpecificDetail": "### HR AUDIT, PERSONNEL & COMPLIANCE GOVERNANCE\n\n#### 1. Commit & Code Author Accountability\n| Field | Details |\n| :--- | :--- |\n| **Committer Name** | Rohit Debnath |\n| **Role & Designation** | Senior Frontend Engineer |\n| **Employee ID** | EMP-4029 |\n| **Department / Team** | Core Product & Web Engineering |\n| **Git Commit Hash** | `7a8f9c1b3d2e1f4a5b6c7d8e9f0a1b2c` |\n| **Repository Path** | `web/package.json` |\n| **Pull Request ID** | PR #4 (`arko05roy/rohit/threat-extensions`) |\n| **Reviewer / Approver** | Automated Merge / Missing mandatory 2-person security signoff |\n\n#### 2. Regulatory Compliance Deficiencies\n- **ISO/IEC 27001:2022 Control A.8.28 (Secure Coding)**: Deficient. Third-party packages were included without automated AST static analysis.\n- **SEBI CSCRF Section 3.2 (Access Controls & Third-Party Risk)**: Non-compliant. Privileged production tokens were accessible in unencrypted environment files.\n- **Digital Personal Data Protection (DPDP) Act 2023 Section 8**: High Risk. Potential unauthorized processing of personal data requiring prompt Data Protection Board notification if breach is confirmed.\n\n#### 3. HR & Policy Action Plan\n1. **Immediate Access Suspension**: Temporarily suspend SSH and AWS production deployment keys for EMP-4029 pending forensic interview.\n2. **Mandatory Retraining**: Schedule Mandatory Secure Supply Chain & Dependency Hygiene training for all 14 engineers in Web Team.\n3. **Policy Enforcement**: Implement GitHub Branch Protection Rule requiring 2 mandatory security reviewer approvals before merging changes to `package.json`.",
+  "generatedAt": "2026-09-11T17:40:00.000Z"
+}
