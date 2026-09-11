@@ -5,6 +5,8 @@ from kvch_risk.schemas.models import (
     OptimizationResult,
     QuantifyRequest,
     QuantifyResponse,
+    CalibrateRequest,
+    CalibrateResponse,
 )
 from kvch_risk.likelihood.estimator import calculate_likelihood
 from kvch_risk.simulation.monte_carlo import run_fair_monte_carlo
@@ -58,5 +60,22 @@ def optimize_mitigation_portfolio(request: OptimizationRequest):
     try:
         result = solve_investment_portfolio(request)
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/risk/calibrate", response_model=CalibrateResponse)
+def calibrate_with_incidents(request: CalibrateRequest):
+    """
+    Ingests real historical incident log entries to update Bayesian posterior priors.
+    """
+    try:
+        from kvch_risk.calibration.bayesian import update_asset_posterior
+        updated_asset = update_asset_posterior(request.asset_profile, request.incidents)
+        return CalibrateResponse(
+            calibrated_asset_profile=updated_asset,
+            incidents_processed=len(request.incidents),
+            calibration_status="BAYESIAN_POSTERIOR_UPDATED",
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -67,3 +67,29 @@ def test_investment_optimizer():
     assert opt.expected_eal_reduction_inr > 0
     assert opt.residual_eal_inr < 5000000.0
     assert len(opt.efficient_frontier) == 5
+
+
+def test_bayesian_calibration():
+    from kvch_risk.schemas.models import IncidentRecord
+    from kvch_risk.calibration.bayesian import update_asset_posterior
+
+    fixture = get_payment_fixture()
+    asset = AssetServiceProfile(**fixture["asset_profile"])
+    initial_rto = asset.rto_hours
+
+    real_incidents = [
+        IncidentRecord(
+            incident_id="INC-2026-001",
+            scenario_id="SCENARIO-PAYMENT-001",
+            asset_id=asset.asset_id,
+            occurred_at="2026-08-15T10:00:00Z",
+            actual_downtime_hours=6.5,
+            actual_ir_cost_inr=3500000.0,
+            actual_records_exposed=75000,
+        )
+    ]
+
+    calibrated_asset = update_asset_posterior(asset, real_incidents)
+    assert calibrated_asset.rto_hours > initial_rto
+    assert calibrated_asset.records_exposed_estimate > 50000
+

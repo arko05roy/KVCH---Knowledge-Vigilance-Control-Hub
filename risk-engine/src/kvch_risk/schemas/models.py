@@ -32,6 +32,29 @@ class AssetServiceProfile(BaseModel):
     active_users: int = Field(default=10000, ge=0)
 
 
+class IncidentRecord(BaseModel):
+    incident_id: str
+    scenario_id: str
+    asset_id: str
+    occurred_at: str
+    actual_downtime_hours: float = Field(..., ge=0.0)
+    actual_ir_cost_inr: float = Field(..., ge=0.0)
+    actual_records_exposed: int = Field(default=0, ge=0)
+    actual_sla_penalty_inr: float = Field(default=0.0, ge=0.0)
+    root_cause_summary: str = "Unpatched Vulnerability"
+
+
+class CalibrateRequest(BaseModel):
+    asset_profile: AssetServiceProfile
+    incidents: List[IncidentRecord]
+
+
+class CalibrateResponse(BaseModel):
+    calibrated_asset_profile: AssetServiceProfile
+    incidents_processed: int
+    calibration_status: str = "BAYESIAN_POSTERIOR_UPDATED"
+
+
 class MitigationCandidate(BaseModel):
     action_id: str
     name: str
