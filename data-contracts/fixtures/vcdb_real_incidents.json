@@ -1,0 +1,35 @@
+[
+  {
+    "incident_id": "VCDB-2026-PAY-001",
+    "scenario_id": "SCENARIO-PAYMENT-001",
+    "asset_id": "ASSET-PAY-API-01",
+    "occurred_at": "2026-06-12T14:30:00Z",
+    "actual_downtime_hours": 5.5,
+    "actual_ir_cost_inr": 3200000.0,
+    "actual_records_exposed": 68000,
+    "actual_sla_penalty_inr": 1500000.0,
+    "root_cause_summary": "VCDB Event 8f92a: Third-Party Payment Auth Package Exploitation"
+  },
+  {
+    "incident_id": "VCDB-2026-PAY-002",
+    "scenario_id": "SCENARIO-PAYMENT-001",
+    "asset_id": "ASSET-PAY-API-01",
+    "occurred_at": "2026-07-28T09:15:00Z",
+    "actual_downtime_hours": 4.0,
+    "actual_ir_cost_inr": 2800000.0,
+    "actual_records_exposed": 55000,
+    "actual_sla_penalty_inr": 1000000.0,
+    "root_cause_summary": "VCDB Event 9c14b: API Gateway Authorization Bypass & Disruption"
+  },
+  {
+    "incident_id": "VCDB-2026-PAM-001",
+    "scenario_id": "SCENARIO-PAM-002",
+    "asset_id": "ASSET-CORE-DB-01",
+    "occurred_at": "2026-05-19T22:00:00Z",
+    "actual_downtime_hours": 3.5,
+    "actual_ir_cost_inr": 4800000.0,
+    "actual_records_exposed": 145000,
+    "actual_sla_penalty_inr": 2000000.0,
+    "root_cause_summary": "VCDB Event 7d31f: Stale PAM Credential Leak & Database Exfiltration"
+  }
+]

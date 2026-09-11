@@ -185,6 +185,26 @@ export default function RiskIntelligencePage() {
     }
   };
 
+  const handleCalibrateVCDB = async () => {
+    setLoading(true);
+    try {
+      const cRes = await fetch('/api/risk/calibrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentScenario),
+      });
+      const cData = await cRes.json();
+      if (cData.calibrated_asset_profile) {
+        currentScenario.asset_profile = cData.calibrated_asset_profile;
+      }
+      await fetchQuantification();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const runOptimization = async (baselineEal: number, budget: number) => {
     try {
       const oRes = await fetch('/api/risk/optimize', {
@@ -252,6 +272,13 @@ export default function RiskIntelligencePage() {
             >
               ← Hub Overview
             </Link>
+            <button
+              onClick={handleCalibrateVCDB}
+              disabled={loading}
+              className="px-3.5 py-1.5 rounded-md text-[13px] font-semibold bg-[#2ea043]/15 text-[#2ea043] border border-[#2ea043]/40 hover:bg-[#2ea043]/25 transition-colors flex items-center gap-1.5"
+            >
+              ⚡ Ingest Real VCDB Logs
+            </button>
             <button
               onClick={fetchQuantification}
               disabled={loading}
