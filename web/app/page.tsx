@@ -865,19 +865,19 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="trust-pill">
-                  Trusted by 2000+ Enterprises
+                  Protected by KVCH Security Control Hub
                 </div>
               </div>
 
               {/* Headline (BubbledotICG-FinePos font, exact 2 lines, solid white) */}
               <h1 className="hero-headline">
-                <span className="headline-line">Intelligence</span>
-                <span className="headline-line">Designed To Evolve</span>
+                <span className="headline-line">Sovereign AI</span>
+                <span className="headline-line">Enterprise Armor</span>
               </h1>
 
-              {/* Subhead (KVCH copy with +2pt sizing) */}
+              {/* Subhead (KVCH copy) */}
               <p className="hero-subhead">
-                Build applications that reason, adapt and collaborate using a modular AI platform designed for production.
+                Unify security telemetry, threat intelligence, and automated compliance into one control plane—giving your team a workbench and your enterprise armor.
               </p>
 
               {/* CTA Button */}
@@ -893,7 +893,7 @@ export default function Home() {
                 target={120}
                 suffix="ms"
                 decimals={0}
-                label="Inference Time"
+                label="Threat Detection Speed"
                 index={0}
               />
               <StatCounter
@@ -901,7 +901,7 @@ export default function Home() {
                 target={99.99}
                 suffix="%"
                 decimals={2}
-                label="Platform Uptime"
+                label="Security Posture Uptime"
                 index={1}
               />
               <StatCounter
@@ -909,7 +909,7 @@ export default function Home() {
                 target={24}
                 suffix="/7"
                 decimals={0}
-                label="Autonomous Runtime"
+                label="Autonomous EDR Shield"
                 index={2}
               />
               <StatCounter
@@ -917,7 +917,7 @@ export default function Home() {
                 target={2.4}
                 suffix="M"
                 decimals={1}
-                label="Context Windows"
+                label="Audited Telemetry Events"
                 index={3}
               />
             </footer>

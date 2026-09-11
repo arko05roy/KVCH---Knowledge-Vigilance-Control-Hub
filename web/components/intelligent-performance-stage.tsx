@@ -147,7 +147,7 @@ export function IntelligentPerformanceStage() {
           </h1>
 
           <p className="intro w-full m-0 mt-[0.34em] text-[#8a8f98] text-[clamp(13px,min(1.36vw,2.6vh),20.6px)] font-normal tracking-[-0.017em] leading-[1.62]">
-            Every capability is engineered for speed, scale and<br className="hidden md:inline" /> contextual understanding, giving your AI the foundation<br className="hidden md:inline" /> to reason, adapt and perform in production.
+            Every security capability is engineered for real-time threat detection, automated patch<br className="hidden md:inline" /> validation, and role-based governance—giving your enterprise<br className="hidden md:inline" /> the armor to reason, adapt, and perform in production.
           </p>
         </div>
 
