@@ -1,0 +1,103 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-11T19:53:33.995120Z",
+  "severity": "low",
+  "category": "phishing_hunter",
+  "title": "Phishing Typosquatting & Impersonation Scan",
+  "summary": "Phishing hunt completed for target MacBook-Air.lan.local. Analyzed 900 typosquatting variations. Found 0 suspicious domains and 0 high-risk impersonations.",
+  "resource": {
+    "type": "domain",
+    "id": "MacBook-Air.lan.local",
+    "name": "MacBook-Air.lan"
+  },
+  "evidence": [
+    "Typosquat permutations tested: 900",
+    "Suspicious domains: 0"
+  ],
+  "indicators": [],
+  "baseline": {
+    "active_phishing_tolerance": 0
+  },
+  "recommended_actions": [
+    "Block identified lookalike domains at local DNS resolvers and web proxies",
+    "Monitor domain registrar WHOIS updates for brand impersonation",
+    "Initiate domain takedown requests for confirmed phishing portals"
+  ],
+  "details": {
+    "target_domain": "MacBook-Air.lan.local",
+    "target_hostname": "MacBook-Air.lan",
+    "scan_timestamp": "2026-09-12T01:23:25.921479Z",
+    "execution_metrics": {
+      "duration_seconds": 8.074
+    },
+    "typosquatting_generation": {
+      "typosquats_generated_count": 900,
+      "typosquatting_sample": [
+        "MacBooi-Akr.com",
+        "MacBooi-Akr.net",
+        "MacBooi-Akr.org",
+        "MacBooi-Akr.io",
+        "MacBooi-Akr.co",
+        "MacBooi-Akr.uk",
+        "MacBooi-Akr.de",
+        "MacBooi-Akr.fr",
+        "MacBooi-Akr.au",
+        "MacBooi-Akr.ca",
+        "MocBaok-Air.com",
+        "MocBaok-Air.net",
+        "MocBaok-Air.org",
+        "MocBaok-Air.io",
+        "MocBaok-Air.co",
+        "MocBaok-Air.uk",
+        "MocBaok-Air.de",
+        "MocBaok-Air.fr",
+        "MocBaok-Air.au",
+        "MocBaok-Air.ca",
+        "MacBook-Air.com",
+        "MacBook-Air.net",
+        "MacBook-Air.org",
+        "MacBook-Air.io",
+        "MacBook-Air.co"
+      ]
+    },
+    "suspicious_domains_analysis": {
+      "suspicious_domains_count": 0,
+      "suspicious_domains": [],
+      "high_risk_domains_count": 0,
+      "high_risk_domains": []
+    },
+    "whois_intelligence": {},
+    "dns_reconnaissance": {},
+    "risk_assessments": [],
+    "manifest": {
+      "identity": {
+        "name": "Phishing Hunter",
+        "type": "report",
+        "creator": "external-threat-team",
+        "edit_access": [
+          "external-threat-team",
+          "security-team"
+        ],
+        "target_scope": "Domains and subdomains related to company.com"
+      },
+      "intent": {
+        "what_is_normal": "- Company-owned domains that are properly registered and maintained\n- Domains that are more than 30 days old\n",
+        "what_is_not_normal": "- Typosquatting domains\n- Domains registered within the last 30 days\n- Domains containing suspicious keywords (secure, login, verify)\n"
+      },
+      "routing": {
+        "escalation_route": [
+          "security_analyst",
+          "ciso"
+        ]
+      },
+      "governance": {
+        "evaluation_threshold": "HIGH",
+        "approved_artifact_hash": "pending-evaluation"
+      }
+    },
+    "escalation_route": [
+      "security_analyst"
+    ],
+    "phishing_risk_level": "LOW"
+  }
+}

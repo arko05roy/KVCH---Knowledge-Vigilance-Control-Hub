@@ -62,8 +62,7 @@ def main():
     reports_dir = Path(__file__).resolve().parent.parent / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
     
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    report_file = reports_dir / f"finding_cookie_xss_analyzer_{timestamp}.json"
+    report_file = reports_dir / "finding_8_cookie_xss_analyzer.json"
 
     envelope = FindingEnvelope()
     envelope.set_extension_info("cookie-xss-auditor", "1.0.0")
