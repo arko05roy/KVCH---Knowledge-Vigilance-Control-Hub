@@ -547,6 +547,7 @@ export const FLOW_SCENARIOS: FlowScenario[] = [
 ];
 
 export default function ThreatReactFlowDiagram() {
+  const [mounted, setMounted] = useState<boolean>(false);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>("SCENARIO-1-EDR");
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -559,8 +560,12 @@ export default function ThreatReactFlowDiagram() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const currentScenario = FLOW_SCENARIOS.find((s) => s.id === selectedScenarioId) || FLOW_SCENARIOS[0];
-  const currentNode = currentScenario.nodes[currentStepIndex] || currentScenario.nodes[0];
+  const currentNode = currentScenario.nodes[Math.min(currentStepIndex, currentScenario.nodes.length - 1)] || currentScenario.nodes[0];
 
   // Stepper Auto-Play interval
   useEffect(() => {
@@ -879,6 +884,17 @@ export default function ThreatReactFlowDiagram() {
           >
             {/* Bezier Animated SVG Edges Layer */}
             <svg className="absolute inset-0 w-[2400px] h-[600px] pointer-events-none z-10 overflow-visible">
+              <defs>
+                <style>{`
+                  @keyframes kvchEdgeDash {
+                    from { stroke-dashoffset: 28; }
+                    to { stroke-dashoffset: 0; }
+                  }
+                  .kvch-animated-edge {
+                    animation: kvchEdgeDash 1.2s linear infinite;
+                  }
+                `}</style>
+              </defs>
               {currentScenario.edges.map((edge) => {
                 const sourceNode = currentScenario.nodes.find((n) => n.id === edge.source);
                 const targetNode = currentScenario.nodes.find((n) => n.id === edge.target);
@@ -916,7 +932,7 @@ export default function ThreatReactFlowDiagram() {
                         stroke="#818cf8"
                         strokeWidth="3"
                         strokeDasharray="8 6"
-                        className="animate-[dash_1.5s_linear_infinite]"
+                        className="kvch-animated-edge"
                       />
                     )}
                   </g>

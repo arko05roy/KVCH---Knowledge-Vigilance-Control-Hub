@@ -428,6 +428,7 @@ export const THREAT_SCENARIOS: ThreatScenarioGraph[] = [
 ];
 
 export default function ThreatFlowDiagram() {
+  const [mounted, setMounted] = useState<boolean>(false);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>("SCENARIO-1-C2");
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -435,8 +436,12 @@ export default function ThreatFlowDiagram() {
   const [activeTab, setActiveTab] = useState<"diagram" | "telemetry" | "mitre">("diagram");
   const [inspectNodeId, setInspectNodeId] = useState<string | null>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const currentScenario = THREAT_SCENARIOS.find((s) => s.id === selectedScenarioId) || THREAT_SCENARIOS[0];
-  const currentStep = currentScenario.steps[currentStepIndex] || currentScenario.steps[0];
+  const currentStep = currentScenario.steps[Math.min(currentStepIndex, currentScenario.steps.length - 1)] || currentScenario.steps[0];
 
   // Auto-play stepper effect
   useEffect(() => {
