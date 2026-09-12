@@ -1,0 +1,11 @@
+{
+  "name": "gie-filter",
+  "version": "0.1.0",
+  "description": "GIE-512 invariant filtration layer: raw heterogeneous system logs in, normalized defect frames out. Software reference implementation of the GIE-512 whitepaper.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "bench": "node src/bench.js",
+    "filter": "node src/service.js"
+  }
+}

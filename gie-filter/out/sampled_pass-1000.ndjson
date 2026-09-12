@@ -1,0 +1,11 @@
+{"sampled_pass":true,"raw":"{\"t\":\"db_query\",\"host\":\"api-2\",\"ts\":\"2026-09-13T02:00:59Z\",\"query\":\"INSERT INTO audit_log (actor, action, ts) VALUES ('v771', 'v771', 89608)\"}","ref":"line:133"}
+{"sampled_pass":true,"raw":"_PID=9209 _COMM=node _HOSTNAME=web-2 MESSAGE=\"request completed in 57ms\"","ref":"line:161"}
+{"sampled_pass":true,"raw":"dns ts=2026-09-13T02:01:56Z src=10.0.4.108 qname=static.example.com qtype=A","ref":"line:193"}
+{"sampled_pass":true,"raw":"{\"evt\":\"mem\",\"host\":\"api-2\",\"ts\":\"2026-09-13T02:02:01Z\",\"prot\":\"READ\"}","ref":"line:332"}
+{"sampled_pass":true,"raw":"{\"t\":\"oauth\",\"host\":\"db-1\",\"ts\":\"2026-09-13T02:02:28Z\",\"flow\":\"authorize\",\"code_challenge\":\"E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM\",\"challenge_method\":\"S256\",\"redirect_uri\":\"https://app.kvch.internal/oauth/callback\"}","ref":"line:361"}
+{"sampled_pass":true,"raw":"{\"evt\":\"mem\",\"host\":\"web-1\",\"ts\":\"2026-09-13T02:03:28Z\",\"prot\":\"READ|EXEC\"}","ref":"line:424"}
+{"sampled_pass":true,"raw":"34.54.9.19 - - [13/Sep/2026:02:03:58 +0000] \"GET /profile?id=5388 HTTP/1.1\" 200 3453 host=api.kvch.internal","ref":"line:532"}
+{"sampled_pass":true,"raw":"{\"evt\":\"flow\",\"host\":\"api-1\",\"ts\":\"2026-09-13T02:05:19Z\",\"dport\":443,\"proto\":\"h2\",\"bytes_in\":3160,\"req_count\":17}","ref":"line:687"}
+{"sampled_pass":true,"raw":"{\"host\":\"db-1\",\"ts\":\"2026-09-13T02:05:55Z\",\"evt\":\"file_write\",\"comm\":\"app\",\"path\":\"/app/data/session-100.log\"}","ref":"line:725"}
+{"sampled_pass":true,"raw":"{\"evt\":\"mem\",\"host\":\"edge-1\",\"ts\":\"2026-09-13T02:07:28Z\",\"prot\":\"READ|WRITE\"}","ref":"line:1022"}
+{"sampled_pass":true,"raw":"{\"evt\":\"flow\",\"host\":\"api-1\",\"ts\":\"2026-09-13T02:08:05Z\",\"dport\":443,\"proto\":\"h2\",\"bytes_in\":3763,\"req_count\":1}","ref":"line:1061"}
