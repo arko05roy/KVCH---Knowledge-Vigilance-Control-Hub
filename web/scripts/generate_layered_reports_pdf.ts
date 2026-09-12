@@ -191,7 +191,7 @@ function createPdfReport(data: ReportData, outputPath: string, isFullAllowance: 
   );
 
   doc.end();
-  return new Promise((resolve) => stream.on("finish", resolve));
+  return new Promise<void>((resolve) => stream.on("finish", () => resolve()));
 }
 
 async function main() {
