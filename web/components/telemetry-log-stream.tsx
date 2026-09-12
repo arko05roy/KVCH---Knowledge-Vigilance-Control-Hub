@@ -134,11 +134,13 @@ export const SAMPLE_TELEMETRY_LOGS: TelemetryLogEntry[] = [
   },
 ];
 
-export function TelemetryLogStream() {
+export function TelemetryLogStream({ logs }: { logs?: TelemetryLogEntry[] }) {
   const [filter, setFilter] = useState<"ALL" | "MALICIOUS" | "BENIGN">("ALL");
   const [search, setSearch] = useState("");
 
-  const filteredLogs = SAMPLE_TELEMETRY_LOGS.filter((log) => {
+  const activeLogs = logs && logs.length > 0 ? logs : SAMPLE_TELEMETRY_LOGS;
+
+  const filteredLogs = activeLogs.filter((log) => {
     if (filter === "MALICIOUS" && !log.isMalicious) return false;
     if (filter === "BENIGN" && log.isMalicious) return false;
     if (search && !log.message.toLowerCase().includes(search.toLowerCase()) && !log.extension.toLowerCase().includes(search.toLowerCase())) {
@@ -147,7 +149,7 @@ export function TelemetryLogStream() {
     return true;
   });
 
-  const maliciousCount = SAMPLE_TELEMETRY_LOGS.filter((l) => l.isMalicious).length;
+  const maliciousCount = activeLogs.filter((l) => l.isMalicious).length;
 
   return (
     <div className="w-full bg-[#08090a] border border-[#232529] rounded-xl overflow-hidden font-mono text-[12px] my-4 shadow-lg">
@@ -182,7 +184,7 @@ export function TelemetryLogStream() {
                 filter === "ALL" ? "bg-[#1e2025] text-[#f7f8f8]" : "text-[#8a8f98] hover:text-[#f7f8f8]"
               }`}
             >
-              All ({SAMPLE_TELEMETRY_LOGS.length})
+              All ({activeLogs.length})
             </button>
             <button
               onClick={() => setFilter("MALICIOUS")}

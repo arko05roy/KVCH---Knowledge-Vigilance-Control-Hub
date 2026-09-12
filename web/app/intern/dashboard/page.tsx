@@ -4,14 +4,21 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { AiReportDisplayCard } from "@/components/ai-report-card";
 import { DEMO_REPORTS } from "@/lib/demo-data";
 import { MinimalSparklineChart } from "@/components/charts/minimal-charts";
-import { TelemetryLogStream } from "@/components/telemetry-log-stream";
+import { TelemetryLogStream, SAMPLE_TELEMETRY_LOGS, TelemetryLogEntry } from "@/components/telemetry-log-stream";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function InternDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportData, setReportData] = useState<any>(DEMO_REPORTS.intern);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
+
+  // 10-Second Auto-Stream & Telemetry State
+  const [autoRun, setAutoRun] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [logs, setLogs] = useState<TelemetryLogEntry[]>(SAMPLE_TELEMETRY_LOGS);
+  const [pulseCount, setPulseCount] = useState(0);
 
   // Interactive Checklist State
   const [checklist, setChecklist] = useState({
@@ -22,12 +29,24 @@ export default function InternDashboardPage() {
   });
 
   const toggleCheck = (key: keyof typeof checklist) => {
-    setChecklist((prev) => ({ ...prev, [key]: !prev[key] }));
+    setChecklist((prev) => {
+      const updated = { ...prev, [key]: !prev[key] };
+      const count = Object.values(updated).filter(Boolean).length;
+      if (count === 4) {
+        setStatusNotice("🎉 All 4 Triage Verification Steps Complete! Incident #INC-2026-8891 ready for Sr. Dev sign-off.");
+      } else {
+        setStatusNotice(`Checklist updated: ${count}/4 verification tasks completed.`);
+      }
+      return updated;
+    });
   };
 
-  const handleGenerateAiReport = async () => {
+  const handleGenerateAiReport = useCallback(async () => {
     setIsGenerating(true);
     setErrorMsg(null);
+    const now = new Date();
+    const timeStr = now.toTimeString().split(" ")[0] + "." + String(now.getMilliseconds()).padStart(3, "0");
+
     try {
       const res = await fetch("/api/demo/seed-finding", {
         method: "POST",
@@ -43,15 +62,48 @@ export default function InternDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.intern);
+      setPulseCount((prev) => prev + 1);
+
+      // Prepend fresh log entry to telemetry stream
+      const newLog: TelemetryLogEntry = {
+        id: `log-live-${Date.now()}`,
+        timestamp: timeStr,
+        level: "INFO",
+        extension: "edr-daemon",
+        message: `⚡ 10s AI Triage Pulse #${pulseCount + 1}: Synthesized fresh findings report for Incident #INC-2026-8891`,
+        isMalicious: false,
+      };
+
+      setLogs((prevLogs) => [newLog, ...prevLogs.slice(0, 25)]);
+      setStatusNotice(`⚡ [${timeStr.split(".")[0]}] Sovereign Ollama AI: Triage Walkthrough Auto-Synthesized (Pulse #${pulseCount + 1})`);
     } catch (err: unknown) {
       const error = err as { message?: string };
       setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
+      setCountdown(10);
     }
-  };
+  }, [pulseCount]);
+
+  // 10-Second Continuous Polling Loop
+  useEffect(() => {
+    if (!autoRun) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          handleGenerateAiReport();
+          return 10;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [autoRun, handleGenerateAiReport]);
 
   const completedCount = Object.values(checklist).filter(Boolean).length;
+  const isFullyVerified = completedCount === 4;
 
   return (
     <DashboardShell roleName="Intern" navItems={[]} hideHeader>
@@ -72,20 +124,6 @@ export default function InternDashboardPage() {
               </h1>
             </div>
             <div className="flex items-center gap-2.5">
-              <button
-                onClick={handleGenerateAiReport}
-                disabled={isGenerating}
-                className="px-3 py-1.5 bg-[#1e2025] hover:bg-[#282a30] text-[12.5px] font-medium text-[#f7f8f8] rounded-md border border-[#2b2d31] transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {isGenerating ? (
-                  <>
-                    <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Generating AI Notes...
-                  </>
-                ) : (
-                  "⚡ Run AI Triage Walkthrough"
-                )}
-              </button>
               <Link
                 href="/intern/tasks"
                 className="px-3 py-1.5 bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[12.5px] font-medium text-[#0c0d0e] rounded-md transition-colors"
@@ -96,15 +134,27 @@ export default function InternDashboardPage() {
           </div>
         </div>
 
+        {/* Live Status Toast Banner */}
+        {statusNotice && (
+          <div className="mx-8 mt-4 p-3 bg-[#121f17] border border-[#2ea043]/40 rounded-lg text-[#2ea043] text-[12.5px] flex items-center justify-between animate-fadeIn">
+            <span>{statusNotice}</span>
+            <button onClick={() => setStatusNotice(null)} className="text-[#8a8f98] hover:text-[#f7f8f8] text-xs">✕</button>
+          </div>
+        )}
+
         {/* Overview Stats Row */}
         <div className="px-8 py-5 grid grid-cols-4 gap-3.5">
           <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Assigned Triage Alerts</span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-[24px] font-semibold text-[#f7f8f8]">4</span>
+              <span className="text-[24px] font-semibold text-[#f7f8f8]">
+                {isFullyVerified ? "2" : "4"}
+              </span>
               <MinimalSparklineChart data={[2, 3, 1, 4, 3, 5, 4]} color="#828fff" />
             </div>
-            <span className="text-[11px] text-[#2ea043] mt-2 flex items-center gap-1">✓ 2 verified today</span>
+            <span className="text-[11px] text-[#2ea043] mt-2 flex items-center gap-1">
+              ✓ {isFullyVerified ? "4 verified today" : "2 verified today"}
+            </span>
           </div>
 
           <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
@@ -133,8 +183,12 @@ export default function InternDashboardPage() {
           <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Triage Difficulty Score</span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-[24px] font-semibold text-[#ff5555]">78</span>
-              <span className="text-[11px] font-mono text-[#ff5555]">HIGH</span>
+              <span className={`text-[24px] font-semibold ${isFullyVerified ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+                {isFullyVerified ? "18" : "78"}
+              </span>
+              <span className={`text-[11px] font-mono ${isFullyVerified ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+                {isFullyVerified ? "RESOLVED" : "HIGH"}
+              </span>
             </div>
             <span className="text-[11px] text-[#8a8f98] mt-2">Incident #INC-2026-8891</span>
           </div>
@@ -149,7 +203,7 @@ export default function InternDashboardPage() {
 
         {/* Live EDR Telemetry Log Stream Section (15 logs, 4 Malicious highlighted in Red) */}
         <div className="px-8 mb-6">
-          <TelemetryLogStream />
+          <TelemetryLogStream logs={logs} />
         </div>
 
         {/* AI Triage Intelligence Report Card (Zero Monetary Values for Intern) */}

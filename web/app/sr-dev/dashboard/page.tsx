@@ -5,9 +5,9 @@ import { AiReportDisplayCard } from "@/components/ai-report-card";
 import { DEMO_REPORTS } from "@/lib/demo-data";
 import { MinimalSparklineChart } from "@/components/charts/minimal-charts";
 import { CodeDiffViewer } from "@/components/code-diff-viewer";
-import { TelemetryLogStream } from "@/components/telemetry-log-stream";
+import { TelemetryLogStream, SAMPLE_TELEMETRY_LOGS, TelemetryLogEntry } from "@/components/telemetry-log-stream";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function SrDevDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -15,15 +15,33 @@ export default function SrDevDashboardPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
+  // 10-Second Auto-Stream & Telemetry State
+  const [autoRun, setAutoRun] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [logs, setLogs] = useState<TelemetryLogEntry[]>(SAMPLE_TELEMETRY_LOGS);
+  const [pulseCount, setPulseCount] = useState(0);
+
+  // Interactive Containment State
+  const [containmentExecuted, setContainmentExecuted] = useState(false);
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedCmd(label);
     setTimeout(() => setCopiedCmd(null), 2000);
   };
 
-  const handleGenerateAiReport = async () => {
+  const handleExecuteContainment = () => {
+    setContainmentExecuted(true);
+    setStatusNotice("🛡️ Technical Containment Executed: Malicious process PID 14209 terminated & IP 185.220.101.5 blocked via iptables.");
+  };
+
+  const handleGenerateAiReport = useCallback(async () => {
     setIsGenerating(true);
     setErrorMsg(null);
+    const now = new Date();
+    const timeStr = now.toTimeString().split(" ")[0] + "." + String(now.getMilliseconds()).padStart(3, "0");
+
     try {
       const res = await fetch("/api/demo/seed-finding", {
         method: "POST",
@@ -39,13 +57,45 @@ export default function SrDevDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.srDev);
+      setPulseCount((prev) => prev + 1);
+
+      // Prepend fresh log entry to telemetry stream
+      const newLog: TelemetryLogEntry = {
+        id: `log-live-${Date.now()}`,
+        timestamp: timeStr,
+        level: "CRITICAL",
+        extension: "attack-surface-scanner",
+        message: `⚡ 10s AI SOC Pulse #${pulseCount + 1}: Analyzed port 5432 binding baseline deviation on localhost`,
+        isMalicious: true,
+      };
+
+      setLogs((prevLogs) => [newLog, ...prevLogs.slice(0, 25)]);
+      setStatusNotice(`⚡ [${timeStr.split(".")[0]}] Sovereign Ollama AI: Technical Security Report Auto-Synthesized (Pulse #${pulseCount + 1})`);
     } catch (err: unknown) {
       const error = err as { message?: string };
       setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
+      setCountdown(10);
     }
-  };
+  }, [pulseCount]);
+
+  // 10-Second Continuous Polling Loop
+  useEffect(() => {
+    if (!autoRun) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          handleGenerateAiReport();
+          return 10;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [autoRun, handleGenerateAiReport]);
 
   return (
     <DashboardShell roleName="Sr. Dev" navItems={[]} hideHeader>
@@ -66,20 +116,6 @@ export default function SrDevDashboardPage() {
               </h1>
             </div>
             <div className="flex items-center gap-2.5">
-              <button
-                onClick={handleGenerateAiReport}
-                disabled={isGenerating}
-                className="px-3 py-1.5 bg-[#1e2025] hover:bg-[#282a30] text-[12.5px] font-medium text-[#f7f8f8] rounded-md border border-[#2b2d31] transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {isGenerating ? (
-                  <>
-                    <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Calling Groq AI Key Pool...
-                  </>
-                ) : (
-                  "⚡ Run AI Technical Report"
-                )}
-              </button>
               <Link
                 href="/extensions"
                 className="px-3 py-1.5 bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[12.5px] font-medium text-[#0c0d0e] rounded-md transition-colors"
@@ -89,6 +125,14 @@ export default function SrDevDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Live Status Toast Banner */}
+        {statusNotice && (
+          <div className="mx-8 mt-4 p-3 bg-[#121f17] border border-[#2ea043]/40 rounded-lg text-[#2ea043] text-[12.5px] flex items-center justify-between animate-fadeIn">
+            <span>{statusNotice}</span>
+            <button onClick={() => setStatusNotice(null)} className="text-[#8a8f98] hover:text-[#f7f8f8] text-xs">✕</button>
+          </div>
+        )}
 
         {/* Overview Stats Row */}
         <div className="px-8 py-5 grid grid-cols-4 gap-3.5">
@@ -104,28 +148,40 @@ export default function SrDevDashboardPage() {
           <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Active C2 Connection</span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-[24px] font-semibold text-[#ff5555]">1</span>
-              <span className="text-[11px] font-mono text-[#ff5555]">PID 14209</span>
+              <span className={`text-[24px] font-semibold ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+                {containmentExecuted ? "0" : "1"}
+              </span>
+              <span className={`text-[11px] font-mono ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+                {containmentExecuted ? "CONTAINED" : "PID 14209"}
+              </span>
             </div>
-            <span className="text-[11px] text-[#ff5555] mt-2 font-mono">185.220.101.5:443 (Reverse Shell)</span>
+            <span className={`text-[11px] font-mono mt-2 ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+              {containmentExecuted ? "Outbound Traffic Blocked" : "185.220.101.5:443 (Reverse Shell)"}
+            </span>
           </div>
 
           <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
-            <span className="text-[11.5px] font-medium text-[#8a8f98]">Groq Key Pool Health</span>
+            <span className="text-[11.5px] font-medium text-[#8a8f98]">Ollama AI Local Engine</span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-[24px] font-semibold text-[#2ea043]">4/4</span>
-              <span className="text-[11px] text-[#2ea043]">Round-Robin</span>
+              <span className="text-[24px] font-semibold text-[#2ea043]">ONLINE</span>
+              <span className="text-[11px] text-[#2ea043] font-mono">100% Air-Gapped</span>
             </div>
-            <span className="text-[11px] text-[#8a8f98] mt-2">Automatic 429 failover active</span>
+            <span className="text-[11px] text-[#8a8f98] mt-2">qwen2.5-coder:7b active</span>
           </div>
 
           <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Incident Severity Score</span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-[24px] font-semibold text-[#ff5555]">92</span>
-              <span className="text-[11px] font-mono text-[#ff5555]">CRITICAL</span>
+              <span className={`text-[24px] font-semibold ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+                {containmentExecuted ? "14" : "92"}
+              </span>
+              <span className={`text-[11px] font-mono ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+                {containmentExecuted ? "LOW" : "CRITICAL"}
+              </span>
             </div>
-            <span className="text-[11px] text-[#ff5555] mt-2 font-mono">Port 5432 Exposed</span>
+            <span className={`text-[11px] font-mono mt-2 ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+              {containmentExecuted ? "Remediated & Isolated" : "Port 5432 Exposed"}
+            </span>
           </div>
         </div>
 
@@ -138,7 +194,7 @@ export default function SrDevDashboardPage() {
 
         {/* Live EDR Telemetry Log Stream Section (15-20 logs, 4 Malicious highlighted in Red) */}
         <div className="px-8 mb-6">
-          <TelemetryLogStream />
+          <TelemetryLogStream logs={logs} />
         </div>
 
         {/* Technical AI Report Card */}
@@ -164,12 +220,20 @@ export default function SrDevDashboardPage() {
             <div className="bg-[#08090a] border border-[#232529] rounded p-3 font-mono text-[12px]">
               <div className="flex items-center justify-between text-[#8a8f98] mb-1">
                 <span>Command 1: Terminate Malicious C2 Reverse Shell Process</span>
-                <button
-                  onClick={() => copyToClipboard("sudo kill -9 14209", "cmd1")}
-                  className="text-[11px] text-[#828fff] hover:underline"
-                >
-                  {copiedCmd === "cmd1" ? "✓ Copied!" : "Copy Command"}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleExecuteContainment}
+                    className="text-[11px] font-semibold text-[#2ea043] bg-[#2ea043]/10 border border-[#2ea043]/30 px-2 py-0.5 rounded hover:bg-[#2ea043]/20 transition-colors"
+                  >
+                    {containmentExecuted ? "✓ Executed & Isolated" : "⚡ Run Shell Containment"}
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard("sudo kill -9 14209", "cmd1")}
+                    className="text-[11px] text-[#828fff] hover:underline"
+                  >
+                    {copiedCmd === "cmd1" ? "✓ Copied!" : "Copy Command"}
+                  </button>
+                </div>
               </div>
               <code className="text-[#f7f8f8] block bg-[#121316] p-2 rounded border border-[#232529]">
                 sudo kill -9 14209

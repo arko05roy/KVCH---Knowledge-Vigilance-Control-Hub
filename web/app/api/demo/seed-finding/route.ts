@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       }
     };
 
-    console.log("[Demo Trigger] Calling Groq Key Pool for 4-Role AI Report Generation...");
+    console.log("[Demo Trigger] Calling Local Sovereign Ollama AI Layer for 4-Role AI Report Generation...");
     const aiReports = await generateAllRoleReports(sampleFinding);
 
     const enrichedEnvelope = {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "AI Role Reports generated successfully via Groq key pool!",
+      message: "AI Role Reports generated successfully via local Ollama inference engine!",
       finding: enrichedEnvelope
     });
   } catch (error: unknown) {
@@ -55,3 +55,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: err?.message || "Generation failed" }, { status: 500 });
   }
 }
+

@@ -1,5 +1,4 @@
-import "server-only";
-import { groqPool } from "./groq";
+import { ollamaProvider } from "./providers/ollama";
 import type { FindingEnvelope } from "../judge/findings";
 
 export interface QuantifiedRiskMetrics {
@@ -229,22 +228,7 @@ Required JSON Structure per role:
 }`;
 
   try {
-    const response = await groqPool.createCompletion({
-      model: "groq/compound",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are the KVCH Cyber Risk Economics & Financial Quantification Engine. You translate technical telemetry into monetary risk (EAL, ROSI), regulatory compliance (ISO 27001, NIST, CIS, RBI, SEBI), extension correlation (attack-surface, vpn-crypto, phishing, threat-hunter, malware), asset criticality modeling (Developer Laptop ₹0-₹10,000 vs Production Server ₹10L+), and actionable 4-role security reports. Output strictly valid raw JSON without markdown codeblocks or conversational text."
-        },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.2,
-      response_format: { type: "json_object" }
-    });
-
-    const content = response.choices[0]?.message?.content || "{}";
-    const parsed = JSON.parse(content);
+    const analysis = await ollamaProvider.generateAnalysis(finding);
     const now = new Date().toISOString();
 
     // Detect asset criticality for fallbacks
@@ -374,10 +358,34 @@ Required JSON Structure per role:
       severity: finding.severity || "medium",
       category: finding.category || "security",
       reports: {
-        srDev: formatRoleReport("srDev", parsed.srDev),
-        intern: formatRoleReport("intern", parsed.intern),
-        hr: formatRoleReport("hr", parsed.hr),
-        management: formatRoleReport("management", parsed.management)
+        srDev: formatRoleReport("srDev", {
+          title: `Technical Analysis: ${finding.title}`,
+          summary: analysis.technical_summary || analysis.executive_summary,
+          businessImpact: analysis.business_impact,
+          recommendedActions: analysis.recommended_actions,
+          finalVerdict: analysis.severity_reasoning
+        }),
+        intern: formatRoleReport("intern", {
+          title: `Triage Walkthrough: ${finding.title}`,
+          summary: analysis.executive_summary,
+          businessImpact: analysis.business_impact,
+          recommendedActions: analysis.recommended_actions,
+          finalVerdict: analysis.severity_reasoning
+        }),
+        hr: formatRoleReport("hr", {
+          title: `Access Governance: ${finding.title}`,
+          summary: analysis.executive_summary,
+          businessImpact: analysis.business_impact,
+          recommendedActions: analysis.recommended_actions,
+          finalVerdict: analysis.severity_reasoning
+        }),
+        management: formatRoleReport("management", {
+          title: `Executive Cyber Brief: ${finding.title}`,
+          summary: analysis.executive_summary,
+          businessImpact: analysis.business_impact,
+          recommendedActions: analysis.recommended_actions,
+          finalVerdict: analysis.severity_reasoning
+        })
       }
     };
   } catch (error) {

@@ -96,6 +96,16 @@ const ROLE_NAVS: Record<string, RoleNavConfig> = {
         ]
       }
     ]
+  },
+  "Risk Intelligence": {
+    top: [
+      { label: "Dashboard", href: "/risk-intelligence", icon: <DashboardIcon /> },
+      { label: "Threat Monitor", href: "/risk-intelligence/threats", icon: <AlertIcon /> },
+      { label: "Forensic Audits", href: "/risk-intelligence/audits", icon: <IncidentsIcon /> },
+      { label: "Compliance Scorecard", href: "/risk-intelligence/compliance", icon: <ChartIcon /> },
+      { label: "Security Guardrails", href: "/risk-intelligence/policies", icon: <PolicyIcon /> },
+    ],
+    sections: []
   }
 };
 

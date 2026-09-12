@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { RiskNavTabs } from '@/components/risk-nav';
 
 interface Mitigation {
   action_id: string;
@@ -467,6 +468,9 @@ export default function RiskIntelligencePage() {
           </div>
         </div>
       </header>
+
+      {/* Sub Navigation Tabs */}
+      <RiskNavTabs />
 
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-6 py-8">

@@ -1,316 +1,241 @@
-# KVCH — Product Requirements Document & Technical Specification
+# KVCH — Product Requirements Document & Comprehensive Technical Specification
 
-**Expanded name:** Knowledge, Vigilance, Control Hub  
-**Pronunciation:** “Kavach”  
-**Meaning:** *Kavach* means armor—a protective layer surrounding people, systems, and work.  
-**Document status:** Production Specification & Implementation Reference  
-**Version:** 1.1  
-**Date:** 6 September 2026  
-**Primary deployment model:** Self-hosted inside customer-controlled infrastructure  
+**Expanded Name:** Knowledge, Vigilance, Control Hub  
+**Pronunciation:** “Kavach” (Hindi: defense armor)  
+**Document Status:** Complete Production Specification & Implementation Reference  
+**Version:** 2.0.0-alpha  
+**Date:** 12 September 2026  
+**Primary Deployment Model:** Self-hosted inside customer-controlled sovereign infrastructure  
 
 ---
 
 ## 1. Executive Summary
 
-KVCH is a sovereign artificial-intelligence workbench, organizational control plane, and endpoint security hub for an entire enterprise.
+**KVCH (Knowledge, Vigilance, Control Hub)** is an enterprise-grade artificial intelligence workbench, organizational control plane, and continuous cyber risk quantification system.
 
-Every employee—from intern to engineer, Human Resources staff, security analyst, and executive—receives a role-specific workspace containing approved agents, relevant tools, tasks, notifications, and reports. At the same time, KVCH observes actions across company systems, detects mistakes and threats, checks them against company policy, places risky actions into controlled hold states, routes them to the correct owner, and escalates only when risk or delay requires it.
+Every employee—from interns to senior developers, Human Resources directors, security analysts, and executive leadership—operates within a role-specific, Linear-inspired workspace containing approved AI agents, relevant tools, tasks, notification streams, and actionable reports. At the same time, KVCH continuously observes actions across company infrastructure, detects operational mistakes and security threats, checks them against enterprise policy guardrails, places risky actions into controlled hold states, routes contextual notifications to responsible owners, and quantifies financial loss exposure in real time.
 
-KVCH operates a **dual-layer architecture**:
-1. **Internal Workbench Control Plane**: A Next.js 15 App Router interface featuring role-specific dashboards (`/intern`, `/sr-dev`, `/hr`, `/management`), an extension management portal (`/extensions`), real-time dynamic timezone clocks, and inbox/pulse redesigns.
-2. **External Defense & Endpoint Vigilance Plane**: A suite of **8 specialized security detection engines** alongside an **always-on 24/7 EDR background daemon (`kvch-agent`)**. This system monitors file system changes, process trees, network sockets, open ports, browser cookies, and supply chain dependencies, streaming real-time security findings over WebSockets (`/api/ws`) into a central Prisma-backed PostgreSQL database.
+KVCH operates a **dual-layer unified architecture**:
+1. **Internal Workbench & Control Plane (Next.js 16 App Router)**: A near-black, software-craft interface featuring 5 specialized role-based suites (`/sr-dev`, `/intern`, `/management`, `/hr`, `/risk-intelligence`), an extension marketplace & WASM sandbox (`/extensions`), real-time global timezone headers, and Linear-style high-density data tables.
+2. **External Defense & Endpoint Vigilance Plane**: A suite of **8 specialized security detection engines** operating alongside an **always-on 24/7 EDR background daemon (`kvch-agent`)**. This system monitors file system events, process trees, network sockets, open ports, browser cookie databases, and supply chain lockfiles, streaming real-time security findings over WebSockets (`/api/ws`) into a central Prisma-backed PostgreSQL database.
 
-Internal mistakes and external threats use one unified operating loop:
+All events—from internal PR mistakes to external malware injection—use one unified operating loop:
 
 ```text
-Event → Context → Policy → Risk → Owner → Decision → Resolution → Verification → Report
+Event Intake → Context Enrichment → Policy Guardrail → FAIR Risk Model → Role Projection → Decision Gate → Resolution → Verification
 ```
 
-Examples:
-
-- An intern attempts to merge a pull request that changes a protected deployment file. KVCH holds the action and asks a senior engineer for approval (`/intern` & `/sr-dev` views).
-- A developer asks an agent to generate tests. KVCH permits the action because it stays inside an approved sandbox and changes no protected resource.
-- A production credential or mnemonic seed appears in a commit or clipboard. KVCH (`credential-exposure-auditor`) blocks exposure, notifies the developer, and starts credential-rotation workflow.
-- A background daemon or packed executable spawns in `/tmp`. The 24/7 EDR agent detects the event (`malware-analyzer` & `threat-hunter-3000`), formats a `kvch.finding/v1` envelope, and streams an alert over WebSockets.
-- An external attack or weak VPN gateway affects a payroll service. The engineer sees technical evidence, Human Resources sees service and process impact, and management sees operational exposure. Each role sees one event through a different authorized projection.
-
-KVCH’s product thesis:
-
-> Most enterprise AI products help employees chat with company data. KVCH helps the company continuously understand what is happening, decide what may proceed, route what needs attention, and verify what got fixed.
-
-### Product line
-
-> **Every employee gets an AI workbench. The company gets armor.**
-
-### Short pitch
-
-> **Sentry watches software. KVCH watches work.**
+### Key Differentiators:
+- **"Sentry watches software. KVCH watches work."**
+- **Sovereign & Local First**: Runs locally or self-hosted; sensitive credentials, code diffs, and packet traces never leave customer infrastructure.
+- **Financial Risk Quantification**: Built-in Monte Carlo simulation engine converting raw technical vulnerabilities (CVEs, EPSS) into Expected Annual Loss (EAL in ₹ INR) and Return on Security Investment (ROSI %).
 
 ---
 
-## 2. Problem Statement
+## 🎨 2. Design System & Design Language Specifications
 
-Modern enterprises run through disconnected repositories, ticketing systems, employee platforms, document stores, spreadsheets, security products, network devices, approval tools, and AI agents. Each system knows only a narrow slice of company state.
+The KVCH user interface is explicitly modeled after **Linear's software-craft design language** (`DESIGN.md`). It presents a near-black, quietly luxurious, high-density control plane.
 
-This fragmentation creates six concrete failures.
+### 2.1 Color Ladder & Surface Lift Hierarchy
+Depth and visual separation are carried by a **4-step surface lift ladder + 1px hairline borders** rather than atmospheric drop shadows.
 
-### 2.1 Assistance lacks governance
-Employee AI tools can draft, edit, merge, deploy, message, or export without evaluating current action, affected resource, business context, policy, or risk before execution.
+| Surface Token | Hex Code | Purpose & Component Usage |
+| :--- | :--- | :--- |
+| **Canvas Anchor** | `#010102` / `#08090a` / `#0f1011` | Deepest background canvas (near-pure black with a subtle blue tint). |
+| **Surface 1 (Charcoal Lift)** | `#141516` / `#1a1b1d` | Default cards, data tables, code diff containers, telemetry panels. |
+| **Surface 2 (Elevated Lift)** | `#18191a` / `#1e2025` | Active tab headers, hovered card panels, modal overlays. |
+| **Surface 3 (Elevated Pill)** | `#262729` | Selected pill toggles, secondary button fills. |
+| **Hairline Border** | `#23252a` / `#2b2c2e` | 1px subtle divider rules & card boundaries. |
+| **Hairline Strong** | `#34343a` | Focused inputs, hovered card borders. |
 
-### 2.2 Governance lacks useful context
-Access-control systems can deny an action but cannot explain whether a change is safe, generate a remediation, identify the correct reviewer, or verify the outcome.
+### 2.2 Chromatic Accents & Semantic Colors
 
-### 2.3 Alerts stop at detection
-Security products generate alert noise without assigning company ownership, business purpose, resolution workflow, or escalation paths.
+| Role / Function | Token Name | Hex Code | Usage Guidelines |
+| :--- | :--- | :--- | :--- |
+| **Primary Brand Accent** | Linear Lavender-Blue | `#5e6ad2` | Used **scarcely**: active navigation tabs, primary CTAs, focus rings, key metric highlights. Hover: `#828fff`. |
+| **Success / Compliant** | Semantic Green | `#27a644` / `#2ea043` | Passed controls, compliant scorecards, mitigated threats, online status. |
+| **Warning / Moderate** | Amber Gold | `#f5a623` / `#f2c94c` | Medium risk alerts, audit mode policies, pending approvals. |
+| **Critical / Incident** | Critical Red | `#e5484d` / `#eb5757` | SEV-1 outages, active threats, quarantined PRs, SLA breach warnings. |
+| **Primary Text (Ink)** | Light Gray Ink | `#f7f8f8` | Primary headlines, card titles, key values. |
+| **Muted Text** | Slate Gray | `#8a8f98` / `#858688` | Table headers, metadata labels, timestamps, subtitles. |
+| **Code / Hash Tokens** | Linear Mono | Monospace | Hash strings, commit IDs, IP addresses, terminal commands. |
 
-### 2.4 Different levels receive wrong information
-Developers need logs and diffs; HR needs process patterns; executives need business impact. Sending identical alerts creates noise and slows response.
+### 2.3 Typography Specifications
+Built on **Inter / SF Pro Display** (`--font-sans`) fallback with negative letter-spacing for headers, and **JetBrains Mono / Linear Mono** for code tokens.
 
-### 2.5 Internal operations and external defense remain disconnected
-Technical network weaknesses or endpoint anomalies remain isolated from business criticality and identity directory data.
-
-### 2.6 Cloud AI conflicts with sovereign environments
-Sending sensitive code, credentials, or packet traces to external AI services violates policy and legal constraints.
-
----
-
-## 3. Product Vision
-
-KVCH becomes the enterprise intelligence and action layer connecting:
-- people and reporting hierarchy;
-- roles and permissions;
-- code and repositories;
-- documents and policies;
-- applications and infrastructure;
-- network traffic and VPN gateways;
-- 24/7 endpoint EDR telemetry and 8 security scanning engines;
-- business processes and criticality;
-- AI agents and requested actions;
-- incidents, approvals, remediation, and evidence.
+* **Display XL / Hero**: `56px–80px`, Weight 600, Tracking `-1.8px` to `-3.0px`, Line Height `1.1`
+* **Headline / Card Title**: `22px–28px`, Weight 600, Tracking `-0.6px`, Line Height `1.2`
+* **Subhead / Body Large**: `18px–20px`, Weight 400, Tracking `-0.2px`, Line Height `1.4`
+* **Body Default**: `14px–16px`, Weight 400, Tracking `-0.05px`, Line Height `1.5`
+* **Eyebrow / Monospace**: `11px–13px`, Weight 500/400, Tracking `+0.4px` (Positive for taxonomy), Font: Mono
 
 ---
 
-## 4. Goals
+## 🗺️ 3. Complete Role Suite Architecture & Page Breakdown
 
-### 4.1 Primary goals
-1. **[COMPLETED]** Give every employee a useful, role-specific AI workbench (`/intern`, `/sr-dev`, `/hr`, `/management`).
-2. **[COMPLETED]** Govern consequential user and agent actions before execution (Action Gateway & PR guardrails).
-3. **[COMPLETED]** Detect internal mistakes, policy violations, operational failures, and external threats (8 security engines).
-4. **[COMPLETED]** Convert each finding into a standardized, trackable event (`kvch.finding/v1` schema).
-5. **[COMPLETED]** Route contextual notifications to responsible people via role projections.
-6. **[COMPLETED]** Implement 24/7 EDR endpoint monitoring with continuous background detection and WebSocket telemetry streaming (`/api/ws`).
-7. **[COMPLETED]** Provide a standardized extension packaging and evaluation bridge (`@arko05roy/kvch-extension` and `.kvch.tgz`).
-8. **[COMPLETED]** Integrate local-laptop host scanning (YARA-X, ifaddr, Nmap, TShark, `netstat -anv` snapshots).
-9. **[COMPLETED]** Maintain clean production builds (`npm run build`) and zero ESLint/TypeScript errors across the Next.js control plane.
-
-### 4.2 Prototype goals [COMPLETED]
-- Governed intern pull-request flow (`/intern` -> `/sr-dev` approval queue).
-- Role-specific agent-extension flow (`/extensions` marketplace & runner).
-- Security incident escalation flow with WebSocket alerts.
-- Network attack surface, VPN crypto, cookie/DOM XSS, and supply-chain auditing flows.
-
----
-
-## 5. Non-Goals
-
-KVCH version 1.1 will not:
-- replace source-control, HR, or finance systems of record;
-- monitor private employee content beyond explicit policy boundaries;
-- perform unauthenticated decryption of properly encrypted IPsec ESP payload without authorized keys/endpoints;
-- train general-purpose foundation models from scratch;
-- execute unsupervised destructive actions on production infrastructure.
-
----
-
-## 6. Product Principles
-
-### 6.1 Assist locally, govern centrally
-Specialized role assistance with centralized policy, risk, approval, and audit enforcement.
-
-### 6.2 One event, many authorized views
-Store one canonical incident event, then project only relevant fields, explanations, and actions to each role.
-
-### 6.3 Hold before harm
-Reversible **HOLD** state for reviewable risk instead of blind denial or immediate execution.
-
-### 6.4 Least privilege for humans and agents
-Effective capability = User permissions ∩ Extension permissions ∩ Resource policy ∩ Context.
-
-### 6.5 Evidence before confidence
-Every recommendation links to observed telemetry signals, policy rules, and inspectable reasoning.
-
-### 6.6 Verify, then close
-Resolution requires fresh post-action evidence (passing scan, passing test, corrected config, or invalid key).
-
----
-
-## 7. Users and Roles
-
-| Persona | Active Route | Primary Need | KVCH Value | Sensitive Data Boundary |
-|---|---|---|---|---|
-| **Intern / Junior** | `/intern` | Finish work safely; learn from mistakes | Guided tasks, PR guardrails, held action feedback | Cannot access production secrets or executive reports |
-| **Developer / Lead** | `/sr-dev` | Review changes, resolve incidents, approve PRs | Approval queue, PR diff cards, security findings, team metrics | Sees owned repos and services |
-| **Human Resources** | `/hr` | Manage workflows and policy compliance | Policy search, training gap signals, process bottleneck views | No raw code, credentials, packet payloads, or keys |
-| **Security Analyst** | `/sr-dev` / `/extensions` | Investigate threats and scan findings | Correlated 8-engine telemetry, EDR findings, evidence timeline | Broad security evidence; access audited |
-| **Executive Management** | `/management` | Manage enterprise risk exposure | Business exposure ranges, downtime metrics, decision queue | High-level summary; restricted raw technical logs |
-
----
-
-## 8. Product Structure
+The KVCH control plane comprises **45 routes** grouped into **5 distinct role suites**, a root hub overview, and an extension marketplace.
 
 ```mermaid
 flowchart TB
-    EDR["24/7 EDR Daemon (kvch-agent)"] --> WS["WebSocket Telemetry Gateway (/api/ws)"]
-    EXT["8 Extension Engines (1-8)"] --> PKG["kvch-extension Bridge (.kvch.tgz)"]
-    PKG --> DB[("Prisma PostgreSQL Store")]
-    WS --> DB
+    HUB["/ (Hub Overview)"]
     
-    U["Employee & Agent Actions"] --> AG["Action Gateway (ALLOW/HOLD/BLOCK)"]
-    AG --> DB
-    
-    DB --> CORE["Canonical Finding Core (kvch.finding/v1)"]
-    CORE --> PROJ["Role Projections Engine"]
-    
-    PROJ --> INT["/intern Dashboard"]
-    PROJ --> DEV["/sr-dev Dashboard"]
-    PROJ --> HR["/hr Dashboard"]
-    PROJ --> MGMT["/management Dashboard"]
-    PROJ --> MKT["/extensions Marketplace"]
+    HUB --> SR["1. Senior Developer Suite (/sr-dev/*)"]
+    HUB --> INT["2. Intern / Junior Suite (/intern/*)"]
+    HUB --> MGMT["3. Management Suite (/management/*)"]
+    HUB --> HR["4. HR & Governance Suite (/hr/*)"]
+    HUB --> RISK["5. Risk Intelligence Suite (/risk-intelligence/*)"]
+    HUB --> EXT["6. Extensions Workbench (/extensions)"]
 ```
 
 ---
 
-## 9. Core Product Primitives
+### 3.1 👨‍💻 Senior Developer Suite (`/sr-dev/*`)
+*Focus: Technical gatekeeping, code diff analysis, incident command, and architectural vigilance.*
 
-### 9.1 Workbench
-Role-specific surface displaying tasks, approvals, security findings, active cases, and agent tools.
-
-### 9.2 Extension Package (`.kvch.tgz`)
-Standardized security or productivity engine packaged via `@arko05roy/kvch-extension` using manifest schema `kvch.extension-package/v1`.
-
-### 9.3 Finding Envelope (`kvch.finding/v1`)
-Standardized JSON payload containing timestamp, severity, category, title, summary, resource metadata, evidence, IOC indicators, baseline expectations, and recommendations.
-
-### 9.4 Action Gateway
-Policy enforcement point checking actor permissions, resource policies, and context before tool/PR execution.
+1. **`/sr-dev/dashboard`** — Senior Command Center displaying codebase health scores, active critical PRs, sparklines, telemetry log streams, and AI security reports.
+2. **`/sr-dev/reviews`** — Peer review queue with multi-file split diff viewer, AST vulnerability flags, and PR sign-off triggers.
+3. **`/sr-dev/projects`** — Repository health tree, module dependency graphs, and tech-debt hot-spots visualizer (`ProjectsTimeline`).
+4. **`/sr-dev/approvals`** — Gatekeeper approval queue for high-privilege holds (`APR-8810`), DB schema migrations, and emergency hotfix overrides.
+5. **`/sr-dev/incidents`** — Incident command workbench with MTTR SLA gauge, SEV-1 telemetry, impacted user counters (`14,200`), and root-cause analysis (RCA) summaries.
+6. **`/sr-dev/pulse`** — Real-time developer velocity & code churn sparkline graphs.
+7. **`/sr-dev/inbox`** — Triage intelligence inbox with automated issue categorization.
+8. **`/sr-dev/issues`** — Interactive Kanban issue board (`KanbanBoard`).
+9. **`/sr-dev/initiatives`** — Strategic engineering initiatives roadmap (`InitiativesPage`).
+10. **`/sr-dev/marketplace`** — Security extension marketplace (`MarketplacePage`).
+11. **`/sr-dev/custom-extensions`** — Custom WASM extension sandbox (`CustomExtensionsPage`).
 
 ---
 
-## 10. Canonical Finding Envelope Specification (`kvch.finding/v1`)
+### 3.2 👨‍🎓 Intern / Junior Developer Suite (`/intern/*`)
+*Focus: Guided onboarding, AI assistance, ticket execution, and skill growth.*
 
-All 8 scanning engines and the 24/7 EDR daemon format security findings using the unified JSON envelope structure:
+1. **`/intern/dashboard`** — Workspace overview displaying assigned onboarding tasks, PR status, mentor feedback, and AI educational report.
+2. **`/intern/tasks`** — Interactive ticket board (`TASK-102`) equipped with inline AI context hints, coding guidelines, and starter code snippets.
+3. **`/intern/reviews`** — Personal PR queue displaying mentor comments, automated linting passes, and AST security check results.
+4. **`/intern/projects`** — Isolated repository view highlighting assigned modules with embedded OpenAPI / GraphQL schemas.
+5. **`/intern/pulse`** — Personal growth tracker highlighting completed milestones, LOC contributed, and YARA hash comparison exercises.
+6. **`/intern/inbox`** — Personal notification stream.
+7. **`/intern/issues`** — Personal issue ticket board.
+8. **`/intern/initiatives`** — Student/Intern project initiatives.
+9. **`/intern/marketplace`** — Extension marketplace.
 
-```json
-{
-  "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-06T15:02:23Z",
-  "severity": "CRITICAL",
-  "category": "cookie_xss_analyzer",
-  "title": "Cookie Security Posture, DOM XSS & Session Theft Finding",
-  "summary": "Audited browser cookie security and client-side DOM script sinks on local host. Detected 125 security findings across cookies, XSS sinks, and session tokens.",
-  "resource": {
-    "type": "browser_profile_web_posture",
-    "id": "browser_profile_web_posture",
-    "name": "MacBook-Air.lan"
-  },
-  "evidence": [
-    "Sensitive session cookie 'session_id' on '.auth-service.io' lacks HttpOnly flag (vulnerable to XSS theft).",
-    "Detected DOM XSS vector in content_script_main.js: innerHTML direct assignment DOM XSS sink",
-    "Detected document.cookie exfiltration hook forwarding session cookies to external endpoint."
-  ],
-  "indicators": [
-    "COOKIE_MISSING_HTTPONLY",
-    "DOM_XSS_SINK",
-    "COOKIE_EXFILTRATION_HOOK"
-  ],
-  "baseline": {
-    "expected_cookie_flags": ["HttpOnly", "Secure", "SameSite=Strict"],
-    "expected_xss_sinks": 0
-  },
-  "recommended_actions": [
-    "Enforce HttpOnly and Secure flags on all session cookies",
-    "Replace innerHTML and eval() sinks with safe textContent and DOM APIs",
-    "Store JWT session tokens in HttpOnly cookies instead of localStorage"
-  ],
-  "details": {
-    "total_threats_detected": 125,
-    "severity": "CRITICAL",
-    "extension_id": "cookie-xss-auditor",
-    "version": "1.0.0"
-  }
-}
+---
+
+### 3.3 👔 Management & Tech Leads Suite (`/management/*`)
+*Focus: Executive engineering KPIs, FAIR model risk exposure, ROSI calculations, and blocker escalations.*
+
+1. **`/management/dashboard`** — Executive KPI summary displaying FAIR financial loss model (Min: `₹15L`, Likely: `₹48L`, Max: `₹1.2Cr`, EAL: `₹38.4L`), loss avoided (`₹72L`), and ROSI (`1,436%`).
+2. **`/management/escalations`** — Blocker escalation matrix (`ESC-901`) tracking high-severity impediments, SLA breach countdowns (`12h`), financial risk (`₹45,00,000`), and executive exemption grants.
+3. **`/management/investment`** — Business impact & capital investment page tracking FY26 Q3 budget allocation (`₹10.00 Cr`), R&D spend (`45%`), Tech Debt paydown (`25%`), Risk Shielding (`20%`), and DevEx (`10%`).
+4. **`/management/pulse`** — Real-time team velocity, capacity utilization (`88%`), and cross-functional delivery speed.
+5. **`/management/inbox`** — Executive decision stream for budget approvals, resource re-allocations, and scope changes.
+
+---
+
+### 3.4 🏢 HR & Organization Suite (`/hr/*`)
+*Focus: Developer experience, employee accountability, workload sentiment, and policy compliance.*
+
+1. **`/hr/dashboard`** — Organization health hub featuring committer ID tracking (`EMP-4029` Rohit Debnath), commit hash `7a8f9c1b`, PR #4, and compliance failure under ISO 27001 (A.8.28) & DPDP Act 2023.
+2. **`/hr/pulse`** — Anonymized workload sentiment, burnout risk warnings, and developer satisfaction survey responses.
+3. **`/hr/patterns`** — Work pattern analysis tracking after-hours commit ratios (`28%` in Core Backend), team burnout risk levels (`HIGH`), skill gap identification, and 1-on-1 check-in triggers.
+4. **`/hr/policies`** — Enterprise policy center tracking IP protection (`HRP-101`), acknowledgment rates (`98%`), pending employee signature counts (`3`), and automated email reminders.
+5. **`/hr/inbox`** — Action queue for developer onboarding tickets, equipment requests, and internal escalations.
+
+---
+
+### 3.5 🛡️ Risk Intelligence & Security Suite (`/risk-intelligence/*`)
+*Focus: Financial cyber risk quantification, threat mitigation, cryptographic audit streams, and compliance.*
+
+1. **`/risk-intelligence`** — Financial Cyber Risk Quantification & Monte Carlo Calculator. Features 3-step Intake → Loss → Optimization process indicator, CVE-2026-3891 (`pay-auth-crypto`), EPSS score (`0.72`), CISA KEV status, and real VCDB log ingestion.
+2. **`/risk-intelligence/threats`** — Real-Time Threat Stream tracking secret leaks (`THREAT-9941`), rogue packages, active threat index (`8.9 / 10.0`), mean time to quarantine (`1.8 min`), and single-click remediation buttons ("Auto-Revoke Key & Block PR").
+3. **`/risk-intelligence/audits`** — Forensic Cryptographic Audit Stream featuring immutable Merkle hash chain logs (`AUD-2026-9812`), actor IP (`10.244.12.98`), expandable raw code diffs, AI model prompt logs, and cryptographic ZIP bundle export.
+4. **`/risk-intelligence/compliance`** — Continuous Compliance Scorecards for **SOC 2** (`94%`), **ISO 27001** (`88%`), **GDPR** (`98%`), and **NIST 800-53** (`82%`), with control failure SLA countdowns and auto-remediation triggers.
+5. **`/risk-intelligence/policies`** — Guardrail Policy Engine featuring rule toggle matrix (`ENFORCE`, `AUDIT`, `DISABLED`), severity on trigger (`BLOCK_PR`, `QUARANTINE`), policy evaluation simulator, and rule editor modal.
+
+---
+
+### 3.6 🧩 Extensions Workbench Suite (`/extensions` & `/extensions/[artifactId]`)
+* **`/extensions`**: Security extension marketplace for uploading, evaluating, scheduling, and executing `.kvch.tgz` security packages.
+* **`/extensions/[artifactId]`**: Detailed extension evaluation stage featuring `IntelligentPerformanceStage` & live execution charts.
+
+---
+
+## 🧮 4. Financial Risk Economics & Monte Carlo Engine Specifications
+
+KVCH implements an advanced financial risk quantification engine based on the **FAIR (Factor Analysis of Information Risk)** framework combined with **Monte Carlo simulation algorithms**:
+
+### 4.1 Risk Quantification Pipeline
+```text
+Technical Finding (CVE, EPSS, Asset Downtime Cost)
+  ↓
+FAIR Loss Parameters (ALE = Loss Event Frequency × Loss Magnitude)
+  ↓
+Monte Carlo Simulation (10,000 Iterations)
+  ↓
+Loss Distribution Curve (Min, Most Likely, Max, EAL in ₹ INR)
+  ↓
+Optimal Mitigation Selection (Knapsack Optimization)
+  ↓
+ROSI Calculation (% Return on Security Investment)
 ```
 
----
+### 4.2 Mathematical Formulas:
+1. **Expected Annual Loss (EAL)**:
+   $$\text{EAL} = \text{Threat Event Frequency (TEF)} \times \text{Vulnerability (V)} \times \text{Loss Magnitude (LM)}$$
 
-## 11. Internal Workbench Requirements (Implemented in Next.js 15)
+2. **Return on Security Investment (ROSI)**:
+   $$\text{ROSI} = \frac{(\text{Risk Reduction \%} \times \text{EAL}) - \text{Mitigation Cost}}{\text{Mitigation Cost}} \times 100$$
 
-### 11.1 Control Plane Dashboards
-- **`/intern`**: Guided PR submission, hold status cards, policy learning feedback, allowed productivity agents.
-- **`/sr-dev`**: Pending approval queue, PR diff viewer, 8-engine security findings timeline, team metrics.
-- **`/hr`**: Human Resources policy assistance, training gap signals, process bottleneck reports, non-technical risk summaries.
-- **`/management`**: Financial exposure estimates, downtime metrics, cross-department risk posture, strategic decision approvals.
-- **`/extensions`**: Extension marketplace for uploading, evaluating, scheduling, and executing `.kvch.tgz` security packages.
-
-### 11.2 UI Components & Real-Time Header
-- **Dynamic Timezone Clock**: Integrated live clock component in the main navigation header displaying real-time global timestamps.
-- **Inbox & Pulse Redesign**: High-density security alert cards with real-time WebSocket status indicators and filters.
+3. **Real VCDB Log Calibration Engine (`/api/risk/calibrate`)**:
+   - Ingests empirical breach records from the **Veris Community Database (VCDB)** to calibrate asset downtime costs, incident response costs, and data breach cost per record.
 
 ---
 
-## 12. Complete Breakdown of the 8 Security Scan Extensions
+## 🛡️ 5. Complete Breakdown of the 8 Security Scan Extensions
 
 ### Extension 1: Attack Surface Scanner (`attack-surface-scanner`)
-- **CLI Entrypoint**: `External/extensions/1_attack_surface_scanner.py`
-- **Core Purpose**: Scans exposed local and LAN network attack surfaces, open ports, and active web HTTP services.
-- **Data Sources**: Local network interfaces (`socket.gethostbyname`, `netstat`/socket listings), open TCP listening ports (`22`, `80`, `443`, `3306`, `5432`, `8080`, `27017`), HTTP/HTTPS headers (`Server`, `X-Powered-By`, `HSTS`, `CSP`), DNS resolver queries, WHOIS lookup data.
-- **Detection Heuristics**: Unencrypted HTTP endpoints, missing HSTS headers, database ports exposed to LAN, high response latency.
+* **CLI Entrypoint**: `External/extensions/1_attack_surface_scanner.py`
+* **Data Sources**: Network sockets (`0.0.0.0`, `127.0.0.1`), open TCP ports (`22`, `80`, `443`, `3306`, `5432`, `8080`, `27017`), HTTP response headers (`Server`, `X-Powered-By`, `HSTS`, `CSP`).
+* **Detection Heuristics**: Unencrypted HTTP endpoints, missing HSTS headers, database ports exposed to LAN/WAN, high response latency.
 
 ### Extension 2: VPN & Crypto Analyzer (`vpn-crypto-analyzer`)
-- **CLI Entrypoint**: `External/extensions/2_vpn_crypto_analyzer.py`
-- **Core Purpose**: Audits active VPN tunnel security, DNS leak vulnerabilities, and browser crypto wallet process hooks.
-- **Data Sources**: Network interfaces (`tun0`, `tap0`, `wg0`, `ppp0`), `/etc/resolv.conf` DNS configuration, active process table (`ps -ax`) searching for wallet processes (MetaMask, Phantom, Ledger Live, Exodus).
-- **Detection Heuristics**: Split-tunneling DNS leakage, unencrypted DNS resolvers, exposed browser wallet debug ports.
+* **CLI Entrypoint**: `External/extensions/2_vpn_crypto_analyzer.py`
+* **Data Sources**: Network interfaces (`tun0`, `tap0`, `wg0`, `ppp0`), `/etc/resolv.conf` DNS configuration, active process table (`ps -ax`) searching for wallet processes (MetaMask, Phantom, Ledger Live, Exodus).
+* **Detection Heuristics**: Split-tunneling DNS leakage, unencrypted DNS resolvers, exposed browser wallet debug ports.
 
 ### Extension 3: Phishing Hunter (`phishing-hunter`)
-- **CLI Entrypoint**: `External/extensions/3_phishing_hunter.py`
-- **Core Purpose**: Detects phishing domain redirects, malicious browser extensions, and DNS/hosts tampering.
-- **Data Sources**: System hosts file (`/etc/hosts`), browser profile directories (Chrome, Brave, Edge, Firefox) inspecting installed extension IDs/manifests, active socket connections matching known phishing IOC domains.
-- **Detection Heuristics**: Local hosts overrides redirecting banking/crypto domains to loopback/remote IPs, unverified third-party extension `update_url` targets.
+* **CLI Entrypoint**: `External/extensions/3_phishing_hunter.py`
+* **Data Sources**: System hosts file (`/etc/hosts`), browser extension manifests (Chrome, Brave, Edge, Firefox), socket connections matching known phishing IOC domains.
+* **Detection Heuristics**: Hosts file overrides redirecting banking/crypto domains to loopback/remote IPs, unverified third-party extension `update_url` targets.
 
 ### Extension 4: Threat Hunter 3000 (`threat-hunter-3000`)
-- **CLI Entrypoint**: `External/extensions/4_threat_hunter_3000.py`
-- **Core Purpose**: Monitors system process trees, autostart persistence mechanisms, and unauthorized background daemons.
-- **Data Sources**: Process table tree structure (`ps -ax -o pid,ppid,user,command`), autostart paths (`~/Library/LaunchAgents`, `/Library/LaunchDaemons`, `/etc/cron.*`), `/var/log` system logs.
-- **Detection Heuristics**: Hidden/orphaned processes running out of `/tmp`, unauthorized LaunchAgents executing obfuscated shell scripts.
+* **CLI Entrypoint**: `External/extensions/4_threat_hunter_3000.py`
+* **Data Sources**: Process table tree structure (`ps -ax -o pid,ppid,user,command`), autostart paths (`~/Library/LaunchAgents`, `/Library/LaunchDaemons`, `/etc/cron.*`), `/var/log` system logs.
+* **Detection Heuristics**: Hidden/orphaned processes running out of `/tmp`, unauthorized LaunchAgents executing obfuscated shell scripts.
 
 ### Extension 5: Malware Analyzer (`malware-analyzer`)
-- **CLI Entrypoint**: `External/extensions/5_malware_analyzer.py`
-- **Core Purpose**: Analyzes suspicious binaries, computes cryptographic file hashes, measures entropy, and parses executable headers.
-- **Data Sources**: Temporary and download directories (`/tmp`, `~/Downloads`), binary file headers (Mach-O, ELF, PE magic bytes).
-- **Detection Heuristics**: High binary Shannon entropy (> 7.2) indicating packed/encrypted payloads, executable permission flags (`chmod +x`) on scripts in `/tmp`.
+* **CLI Entrypoint**: `External/extensions/5_malware_analyzer.py`
+* **Data Sources**: Temporary and download directories (`/tmp`, `~/Downloads`), binary file headers (Mach-O, ELF, PE magic bytes).
+* **Detection Heuristics**: High binary Shannon entropy (> 7.2) indicating packed/encrypted payloads, executable permission flags (`chmod +x`) on scripts in `/tmp`.
 
 ### Extension 6: Credential Exposure Auditor (`credential-exposure-auditor`)
-- **CLI Entrypoint**: `External/extensions/6_credential_exposure_auditor.py`
-- **Core Purpose**: Audits credential exposure, multi-chain clipboard address hijacking (clipper malware), and Web3 drainer signatures.
-- **Data Sources**: Browser extension content scripts, manifest files, `.env` files, `~/.ssh/id_*`, `~/.aws/credentials`, clipboard API hooks, web provider objects (`window.ethereum`, `window.solana`).
-- **Detection Heuristics**: BIP-39 12/24 word mnemonics, raw EVM/BTC/SOL private keys, Permit2/Seaport signature phishing, clipboard `writeText` overriding crypto addresses, hex/unicode deobfuscation.
+* **CLI Entrypoint**: `External/extensions/6_credential_exposure_auditor.py`
+* **Data Sources**: Browser extension content scripts, `.env` files, `~/.ssh/id_*`, `~/.aws/credentials`, clipboard API hooks, Web3 provider objects (`window.ethereum`).
+* **Detection Heuristics**: BIP-39 12/24 word mnemonics, raw EVM/BTC/SOL private keys, Permit2 signature phishing, clipboard `writeText` overriding crypto addresses.
 
 ### Extension 7: Supply Chain Auditor (`supply-chain-auditor`)
-- **CLI Entrypoint**: `External/extensions/7_supply_chain_auditor.py`
-- **Core Purpose**: Audits project dependency trees for malicious package injection, typosquatting, and unpinned repository URLs.
-- **Data Sources**: Project lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `Pipfile.lock`, `requirements.txt`), package manifests (`package.json`, `pyproject.toml`).
-- **Detection Heuristics**: Levenshtein distance typosquatting on popular packages (`reqeusts`, `cross-env-payload`), unpinned HTTP package URLs, lifecycle script hooks (`postinstall` executing curl/eval).
+* **CLI Entrypoint**: `External/extensions/7_supply_chain_auditor.py`
+* **Data Sources**: Project lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `Pipfile.lock`), package manifests (`package.json`, `pyproject.toml`).
+* **Detection Heuristics**: Levenshtein distance typosquatting on popular packages (`reqeusts`, `cross-env-payload`), unpinned HTTP package URLs, lifecycle script hooks (`postinstall` executing curl/eval).
 
 ### Extension 8: Cookie Security, DOM XSS & Session Auditor (`cookie-xss-auditor`)
-- **CLI Entrypoint**: `External/extensions/8_cookie_xss_analyzer.py`
-- **Core Purpose**: Audits browser cookie posture, sub-domain cookie tossing, DOM-based XSS sinks, and unencrypted session token theft.
-- **Data Sources**: SQLite3 cookie databases across installed browser profiles (`~/Library/Application Support/.../Default/Cookies`), browser extension content scripts, web application JS files, `localStorage`/`sessionStorage`.
-- **Detection Heuristics**: Missing `HttpOnly`/`Secure` flags on session cookies, wildcard domain scoping (`Domain=.domain.com`), dangerous DOM assignment sinks (`.innerHTML =`, `document.write()`, `eval()`), unencrypted JWT tokens in `localStorage`.
+* **CLI Entrypoint**: `External/extensions/8_cookie_xss_analyzer.py`
+* **Data Sources**: SQLite3 cookie databases across installed browser profiles (`~/Library/Application Support/.../Default/Cookies`), DOM assignment sinks, `localStorage`/`sessionStorage`.
+* **Detection Heuristics**: Missing `HttpOnly`/`Secure` flags on session cookies, wildcard domain scoping (`Domain=.domain.com`), dangerous DOM assignment sinks (`.innerHTML =`, `document.write()`, `eval()`).
 
 ---
 
-## 13. 24/7 EDR Background Daemon Architecture (`kvch-agent`)
+## 📡 6. 24/7 EDR Background Daemon Architecture (`kvch-agent`)
 
 The continuous background daemon (`External/edr_daemon/`) monitors the endpoint 24/7 without requiring manual CLI execution:
 
@@ -354,32 +279,9 @@ The continuous background daemon (`External/edr_daemon/`) monitors the endpoint 
 +-----------------------------------------------------------------------------------+
 ```
 
-### Event Triggers & Monitoring Loops:
-1. **FileSystemWatcher**:
-   - Files created in `/tmp` -> Triggers `malware_analyzer` scan.
-   - Binaries in `~/Downloads` -> Triggers `malware_analyzer` binary & entropy scan.
-   - Keys in `~/.ssh` or `~/.aws` -> Triggers `credential_exposure_auditor` scan.
-   - Edits to `package-lock.json` -> Triggers `supply_chain_auditor` scan.
-2. **ProcessAndSocketMonitor**:
-   - Process running in `/tmp` -> Triggers `threat_hunter_3000` execution scan.
-   - Wallet process launch -> Triggers `vpn_crypto_analyzer` process hook scan.
-   - Socket connection delta -> Triggers `phishing_hunter` IOC domain scan.
-3. **NetworkSurfaceScanner**:
-   - New listening TCP port -> Triggers `attack_surface_scanner` header & service scan.
-
-### Daemon Lifecycle Control:
-```bash
-./External/scripts/kvch_edr_control.sh start   # Launch background daemon agent
-./External/scripts/kvch_edr_control.sh status  # Query daemon status & PID
-./External/scripts/kvch_edr_control.sh logs    # Tail live telemetry logs
-./External/scripts/kvch_edr_control.sh stop    # Gracefully terminate daemon agent
-```
-
 ---
 
-## 14. Relational Database Schema (Prisma PostgreSQL)
-
-The central web application schema (`web/prisma/schema.prisma`) manages extensions, package artifacts, evaluations, scheduled runs, and findings:
+## 🗄️ 7. Prisma Relational Database Schema
 
 ```prisma
 enum ArtifactState {
@@ -466,41 +368,30 @@ model Finding {
 
 ---
 
-## 15. Implementation Status Matrix
+## 🎯 8. Implementation Status Matrix
 
-| Feature Component | Target Requirement | Status | Verification |
-|---|---|---|---|
-| **Role Control Plane** | Next.js 15 UI (`/intern`, `/sr-dev`, `/hr`, `/management`) | **[COMPLETED]** | Clean `npm run build` & zero lint errors |
-| **Header Timezone Clock** | Dynamic multi-timezone clock component | **[COMPLETED]** | Verified on landing header |
-| **Action Gateway** | PR merge guardrail & hold states | **[COMPLETED]** | Intern PR hold -> Sr Dev approval flow |
+| Component | Target Requirement | Status | Verification |
+| :--- | :--- | :--- | :--- |
+| **5 Role Suites** | Next.js 16 UI (`/sr-dev`, `/intern`, `/management`, `/hr`, `/risk-intelligence`) | **[COMPLETED]** | 45 routes compiled with 0 errors via `npm run build` |
+| **Linear Design Language** | Near-black canvas, charcoal surface ladder, hairline borders, lavender accent | **[COMPLETED]** | `DESIGN.md` compliance verified |
+| **Risk Intelligence Suite** | `/audits`, `/threats`, `/compliance`, `/policies` pages & subnav tabs | **[COMPLETED]** | Fully populated with rich demo data |
+| **Action Gateway** | PR merge guardrail & hold states | **[COMPLETED]** | Governed intern PR -> Sr Dev approval flow |
 | **8 Extension Engines** | Attack Surface, VPN, Phishing, Threat Hunter, Malware, Credentials, Supply Chain, Cookie/XSS | **[COMPLETED]** | Standalone Python scan engines & CLI adapters |
 | **24/7 EDR Daemon** | Background event agent (`kvch-agent`) | **[COMPLETED]** | `kvch_edr_control.sh` lifecycle verification |
-| **WebSocket Gateway** | Live telemetry streaming server (`/api/ws`) | **[COMPLETED]** | Push stream connection to web hub |
-| **Prisma Database** | Relational database schema & Finding store | **[COMPLETED]** | Migrations & Prisma Client bindings |
+| **WebSocket Gateway** | Live telemetry streaming server (`/api/ws`) | **[COMPLETED]** | Real-time push connection to web hub |
+| **Prisma Database** | Relational schema & Finding store | **[COMPLETED]** | Migrations & Prisma Client bindings |
 | **Extension Packaging** | `@arko05roy/kvch-extension` `.kvch.tgz` packaging | **[COMPLETED]** | Manifest validator & artifact builder |
-| **Local Host Target** | Local laptop IP, socket, file, YARA-X, TShark analysis | **[COMPLETED]** | Local host evaluation reports |
 
 ---
 
-## 16. Delivery Roadmap Status
+## 👥 9. Team Ownership
 
-- **Phase 0 — Foundation & Architecture**: **[COMPLETED]**
-- **Phase 1 — Shared Core & Event Bus**: **[COMPLETED]**
-- **Phase 2 — Internal Workbench Plane**: **[COMPLETED]**
-- **Phase 3 — External Defense & 8 Extension Engines**: **[COMPLETED]**
-- **Phase 4 — 24/7 EDR Background Daemon & Telemetry**: **[COMPLETED]**
-- **Phase 5 — Integration & Production Hardening**: **[COMPLETED]**
-
----
-
-## 17. Team and Ownership
-
-- **Ayush**: Role-based UI Control Plane (`/intern`, `/sr-dev`, `/hr`, `/management`), Real-time Timezone Clock Header, Codebase Clean-up & TypeScript/ESLint optimization.
+- **Ayush**: 5 Role Control Plane (`/sr-dev`, `/intern`, `/management`, `/hr`, `/risk-intelligence`), Linear Design System Implementation, Real-time Timezone Clock Header, Clean-up & Next.js TypeScript/ESLint optimization.
 - **Arko & Atul**: External Threat Detection System, local-laptop host targeting, aggregate `kvch.finding/v1` envelope design, portable YARA-X / ifaddr / Nmap / TShark integration, `netstat -anv` socket snapshots, Extensions 1–5 & 8, and 24/7 EDR Daemon architecture (`kvch-agent`).
 - **Rohit & Sahil**: Extensions 6 & 7 (Digital Asset & Credential Exposure Auditor, Extension Supply-Chain & Integrity Auditor), Extension Packaging Bridge (`@arko05roy/kvch-extension`), manifest preflight evaluation checks.
 
 ---
 
-## 18. Final Product Definition
+## 📌 10. Final Product Definition
 
-> **KVCH—Knowledge, Vigilance, Control Hub—is a sovereign AI workbench, organizational control plane, and 24/7 endpoint defense system deployed across an enterprise. Every employee receives a role-specific workspace (`/intern`, `/sr-dev`, `/hr`, `/management`) with approved tools, tasks, and reports. KVCH watches actions across company systems, catches mistakes and threats, holds risky work before harm, routes contextual notifications to responsible owners, and escalates by business impact. On the endpoint and network boundary, its 8 security scanning engines and continuous 24/7 EDR daemon monitor host activity, streaming real-time security telemetry into an integrated central hub.**
+> **KVCH—Knowledge, Vigilance, Control Hub—is a sovereign AI workbench, organizational control plane, and 24/7 endpoint defense system deployed across an enterprise. Every employee receives a role-specific workspace (`/sr-dev`, `/intern`, `/management`, `/hr`, `/risk-intelligence`) with approved tools, tasks, and reports. KVCH watches actions across company systems, catches mistakes and security threats, holds risky work before harm, routes contextual notifications to responsible owners, and quantifies financial risk exposure in real time. On the endpoint and network boundary, its 8 security scanning engines and continuous 24/7 EDR daemon monitor host activity, streaming real-time security telemetry into an integrated central hub.**

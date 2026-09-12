@@ -9,7 +9,7 @@ import {
   SemiCircleGaugeChart
 } from "@/components/charts/minimal-charts";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function ManagementDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -17,10 +17,40 @@ export default function ManagementDashboardPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [approvedBudget, setApprovedBudget] = useState(false);
   const [activeRange, setActiveRange] = useState("1W");
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
 
-  const handleGenerateAiReport = async () => {
+  // 10-Second Auto-Stream State
+  const [autoRun, setAutoRun] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [pulseCount, setPulseCount] = useState(0);
+
+  // Range scaling map for executive financial metrics
+  const RANGE_METRICS: Record<string, { lossAvoided: string; eal: string; rosi: string; ealVal: string }> = {
+    "1D": { lossAvoided: "₹12,00,000", eal: "₹5.4L", rosi: "480% ROI", ealVal: "₹5.4L" },
+    "1W": { lossAvoided: "₹72,00,000", eal: "₹38.4L", rosi: "1,436% ROI", ealVal: "₹38.4L" },
+    "1M": { lossAvoided: "₹3,10,00,000", eal: "₹1.4Cr", rosi: "2,150% ROI", ealVal: "₹1.4Cr" },
+    "1Y": { lossAvoided: "₹18,40,00,000", eal: "₹8.2Cr", rosi: "3,800% ROI", ealVal: "₹8.2Cr" },
+    "ALL": { lossAvoided: "₹42,00,00,000", eal: "₹15.8Cr", rosi: "5,200% ROI", ealVal: "₹15.8Cr" },
+  };
+
+  const currentMetrics = RANGE_METRICS[activeRange] || RANGE_METRICS["1W"];
+
+  const handleToggleBudget = () => {
+    setApprovedBudget((prev) => {
+      const next = !prev;
+      setStatusNotice(next 
+        ? "✓ CISO Emergency Approval Granted: ₹1.5L remediation budget allocated. Expected Annual Loss reduced by 96.8%." 
+        : "Budget approval reset to pending evaluation.");
+      return next;
+    });
+  };
+
+  const handleGenerateAiReport = useCallback(async () => {
     setIsGenerating(true);
     setErrorMsg(null);
+    const now = new Date();
+    const timeStr = now.toTimeString().split(" ")[0];
+
     try {
       const res = await fetch("/api/demo/seed-finding", {
         method: "POST",
@@ -36,13 +66,33 @@ export default function ManagementDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.management);
+      setPulseCount((prev) => prev + 1);
+      setStatusNotice(`⚡ [${timeStr}] Sovereign Ollama AI: Board Briefing Auto-Synthesized (Pulse #${pulseCount + 1})`);
     } catch (err: unknown) {
       const error = err as { message?: string };
       setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
+      setCountdown(10);
     }
-  };
+  }, [pulseCount]);
+
+  // 10-Second Continuous Polling Loop
+  useEffect(() => {
+    if (!autoRun) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          handleGenerateAiReport();
+          return 10;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [autoRun, handleGenerateAiReport]);
 
   return (
     <DashboardShell roleName="Management" navItems={[]} hideHeader>
@@ -70,7 +120,10 @@ export default function ManagementDashboardPage() {
                 {["1D", "1W", "1M", "1Y", "ALL"].map((r) => (
                   <button
                     key={r}
-                    onClick={() => setActiveRange(r)}
+                    onClick={() => {
+                      setActiveRange(r);
+                      setStatusNotice(`Timeline horizon switched to ${r}. Metrics recalculated.`);
+                    }}
                     className={`px-2.5 py-1 text-[11px] font-mono font-medium rounded-full transition-all ${
                       activeRange === r
                         ? "bg-[#282a30] text-[#f7f8f8] border border-[#383b42] shadow-sm"
@@ -83,31 +136,24 @@ export default function ManagementDashboardPage() {
               </div>
 
               <button
-                onClick={handleGenerateAiReport}
-                disabled={isGenerating}
-                className="px-4 py-2 bg-[#1e2026] hover:bg-[#282a32] text-[12.5px] font-semibold text-[#f7f8f8] rounded-xl border border-[#2e3138] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                onClick={handleToggleBudget}
+                className={`px-4 py-2 text-[12.5px] font-bold text-[#ffffff] rounded-xl transition-all shadow-md ${
+                  approvedBudget ? "bg-[#2ea043] hover:bg-[#278637]" : "bg-[#ff5555] hover:bg-[#e04444]"
+                }`}
               >
-                {isGenerating ? (
-                  <>
-                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Generating CISO Briefing...
-                  </>
-                ) : (
-                  <>
-                    <span className="text-[#828fff]">⚡</span> Run AI Executive Briefing
-                  </>
-                )}
+                {approvedBudget ? "✓ Budget Approved (₹1.5L)" : "Approve Remediation (₹1.5L)"}
               </button>
-
-              <Link
-                href="/management/escalations"
-                className="px-4 py-2 bg-[#ff5555] hover:bg-[#e04444] text-[12.5px] font-bold text-[#ffffff] rounded-xl transition-all shadow-md hover:shadow-lg hover:shadow-[#ff5555]/20"
-              >
-                War Room Desk
-              </Link>
             </div>
           </div>
         </div>
+
+        {/* Live Status Toast Banner */}
+        {statusNotice && (
+          <div className="mx-8 mt-4 p-3 bg-[#121f17] border border-[#2ea043]/40 rounded-lg text-[#2ea043] text-[12.5px] flex items-center justify-between animate-fadeIn">
+            <span>{statusNotice}</span>
+            <button onClick={() => setStatusNotice(null)} className="text-[#8a8f98] hover:text-[#f7f8f8] text-xs">✕</button>
+          </div>
+        )}
 
         {/* Top Metric Cards - Award-Winning Fintech Pill Layout */}
         <div className="px-8 py-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -115,14 +161,14 @@ export default function ManagementDashboardPage() {
           {/* Card 1: Neon Highlight Card (Breach Loss Avoided) */}
           <div className="bg-gradient-to-br from-[#0f1f14] to-[#0c0d0e] border border-[#2ea043]/40 hover:border-[#2ea043]/80 transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl shadow-[#2ea043]/5 group">
             <div className="flex items-center justify-between">
-              <span className="text-[12px] font-bold uppercase tracking-wider text-[#2ea043]">Breach Loss Avoided</span>
+              <span className="text-[12px] font-bold uppercase tracking-wider text-[#2ea043]">Breach Loss Avoided ({activeRange})</span>
               <span className="px-2 py-0.5 text-[10.5px] font-bold font-mono text-[#2ea043] bg-[#2ea043]/10 rounded-full border border-[#2ea043]/30 flex items-center gap-1">
                 <span>▲</span> 45.2%
               </span>
             </div>
             <div className="mt-3">
               <span className="text-[32px] font-extrabold text-[#f7f8f8] tracking-tight group-hover:scale-105 transition-transform block">
-                ₹72,00,000
+                {currentMetrics.lossAvoided}
               </span>
             </div>
             <span className="text-[11px] font-medium text-[#2ea043] mt-2.5 flex items-center gap-1">
@@ -134,17 +180,23 @@ export default function ManagementDashboardPage() {
           <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Expected Annual Loss (EAL)</span>
-              <span className="px-2 py-0.5 text-[10.5px] font-bold font-mono text-[#ff5555] bg-[#ff5555]/10 rounded-full border border-[#ff5555]/30">
-                Unmitigated
+              <span className={`px-2 py-0.5 text-[10.5px] font-bold font-mono rounded-full border ${
+                approvedBudget 
+                  ? "text-[#2ea043] bg-[#2ea043]/10 border-[#2ea043]/30" 
+                  : "text-[#ff5555] bg-[#ff5555]/10 border-[#ff5555]/30"
+              }`}>
+                {approvedBudget ? "Mitigated (96.8% Drop)" : "Unmitigated"}
               </span>
             </div>
             <div className="mt-3">
-              <span className="text-[32px] font-extrabold text-[#ff5555] tracking-tight block">
-                ₹38.4L
+              <span className={`text-[32px] font-extrabold tracking-tight block ${
+                approvedBudget ? "text-[#2ea043]" : "text-[#ff5555]"
+              }`}>
+                {approvedBudget ? "₹1.2L" : currentMetrics.eal}
               </span>
             </div>
             <span className="text-[11px] text-[#8a8f98] font-medium mt-2.5 truncate">
-              Without CI/CD Supply Chain Firewall
+              {approvedBudget ? "Remediation patch active across supply chain" : "Without CI/CD Supply Chain Firewall"}
             </span>
           </div>
 
