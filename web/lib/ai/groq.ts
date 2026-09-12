@@ -115,7 +115,7 @@ export class GroqKeyPoolManager {
       // Fallback model if primary model repeatedly hits rate limits
       const requestParams = { ...params };
       if (attempt >= 3 && requestParams.model === "groq/compound") {
-        requestParams.model = "llama-3.1-8b-instant";
+        requestParams.model = "llama-3.3-70b-versatile";
       }
 
       try {
@@ -126,7 +126,7 @@ export class GroqKeyPoolManager {
         const statusCode = err?.status || err?.statusCode;
 
         // Handle rate limits (429) or transient server errors (5xx)
-        if (statusCode === 429 || (statusCode >= 500 && statusCode < 600)) {
+        if (statusCode !== undefined && (statusCode === 429 || (statusCode >= 500 && statusCode < 600))) {
           const delayMs = this.getRetryDelayMs(error, attempt);
           // Set short cooldown (3s for 429, 10s for 5xx) so keys don't stay locked for a full minute
           const cooldownDuration = statusCode === 429 ? 3000 : 10000;

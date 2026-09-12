@@ -1,0 +1,38 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-11T14:01:57.680852Z",
+  "severity": "HIGH",
+  "category": "attack_surface_scanner",
+  "title": "New Open Network Port / Service Header Exposure on Ayushs-Air",
+  "summary": "Scanned exposed TCP listening ports and web service security headers on interface en0 (192.168.0.166).",
+  "resource": {
+    "type": "network_interface",
+    "id": "en0",
+    "name": "Ayushs-Air"
+  },
+  "evidence": [
+    "Host IP: 192.168.0.166",
+    "Network interface: en0",
+    "Hostname: Ayushs-Air"
+  ],
+  "indicators": [
+    "OPEN_PORT_DETECTED",
+    "HTTP_HEADER_MODIFICATION"
+  ],
+  "baseline": {
+    "expected_open_ports": "22 (SSH), 80 (HTTP), 443 (HTTPS)",
+    "expected_hsts": "Enabled"
+  },
+  "recommended_actions": [
+    "Audit service running on open TCP port",
+    "Enforce HSTS and CSP headers on web servers",
+    "Close unused listening ports"
+  ],
+  "details": {
+    "extension_id": "attack-surface-scanner",
+    "version": "1.0.0",
+    "host_ip": "192.168.0.166",
+    "interface": "en0",
+    "mitre_attack": "T1046 - Network Service Discovery"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-11T13:24:05.054704Z",
+  "severity": "HIGH",
+  "category": "phishing_hunter",
+  "title": "Suspicious Remote Socket Connection (Network Socket Delta Detected)",
+  "summary": "Detected network socket delta on host Ayushs-Air (192.168.0.166) with process count 548. Auditing destination IPs against phishing IOC database.",
+  "resource": {
+    "type": "network_socket",
+    "id": "192.168.0.166:socket_delta",
+    "name": "Ayushs-Air"
+  },
+  "evidence": [
+    "Source host IP: 192.168.0.166",
+    "System process count: 548",
+    "Interface: en0"
+  ],
+  "indicators": [
+    "OUTBOUND_SOCKET_SPAWN",
+    "PHISHING_IOC_AUDIT"
+  ],
+  "baseline": {
+    "expected_connections": "Known corporate & trusted domains"
+  },
+  "recommended_actions": [
+    "Inspect remote IP WHOIS and DNS records",
+    "Check /etc/hosts for unauthorized domain redirects",
+    "Isolate suspicious network socket"
+  ],
+  "details": {
+    "extension_id": "phishing-hunter",
+    "version": "1.0.0",
+    "source_ip": "192.168.0.166",
+    "hostname": "Ayushs-Air",
+    "process_count": 548,
+    "mitre_attack": "T1566 - Phishing"
+  }
+}

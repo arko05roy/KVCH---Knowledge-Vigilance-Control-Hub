@@ -1,0 +1,84 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-11T14:48:54.574732Z",
+  "severity": "low",
+  "category": "threat-hunter-3000",
+  "title": "Real-Time Network Threat & Vulnerability Observation",
+  "summary": "Threat hunt on interface None. Processed 0 packets. Observed 0 threats and 0 vulnerabilities.",
+  "resource": {
+    "type": "network_interface",
+    "id": "en0",
+    "name": "Ayushs-Air"
+  },
+  "evidence": [
+    "Packets analyzed: 0",
+    "Threat events: 0"
+  ],
+  "indicators": [],
+  "baseline": {
+    "threat_threshold": 0,
+    "vulnerabilities_allowed": 0
+  },
+  "recommended_actions": [
+    "Maintain active firewall protection on public network interfaces",
+    "Investigate any high-rate TCP connection bursts or port scanning behavior",
+    "Keep system network services patched against known CVE vulnerabilities"
+  ],
+  "details": {
+    "interface": null,
+    "target_hostname": "Ayushs-Air",
+    "scan_timestamp": "2026-09-11T20:18:34.551552Z",
+    "execution_metrics": {
+      "duration_seconds": 20.026,
+      "packets_processed": 0
+    },
+    "threat_detection": {
+      "threats_count": 0,
+      "detected_threats": [],
+      "suspicious_ips_tracked": {}
+    },
+    "vulnerability_scanner": {
+      "vulnerabilities_count": 0,
+      "vulnerabilities": []
+    },
+    "firewall_mitre_mapping": {
+      "blocked_ips_count": 0,
+      "blocked_ips": [],
+      "mitre_techniques": []
+    },
+    "manifest": {
+      "identity": {
+        "name": "Threat Hunter 3000",
+        "type": "preventive",
+        "creator": "external-threat-team",
+        "edit_access": [
+          "external-threat-team",
+          "security-team",
+          "network-team"
+        ],
+        "target_scope": "All network traffic, external IPs, and company perimeter"
+      },
+      "intent": {
+        "what_is_normal": "- Expected network traffic patterns (HTTP/HTTPS, DNS, email)\n- Normal packet rates (< 100 packets per second per IP)\n",
+        "what_is_not_normal": "- Port scanning\n- DDoS attacks\n- Brute force attempts\n- Known malicious IPs\n"
+      },
+      "routing": {
+        "escalation_route": [
+          "security_analyst",
+          "network_engineer",
+          "incident_response",
+          "ciso",
+          "cto"
+        ]
+      },
+      "governance": {
+        "evaluation_threshold": "CRITICAL",
+        "approved_artifact_hash": "pending-evaluation"
+      }
+    },
+    "escalation_route": [
+      "security_analyst"
+    ],
+    "threat_level": "LOW"
+  }
+}

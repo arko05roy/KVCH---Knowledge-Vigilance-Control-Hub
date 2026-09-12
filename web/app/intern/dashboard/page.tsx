@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export default function InternDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [reportData, setReportData] = useState<unknown>(DEMO_REPORTS.intern);
+  const [reportData, setReportData] = useState<any>(DEMO_REPORTS.intern);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Interactive Checklist State

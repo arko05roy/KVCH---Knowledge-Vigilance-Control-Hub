@@ -162,8 +162,8 @@ export default function RiskIntelligencePage() {
   const [budgetLimit, setBudgetLimit] = useState(10000000); // ₹1 Crore default
   const [scenarios, setScenarios] = useState(initialScenariosList);
 
-  const [quantifyData, setQuantifyData] = useState<Record<string, unknown> | null>(null);
-  const [optimizeData, setOptimizeData] = useState<Record<string, unknown> | null>(null);
+  const [quantifyData, setQuantifyData] = useState<any | null>(null);
+  const [optimizeData, setOptimizeData] = useState<any | null>(null);
 
   const currentScenario = scenarios[selectedScenarioIndex];
 
@@ -356,7 +356,7 @@ export default function RiskIntelligencePage() {
           </div>
 
           <div className="flex gap-2">
-            {scenariosList.map((sc, idx) => (
+            {scenarios.map((sc: any, idx: number) => (
               <button
                 key={sc.scenario_id}
                 onClick={() => setSelectedScenarioIndex(idx)}
@@ -636,7 +636,7 @@ export default function RiskIntelligencePage() {
         </div>
 
         {/* Regulatory & Compliance Evidence Strip */}
-        <div className="p-6 rounded-xl bg-[#141516] border border-[#23252a]">
+        <div className="p-6 rounded-xl bg-[#141516] border border-[#23252a] mb-8">
           <h3 className="text-sm font-semibold text-[#f7f8f8] mb-3">
             📋 Framework & Regulatory Evidence Crosswalk
           </h3>
@@ -665,6 +665,91 @@ export default function RiskIntelligencePage() {
               <div className="text-[#8a8f98] mt-1">Control 7: Prioritized Vulnerability Management</div>
               <div className="text-[#2ea043] font-semibold mt-2">✓ Verified Audit Evidence</div>
             </div>
+          </div>
+        </div>
+
+        {/* System Outage Resilience & Attack Vector Handling Matrix */}
+        <div className="p-6 rounded-xl bg-[#141516] border border-[#23252a]">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-semibold text-[#f7f8f8] flex items-center gap-2">
+                🛡️ System Outage Resilience & Attack Vector Matrix
+              </h3>
+              <p className="text-xs text-[#8a8f98] mt-0.5">
+                Real-time fault isolation, DDoS packet velocity differentiation, and base image patching status
+              </p>
+            </div>
+            <span className="px-2.5 py-1 bg-[#2ea043]/15 text-[#2ea043] border border-[#2ea043]/40 text-xs font-mono rounded-md font-semibold">
+              System Health: 100% Operational
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            
+            {/* Outage 1: Server Failure */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">1. Server Fail Handling</span>
+                  <span className="px-2 py-0.5 bg-[#2ea043]/10 text-[#2ea043] font-mono text-[10px] rounded font-semibold">Circuit Breaker</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  TCP connection reset / ECONNREFUSED triggers local in-memory FAIR fallback without dropping telemetry.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#828fff]">
+                Status: In-Memory Fallback Ready
+              </div>
+            </div>
+
+            {/* Outage 2: Gateway Failure */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">2. Gateway Fail (502/504)</span>
+                  <span className="px-2 py-0.5 bg-[#f2c94c]/10 text-[#f2c94c] font-mono text-[10px] rounded font-semibold">Redis Queue Buffer</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  Reverse proxy timeouts buffer incoming `kvch.finding/v1` envelopes asynchronously until gateway recovers.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#2ea043]">
+                Status: Async Queue Active
+              </div>
+            </div>
+
+            {/* Outage 3: DDoS Differentiation */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">3. DDoS Velocity Check</span>
+                  <span className="px-2 py-0.5 bg-[#ff5555]/10 text-[#ff5555] font-mono text-[10px] rounded font-semibold">SYN Flood Sniffer</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  Scapy/TShark telemetry detects SYN flood packet velocity and triggers automated `iptables` rate-limiting.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#ff5555]">
+                Status: Rate-Limit Shield Active
+              </div>
+            </div>
+
+            {/* Outage 4: Base Image & OS Patching */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">4. Base & OS Patching</span>
+                  <span className="px-2 py-0.5 bg-[#828fff]/10 text-[#828fff] font-mono text-[10px] rounded font-semibold">Trivy + Kpatch</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  Trivy multi-stage Docker updates & Linux `kpatch` live-patching for zero-downtime kernel remediation.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#2ea043]">
+                Status: Rebootless Patching On
+              </div>
+            </div>
+
           </div>
         </div>
 

@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export default function SrDevDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [reportData, setReportData] = useState<unknown>(DEMO_REPORTS.srDev);
+  const [reportData, setReportData] = useState<any>(DEMO_REPORTS.srDev);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 

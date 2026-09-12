@@ -278,7 +278,7 @@ Required JSON Structure per role:
 
     // Helper to format fallback fields if missing
     const formatRoleReport = (roleKey: "srDev" | "intern" | "hr" | "management", rawObj: Record<string, unknown> | undefined): RoleSecurityReport => {
-      const raw = rawObj as Record<string, unknown> | undefined;
+      const raw = (rawObj || {}) as any;
       const roleMap = {
         srDev: "sr-dev",
         intern: "intern",
@@ -286,7 +286,7 @@ Required JSON Structure per role:
         management: "management"
       } as const;
 
-      const actions = raw?.recommendedActions || [
+      const actions = raw.recommendedActions || [
         {
           action: finding.recommended_actions?.[0] || "Remediate local configuration",
           riskReductionPercent: 90,
@@ -301,15 +301,15 @@ Required JSON Structure per role:
 
       return {
         role: roleMap[roleKey],
-        title: raw?.title || `${roleKey.toUpperCase()} Security Briefing`,
-        summary: raw?.summary || finding.summary,
-        metrics: raw?.metrics || defaultMetrics,
-        keyFindings: raw?.keyFindings || [finding.title, finding.category],
-        businessImpact: raw?.businessImpact || defaultImpact,
-        aiInsights: raw?.aiInsights || ["Automated AI threat correlation complete"],
-        recommendedActions: actions,
-        investmentOptimization: raw?.investmentOptimization || "Zero-cost local configuration fix recommended.",
-        complianceMappings: raw?.complianceMappings || [
+        title: (raw.title as string) || `${roleKey.toUpperCase()} Security Briefing`,
+        summary: (raw.summary as string) || finding.summary,
+        metrics: (raw.metrics as QuantifiedRiskMetrics) || defaultMetrics,
+        keyFindings: (raw.keyFindings as string[]) || [finding.title, finding.category],
+        businessImpact: (raw.businessImpact as { operational: string; financial: string; compliance: string; reputational: string }) || defaultImpact,
+        aiInsights: (raw.aiInsights as string[]) || ["Automated AI threat correlation complete"],
+        recommendedActions: actions as RecommendedActionItem[],
+        investmentOptimization: (raw.investmentOptimization as string) || "Zero-cost local configuration fix recommended.",
+        complianceMappings: (raw.complianceMappings as ComplianceMappingItem[]) || [
           {
             framework: "ISO/IEC 27001",
             controlId: "A.13.1.1",
@@ -317,7 +317,7 @@ Required JSON Structure per role:
             impactDescription: "Local workstation network control baseline check"
           }
         ],
-        scenarios: raw?.scenarios || {
+        scenarios: (raw.scenarios as ScenarioAnalysis) || {
           scenarioA_NoAction: {
             residualRisk: isLocalLaptop ? "Low local risk" : "High Production Loss",
             financialExposure: isLocalLaptop ? "₹10,000 Max Exposure" : "₹1,00,00,000 Max",
@@ -330,10 +330,10 @@ Required JSON Structure per role:
             expectedLossReduction: "95% loss reduction"
           }
         },
-        finalVerdict: raw?.finalVerdict || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
-        keyInsights: raw?.keyInsights || raw?.keyFindings || [finding.category, `Severity: ${finding.severity}`],
-        actionItems: raw?.actionItems || actions.map((a: unknown) => typeof a === "string" ? a : (a as { action?: string }).action || "Remediate finding") || ["Review finding details"],
-        roleSpecificDetail: raw?.roleSpecificDetail || JSON.stringify(finding.details, null, 2),
+        finalVerdict: (raw.finalVerdict as string) || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
+        keyInsights: (raw.keyInsights as string[]) || (raw.keyFindings as string[]) || [finding.category, `Severity: ${finding.severity}`],
+        actionItems: (raw.actionItems as string[]) || actions.map((a: any) => typeof a === "string" ? a : (a?.action || "Remediate finding")) || ["Review finding details"],
+        roleSpecificDetail: (raw.roleSpecificDetail as string) || JSON.stringify(finding.details, null, 2),
         generatedAt: now
       };
     };
