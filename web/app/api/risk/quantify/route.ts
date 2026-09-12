@@ -8,8 +8,8 @@ export async function POST(request: Request) {
     try {
       const data = await quantifyRiskScenario(body);
       return NextResponse.json(data);
-    } catch (err) {
-      // Dynamic Resilient TypeScript Monte Carlo Loss Engine (FAIR-aligned)
+    } catch {
+      // Dynamic Resilient TypeScript Monte Carlo Loss Engine (FAIR-aligned fallback)
       const finding = body.finding || {};
       const asset = body.asset_profile || {};
 
@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       // 2. Monte Carlo Simulation (10,000 Draws)
       const draws = 10000;
       const losses: number[] = [];
-      const dtHoursDraws: number[] = [];
       let totalDtLoss = 0;
       let totalIrLoss = 0;
       let totalBreachLoss = 0;
@@ -104,8 +103,8 @@ export async function POST(request: Request) {
           p90_loss_inr: Number(p90.toFixed(2)),
           var95_inr: Number(var95.toFixed(2)),
           cvar95_inr: Number(cvar95.toFixed(2)),
-          min_loss_inr: Number(losses[0].toFixed(2)),
-          max_loss_inr: Number(losses[draws - 1].toFixed(2)),
+          min_loss_inr: Number(losses[0]?.toFixed(2) ?? "0"),
+          max_loss_inr: Number(losses[draws - 1]?.toFixed(2) ?? "0"),
           expected_downtime_loss_inr: Number((totalDtLoss / draws).toFixed(2)),
           expected_incident_response_loss_inr: Number((totalIrLoss / draws).toFixed(2)),
           expected_breach_loss_inr: Number((totalBreachLoss / draws).toFixed(2)),
@@ -119,7 +118,8 @@ export async function POST(request: Request) {
 
       return NextResponse.json(fallback);
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }

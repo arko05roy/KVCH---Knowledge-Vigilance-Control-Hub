@@ -384,8 +384,7 @@ class VPNAnalyzer:
         """Save finding envelope to reports folder"""
         reports_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports")
         os.makedirs(reports_dir, exist_ok=True)
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-        filename = os.path.join(reports_dir, f"finding_{self.extension_id}_{timestamp}.json")
+        filename = os.path.join(reports_dir, "finding_2_vpn_crypto_analyzer.json")
         envelope.save(filename)
         return filename
     

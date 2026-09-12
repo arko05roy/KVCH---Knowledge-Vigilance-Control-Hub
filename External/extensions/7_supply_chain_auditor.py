@@ -319,8 +319,7 @@ class SupplyChainAuditor:
 
         reports_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports")
         os.makedirs(reports_dir, exist_ok=True)
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_path = os.path.join(reports_dir, f"finding_supply_chain_auditor_{ts}.json")
+        report_path = os.path.join(reports_dir, "finding_7_supply_chain_auditor.json")
         envelope.save(report_path)
         print(f"\n{Colors.GREEN}✔ Standardized Finding Envelope saved to:{Colors.RESET} {report_path}\n")
         return report_path

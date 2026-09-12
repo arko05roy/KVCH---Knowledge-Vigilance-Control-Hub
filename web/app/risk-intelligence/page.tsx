@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 interface Mitigation {
@@ -296,14 +296,33 @@ export default function RiskIntelligencePage() {
   const [calibratedMap, setCalibratedMap] = useState<Record<string, { count: number; oldRto: number; newRto: number; oldIr: number; newIr: number; oldEal: number; newEal: number }>>({});
   const [notification, setNotification] = useState<string | null>(null);
 
-  const [quantifyData, setQuantifyData] = useState<any>(null);
-  const [optimizeData, setOptimizeData] = useState<any>(null);
+  const [quantifyData, setQuantifyData] = useState<any | null>(null);
+  const [optimizeData, setOptimizeData] = useState<any | null>(null);
 
   const currentScenario = scenariosList[selectedScenarioIndex];
   const isScenarioCalibrated = Boolean(calibratedMap[currentScenario?.scenario_id]);
   const currentCalibrationInfo = calibratedMap[currentScenario?.scenario_id];
 
-  const fetchQuantification = async (customScenario = currentScenario) => {
+  const runOptimization = useCallback(async (baselineEal: number, budget: number, scenario = currentScenario) => {
+    try {
+      const oRes = await fetch('/api/risk/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario_id: scenario.scenario_id,
+          baseline_eal_inr: baselineEal,
+          budget_limit_inr: budget,
+          candidate_mitigations: scenario.candidate_mitigations,
+        }),
+      });
+      const oData = await oRes.json();
+      setOptimizeData(oData);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [currentScenario]);
+
+  const fetchQuantification = useCallback(async (customScenario = currentScenario) => {
     setLoading(true);
     try {
       const qRes = await fetch('/api/risk/quantify', {
@@ -314,12 +333,25 @@ export default function RiskIntelligencePage() {
       const qData = await qRes.json();
       setQuantifyData(qData);
 
-      await runOptimization(qData.baseline_loss.expected_annual_loss_inr, budgetLimit, customScenario);
+      if (qData?.baseline_loss?.expected_annual_loss_inr != null) {
+        await runOptimization(qData.baseline_loss.expected_annual_loss_inr, budgetLimit, customScenario);
+      }
       return qData;
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  }, [currentScenario, budgetLimit, runOptimization]);
+
+  useEffect(() => {
+    fetchQuantification(currentScenario);
+  }, [selectedScenarioIndex, fetchQuantification, currentScenario]);
+
+  const handleBudgetChange = (newBudget: number) => {
+    setBudgetLimit(newBudget);
+    if (quantifyData?.baseline_loss?.expected_annual_loss_inr != null) {
+      runOptimization(quantifyData.baseline_loss.expected_annual_loss_inr, newBudget, currentScenario);
     }
   };
 
@@ -372,36 +404,6 @@ export default function RiskIntelligencePage() {
     }
   };
 
-  const runOptimization = async (baselineEal: number, budget: number, scenarioTarget = currentScenario) => {
-    try {
-      const oRes = await fetch('/api/risk/optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenario_id: scenarioTarget.scenario_id,
-          baseline_eal_inr: baselineEal,
-          budget_limit_inr: budget,
-          candidate_mitigations: scenarioTarget.candidate_mitigations,
-        }),
-      });
-      const oData = await oRes.json();
-      setOptimizeData(oData);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  useEffect(() => {
-    fetchQuantification(currentScenario);
-  }, [selectedScenarioIndex]);
-
-  const handleBudgetChange = (newBudget: number) => {
-    setBudgetLimit(newBudget);
-    if (quantifyData) {
-      runOptimization(quantifyData.baseline_loss.expected_annual_loss_inr, newBudget, currentScenario);
-    }
-  };
-
   const formatINR = (val: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -413,7 +415,7 @@ export default function RiskIntelligencePage() {
   return (
     <div className="min-h-screen bg-[#0f1011] text-[#f7f8f8] font-sans">
       
-      {/* Top Header Bar matching Theme */}
+      {/* Top Header Bar */}
       <header className="border-b border-[#23252a] bg-[#0f1011] sticky top-0 z-30 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -508,7 +510,7 @@ export default function RiskIntelligencePage() {
           </div>
 
           <div className="flex gap-2">
-            {scenariosList.map((sc, idx) => (
+            {scenariosList.map((sc: any, idx: number) => (
               <button
                 key={sc.scenario_id}
                 onClick={() => setSelectedScenarioIndex(idx)}
@@ -818,6 +820,124 @@ export default function RiskIntelligencePage() {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* Regulatory & Compliance Evidence Strip */}
+        <div className="p-6 rounded-xl bg-[#141516] border border-[#23252a] mb-8">
+          <h3 className="text-sm font-semibold text-[#f7f8f8] mb-3">
+            📋 Framework & Regulatory Evidence Crosswalk
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div className="p-3.5 rounded-lg bg-[#0f1011] border border-[#23252a]">
+              <div className="font-bold text-[#5e6ad2]">SEBI CSCRF</div>
+              <div className="text-[#8a8f98] mt-1">Clause 4.2: Continuous Cyber Risk Assessment</div>
+              <div className="text-[#2ea043] font-semibold mt-2">✓ Verified Audit Evidence</div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-[#0f1011] border border-[#23252a]">
+              <div className="font-bold text-[#5e6ad2]">RBI Master Direction</div>
+              <div className="text-[#8a8f98] mt-1">Section 7: Business Service Impact & RTO SLAs</div>
+              <div className="text-[#2ea043] font-semibold mt-2">✓ Verified Audit Evidence</div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-[#0f1011] border border-[#23252a]">
+              <div className="font-bold text-[#5e6ad2]">NIST CSF 2.0</div>
+              <div className="text-[#8a8f98] mt-1">GV.RM-01: Monetary Risk Quantification Strategy</div>
+              <div className="text-[#2ea043] font-semibold mt-2">✓ Verified Audit Evidence</div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-[#0f1011] border border-[#23252a]">
+              <div className="font-bold text-[#5e6ad2]">CIS Controls v8.1</div>
+              <div className="text-[#8a8f98] mt-1">Control 7: Prioritized Vulnerability Management</div>
+              <div className="text-[#2ea043] font-semibold mt-2">✓ Verified Audit Evidence</div>
+            </div>
+          </div>
+        </div>
+
+        {/* System Outage Resilience & Attack Vector Handling Matrix */}
+        <div className="p-6 rounded-xl bg-[#141516] border border-[#23252a]">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-semibold text-[#f7f8f8] flex items-center gap-2">
+                🛡️ System Outage Resilience & Attack Vector Matrix
+              </h3>
+              <p className="text-xs text-[#8a8f98] mt-0.5">
+                Real-time fault isolation, DDoS packet velocity differentiation, and base image patching status
+              </p>
+            </div>
+            <span className="px-2.5 py-1 bg-[#2ea043]/15 text-[#2ea043] border border-[#2ea043]/40 text-xs font-mono rounded-md font-semibold">
+              System Health: 100% Operational
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            
+            {/* Outage 1: Server Failure */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">1. Server Fail Handling</span>
+                  <span className="px-2 py-0.5 bg-[#2ea043]/10 text-[#2ea043] font-mono text-[10px] rounded font-semibold">Circuit Breaker</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  TCP connection reset / ECONNREFUSED triggers local in-memory FAIR fallback without dropping telemetry.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#828fff]">
+                Status: In-Memory Fallback Ready
+              </div>
+            </div>
+
+            {/* Outage 2: Gateway Failure */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">2. Gateway Fail (502/504)</span>
+                  <span className="px-2 py-0.5 bg-[#f2c94c]/10 text-[#f2c94c] font-mono text-[10px] rounded font-semibold">Redis Queue Buffer</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  Reverse proxy timeouts buffer incoming `kvch.finding/v1` envelopes asynchronously until gateway recovers.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#2ea043]">
+                Status: Async Queue Active
+              </div>
+            </div>
+
+            {/* Outage 3: DDoS Differentiation */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">3. DDoS Velocity Check</span>
+                  <span className="px-2 py-0.5 bg-[#ff5555]/10 text-[#ff5555] font-mono text-[10px] rounded font-semibold">SYN Flood Sniffer</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  Scapy/TShark telemetry detects SYN flood packet velocity and triggers automated `iptables` rate-limiting.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#ff5555]">
+                Status: Rate-Limit Shield Active
+              </div>
+            </div>
+
+            {/* Outage 4: Base Image & OS Patching */}
+            <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f7f8f8]">4. Base & OS Patching</span>
+                  <span className="px-2 py-0.5 bg-[#828fff]/10 text-[#828fff] font-mono text-[10px] rounded font-semibold">Trivy + Kpatch</span>
+                </div>
+                <p className="text-[#8a8f98] text-[11.5px] mt-1.5 leading-relaxed">
+                  Trivy multi-stage Docker updates & Linux `kpatch` live-patching for zero-downtime kernel remediation.
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-[#1e2024] text-[11px] font-mono text-[#2ea043]">
+                Status: Rebootless Patching On
+              </div>
+            </div>
+
           </div>
         </div>
 

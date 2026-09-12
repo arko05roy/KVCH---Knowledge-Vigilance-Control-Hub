@@ -66,6 +66,19 @@ export interface RoleSecurityReport {
   finalVerdict?: string;
   keyInsights: string[]; // Backward compatibility helper array
   actionItems: string[]; // Backward compatibility helper array
+  failureDifferentiation?: {
+    incidentType: "SERVER_FAIL" | "GATEWAY_FAIL" | "DDOS_ATTACK" | "DB_OUTAGE" | "CDN_ORIGIN_FAIL";
+    targetLayer: "HOST_OS" | "API_GATEWAY" | "DATABASE" | "CDN_EDGE" | "APPLICATION";
+    reason: string;
+  };
+  activeResponsePayload?: {
+    actionId: string;
+    actionName: string;
+    command: string;
+    recoveryTimeEst: string;
+    status: string;
+    autoExecutable: boolean;
+  };
   roleSpecificDetail: string;
   generatedAt: string;
 }
@@ -277,7 +290,8 @@ Required JSON Structure per role:
         };
 
     // Helper to format fallback fields if missing
-    const formatRoleReport = (roleKey: "srDev" | "intern" | "hr" | "management", raw: any): RoleSecurityReport => {
+    const formatRoleReport = (roleKey: "srDev" | "intern" | "hr" | "management", rawObj: Record<string, unknown> | undefined): RoleSecurityReport => {
+      const raw = (rawObj || {}) as any;
       const roleMap = {
         srDev: "sr-dev",
         intern: "intern",
@@ -285,7 +299,7 @@ Required JSON Structure per role:
         management: "management"
       } as const;
 
-      const actions = raw?.recommendedActions || [
+      const actions = raw.recommendedActions || [
         {
           action: finding.recommended_actions?.[0] || "Remediate local configuration",
           riskReductionPercent: 90,
@@ -298,17 +312,22 @@ Required JSON Structure per role:
         }
       ];
 
+      const activeResp = (finding.active_response || finding.details?.active_response || {}) as Record<string, unknown>;
+      const incidentType = (activeResp.incident_type || (finding.category === "attack_surface_scan" ? "DDOS_ATTACK" : "GATEWAY_FAIL")) as "SERVER_FAIL" | "GATEWAY_FAIL" | "DDOS_ATTACK" | "DB_OUTAGE" | "CDN_ORIGIN_FAIL";
+      const targetLayer = (activeResp.target_layer || (finding.category === "attack_surface_scan" ? "CDN_EDGE" : "API_GATEWAY")) as "HOST_OS" | "API_GATEWAY" | "DATABASE" | "CDN_EDGE" | "APPLICATION";
+      const reason = (activeResp.differentiation_reason as string) || "Diagnostic matrix correlated network telemetry, HTTP status entropy, and connection socket state.";
+
       return {
         role: roleMap[roleKey],
-        title: raw?.title || `${roleKey.toUpperCase()} Security Briefing`,
-        summary: raw?.summary || finding.summary,
-        metrics: raw?.metrics || defaultMetrics,
-        keyFindings: raw?.keyFindings || [finding.title, finding.category],
-        businessImpact: raw?.businessImpact || defaultImpact,
-        aiInsights: raw?.aiInsights || ["Automated AI threat correlation complete"],
-        recommendedActions: actions,
-        investmentOptimization: raw?.investmentOptimization || "Zero-cost local configuration fix recommended.",
-        complianceMappings: raw?.complianceMappings || [
+        title: (raw.title as string) || `${roleKey.toUpperCase()} Security Briefing`,
+        summary: (raw.summary as string) || finding.summary,
+        metrics: (raw.metrics as QuantifiedRiskMetrics) || defaultMetrics,
+        keyFindings: (raw.keyFindings as string[]) || [finding.title, finding.category],
+        businessImpact: (raw.businessImpact as { operational: string; financial: string; compliance: string; reputational: string }) || defaultImpact,
+        aiInsights: (raw.aiInsights as string[]) || ["Automated AI threat correlation complete"],
+        recommendedActions: actions as RecommendedActionItem[],
+        investmentOptimization: (raw.investmentOptimization as string) || "Zero-cost local configuration fix recommended.",
+        complianceMappings: (raw.complianceMappings as ComplianceMappingItem[]) || [
           {
             framework: "ISO/IEC 27001",
             controlId: "A.13.1.1",
@@ -316,7 +335,7 @@ Required JSON Structure per role:
             impactDescription: "Local workstation network control baseline check"
           }
         ],
-        scenarios: raw?.scenarios || {
+        scenarios: (raw.scenarios as ScenarioAnalysis) || {
           scenarioA_NoAction: {
             residualRisk: isLocalLaptop ? "Low local risk" : "High Production Loss",
             financialExposure: isLocalLaptop ? "₹10,000 Max Exposure" : "₹1,00,00,000 Max",
@@ -329,10 +348,23 @@ Required JSON Structure per role:
             expectedLossReduction: "95% loss reduction"
           }
         },
-        finalVerdict: raw?.finalVerdict || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
-        keyInsights: raw?.keyInsights || raw?.keyFindings || [finding.category, `Severity: ${finding.severity}`],
-        actionItems: raw?.actionItems || actions.map((a: any) => typeof a === "string" ? a : a.action) || ["Review finding details"],
-        roleSpecificDetail: raw?.roleSpecificDetail || JSON.stringify(finding.details, null, 2),
+        failureDifferentiation: {
+          incidentType,
+          targetLayer,
+          reason,
+        },
+        activeResponsePayload: {
+          actionId: (activeResp.action_id as string) || "ACT-01-RATE-LIMIT",
+          actionName: (activeResp.action_name as string) || "Deploy Edge Rate Limitation & WAF Rule",
+          command: (activeResp.command as string) || "nft add rule inet filter input limit rate 50/minute accept",
+          recoveryTimeEst: (activeResp.recovery_time_est as string) || "15s",
+          status: (activeResp.status as string) || "PENDING",
+          autoExecutable: Boolean(activeResp.auto_executable ?? true),
+        },
+        finalVerdict: (raw?.finalVerdict as string) || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
+        keyInsights: (raw?.keyInsights as string[]) || (raw?.keyFindings as string[]) || [finding.category, `Severity: ${finding.severity}`],
+        actionItems: (raw?.actionItems as string[]) || actions.map((a: unknown) => typeof a === "string" ? a : (a as { action?: string }).action || "Remediate finding") || ["Review finding details"],
+        roleSpecificDetail: (raw?.roleSpecificDetail as string) || JSON.stringify(finding.details, null, 2),
         generatedAt: now
       };
     };

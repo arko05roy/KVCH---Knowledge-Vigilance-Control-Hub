@@ -39,8 +39,9 @@ export default function SrDevDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.srDev);
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Generation error");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
     }

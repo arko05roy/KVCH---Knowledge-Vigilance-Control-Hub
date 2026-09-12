@@ -620,10 +620,19 @@ async def run_extension_async(ext_num: int) -> Optional[Dict[str, Any]]:
         if not reports_dir.exists():
             return None
 
-        report_files = sorted(reports_dir.glob("finding_*.json"), key=lambda f: f.stat().st_mtime, reverse=True)
-        if report_files:
-            latest_report = report_files[0]
-            with open(latest_report, "r", encoding="utf-8") as f:
+        ext_report_files = {
+            1: "finding_1_attack_surface_scanner.json",
+            2: "finding_2_vpn_crypto_analyzer.json",
+            3: "finding_3_phishing_hunter.json",
+            4: "finding_4_threat_hunter_3000.json",
+            5: "finding_5_malware_analyzer.json",
+            6: "finding_6_credential_exposure_auditor.json",
+            7: "finding_7_supply_chain_auditor.json",
+            8: "finding_8_cookie_xss_analyzer.json",
+        }
+        target_report_file = reports_dir / ext_report_files.get(ext_num, "")
+        if target_report_file.exists():
+            with open(target_report_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if data.get("schema_version") == "kvch.finding/v1":
                     return data

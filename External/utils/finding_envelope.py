@@ -21,10 +21,36 @@ class FindingEnvelope:
         self.indicators: List[Any] = []
         self.baseline: Dict[str, Any] = {}
         self.recommended_actions: List[Any] = []
+        self.active_response: Dict[str, Any] = {}
         self.details: Dict[str, Any] = {}
         
         self._extension_id: Optional[str] = None
         self._version: str = "1.0.0"
+
+    def set_active_response(
+        self,
+        incident_type: str,
+        target_layer: str,
+        action_id: str,
+        action_name: str,
+        command: str,
+        differentiation_reason: str,
+        recovery_time_est: str = "30s",
+        status: str = "PENDING",
+        auto_executable: bool = True,
+    ):
+        self.active_response = {
+            "incident_type": incident_type,
+            "target_layer": target_layer,
+            "action_id": action_id,
+            "action_name": action_name,
+            "command": command,
+            "differentiation_reason": differentiation_reason,
+            "recovery_time_est": recovery_time_est,
+            "status": status,
+            "auto_executable": auto_executable,
+        }
+        self.details["active_response"] = self.active_response
 
     def set_extension_info(self, extension_id: str, version: str):
         self._extension_id = extension_id
@@ -105,6 +131,7 @@ class FindingEnvelope:
             "indicators": self.indicators if isinstance(self.indicators, list) else [],
             "baseline": self.baseline if isinstance(self.baseline, dict) else {},
             "recommended_actions": self.recommended_actions if isinstance(self.recommended_actions, list) else [],
+            "active_response": self.active_response if isinstance(self.active_response, dict) else {},
             "details": self.details if isinstance(self.details, dict) else {}
         }
 

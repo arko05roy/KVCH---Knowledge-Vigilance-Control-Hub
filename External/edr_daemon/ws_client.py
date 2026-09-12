@@ -150,12 +150,29 @@ class WebSocketClient:
         return False
 
     def _backup_locally(self, envelope: Dict[str, Any]):
-        """Saves copy of report envelope to local reports folder."""
+        """Saves copy of report envelope to local reports folder, maintaining exactly 8 report files."""
         try:
-            scanner_name = envelope.get("details", {}).get("auditor_version") or envelope.get("category", "finding")
-            scanner_name = str(scanner_name).replace(" ", "_").lower()
-            timestamp = time.strftime("%Y%m%d_%H%M%S")
-            filename = f"finding_{scanner_name}_{timestamp}.json"
+            category = str(envelope.get("category", "")).lower()
+            category_map = {
+                "attack_surface_scanner": "finding_1_attack_surface_scanner.json",
+                "network_surface_scanner": "finding_1_attack_surface_scanner.json",
+                "vpn_crypto_analyzer": "finding_2_vpn_crypto_analyzer.json",
+                "phishing_hunter": "finding_3_phishing_hunter.json",
+                "threat_hunter_3000": "finding_4_threat_hunter_3000.json",
+                "threat-hunter-3000": "finding_4_threat_hunter_3000.json",
+                "process_monitor": "finding_4_threat_hunter_3000.json",
+                "malware_analyzer": "finding_5_malware_analyzer.json",
+                "file_system_watcher": "finding_5_malware_analyzer.json",
+                "credential_exposure_auditor": "finding_6_credential_exposure_auditor.json",
+                "supply_chain_auditor": "finding_7_supply_chain_auditor.json",
+                "cookie_xss_analyzer": "finding_8_cookie_xss_analyzer.json",
+                "cookie-xss-auditor": "finding_8_cookie_xss_analyzer.json",
+            }
+            filename = category_map.get(category)
+            if not filename:
+                scanner_name = str(category).replace(" ", "_").replace("-", "_")
+                filename = f"finding_{scanner_name}.json"
+            
             filepath = self.backup_dir / filename
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(envelope, f, indent=2)

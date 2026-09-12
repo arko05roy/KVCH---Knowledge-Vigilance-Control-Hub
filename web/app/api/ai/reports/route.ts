@@ -30,8 +30,8 @@ export async function GET(request: Request) {
     const targetKey = roleKeyMap[role] || "srDev";
 
     const reports = findings.map((f) => {
-      const envelope = f.envelope as any;
-      const aiReports = envelope?.ai_reports;
+      const envelope = f.envelope as Record<string, unknown> | null;
+      const aiReports = envelope?.ai_reports as Record<string, unknown> | undefined;
       const roleReport = aiReports?.[targetKey];
 
       return {
@@ -57,8 +57,9 @@ export async function GET(request: Request) {
       count: reports.length,
       reports
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
     console.error("[API AI Reports Error]:", error);
-    return NextResponse.json({ success: false, error: error?.message || "Failed to fetch reports" }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || "Failed to fetch reports" }, { status: 500 });
   }
 }

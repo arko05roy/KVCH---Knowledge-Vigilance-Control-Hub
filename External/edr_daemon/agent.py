@@ -67,6 +67,19 @@ class KVCHAgent:
             except Exception as e:
                 logger.error(f"Error during baseline scan of extension {ext_num}: {e}")
 
+    async def periodic_refresh_loop(self, interval: float = 15.0):
+        """Periodically re-evaluates all 8 extensions every 15 seconds, updating the 8 canonical JSON files."""
+        logger.info(f"Periodic extension refresher active (updating 8 report files every {interval}s)")
+        while self._running:
+            await asyncio.sleep(interval)
+            for ext_num in range(1, 9):
+                try:
+                    env = await run_extension_async(ext_num)
+                    if env:
+                        await self.handle_finding(env)
+                except Exception as e:
+                    logger.error(f"Error during periodic refresh of extension {ext_num}: {e}")
+
     async def start(self):
         """Starts the EDR agent daemon loops."""
         self._running = True
@@ -87,6 +100,7 @@ class KVCHAgent:
             asyncio.create_task(self.fs_watcher.start()),
             asyncio.create_task(self.proc_monitor.start()),
             asyncio.create_task(self.net_scanner.start()),
+            asyncio.create_task(self.periodic_refresh_loop(15.0)),
         ]
 
         logger.info("KVCH 24/7 EDR Agent is active and monitoring in background.")

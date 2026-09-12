@@ -88,8 +88,9 @@ export class GroqKeyPoolManager {
   }
 
   /** Extract delay from 429 error message (e.g. "try again in 176ms") or compute exponential backoff */
-  private getRetryDelayMs(error: any, attempt: number): number {
-    const errorMsg = String(error?.message || error?.error?.error?.message || "");
+  private getRetryDelayMs(error: unknown, attempt: number): number {
+    const err = error as { message?: string; error?: { error?: { message?: string } } };
+    const errorMsg = String(err?.message || err?.error?.error?.message || "");
     const match = errorMsg.match(/try again in (\d+)(ms|s)/i);
     if (match) {
       const amount = parseInt(match[1], 10);
@@ -114,17 +115,18 @@ export class GroqKeyPoolManager {
       // Fallback model if primary model repeatedly hits rate limits
       const requestParams = { ...params };
       if (attempt >= 3 && requestParams.model === "groq/compound") {
-        requestParams.model = "llama-3.1-8b-instant";
+        requestParams.model = "llama-3.3-70b-versatile";
       }
 
       try {
         return (await client.chat.completions.create({ ...requestParams, stream: false })) as Groq.Chat.Completions.ChatCompletion;
-      } catch (error: any) {
+      } catch (error: unknown) {
         lastError = error;
-        const statusCode = error?.status || error?.statusCode;
+        const err = error as { status?: number; statusCode?: number };
+        const statusCode = err?.status || err?.statusCode;
 
         // Handle rate limits (429) or transient server errors (5xx)
-        if (statusCode === 429 || (statusCode >= 500 && statusCode < 600)) {
+        if (statusCode !== undefined && (statusCode === 429 || (statusCode >= 500 && statusCode < 600))) {
           const delayMs = this.getRetryDelayMs(error, attempt);
           // Set short cooldown (3s for 429, 10s for 5xx) so keys don't stay locked for a full minute
           const cooldownDuration = statusCode === 429 ? 3000 : 10000;

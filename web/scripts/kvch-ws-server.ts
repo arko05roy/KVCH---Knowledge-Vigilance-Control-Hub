@@ -1,5 +1,6 @@
 import http from "node:http";
 import crypto from "node:crypto";
+import net from "node:net";
 import { parseFindingsJsonl } from "../lib/judge/findings";
 
 const PORT = parseInt(process.env.KVCH_WS_PORT || "3000", 10);
@@ -98,7 +99,7 @@ const server = http.createServer((req, res) => {
   res.end();
 });
 
-server.on("upgrade", (req, socket: any, head) => {
+server.on("upgrade", (req, socket: net.Socket) => {
   const clientIp = req.headers["x-forwarded-for"] || socket.remoteAddress || "127.0.0.1";
   const secKey = req.headers["sec-websocket-key"];
   if (!secKey) {
@@ -110,7 +111,7 @@ server.on("upgrade", (req, socket: any, head) => {
   const client: ClientSocket = { socket, isAgent: req.headers["user-agent"]?.includes("KVCH") ?? false };
   clients.add(client);
 
-  console.info(`[KVCH WS] Client connected (Agent: ${client.isAgent}) from ${socket.remoteAddress}`);
+  console.info(`[KVCH WS] Client connected (Agent: ${client.isAgent}) from ${clientIp}`);
 
   socket.on("data", (chunk: Buffer) => {
     const frame = decodeWsFrame(chunk);

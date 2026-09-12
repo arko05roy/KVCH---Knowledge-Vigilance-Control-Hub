@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     try {
       const data = await optimizeMitigationPortfolio(body);
       return NextResponse.json(data);
-    } catch (err) {
+    } catch {
       // Fallback calculation for UI testing when python service is unreached
       const budget = body.budget_limit_inr || 10000000;
       const baselineEal = body.baseline_eal_inr || 15513641.82;
@@ -66,7 +66,8 @@ export async function POST(request: Request) {
 
       return NextResponse.json(fallback);
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }

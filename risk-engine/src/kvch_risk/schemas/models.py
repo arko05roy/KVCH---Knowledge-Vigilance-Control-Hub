@@ -16,6 +16,8 @@ class FindingIntake(BaseModel):
     epss_score: float = Field(default=0.01, ge=0.0, le=1.0)
     cisa_kev: bool = False
     cvss_score: float = Field(default=5.0, ge=0.0, le=10.0)
+    incident_type: Optional[str] = "GATEWAY_FAIL"
+    target_layer: Optional[str] = "API_GATEWAY"
 
 
 class AssetServiceProfile(BaseModel):
