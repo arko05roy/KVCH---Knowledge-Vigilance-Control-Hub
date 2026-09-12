@@ -41,7 +41,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "kvch_fingerprint_probe",
         description:
-          "Probes the host across 5 architectural layers (OS, Network, Transport, Presentation, Memory) and generates an attested cryptographic fingerprint prefix. All sensitive retrieval calls must be stamped with this fingerprint.",
+          "Inspects local workspace environment telemetry (OS architecture, network interface, socket table state, OpenSSL version, memory) and generates an authenticated local session attestation prefix.",
         inputSchema: {
           type: "object",
           properties: {
@@ -65,7 +65,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "kvch_create_extension",
         description:
-          "Scaffolds a new standalone sandboxed security extension package with kvch.extension-package/v1 manifest.",
+          "Scaffolds a new standalone security extension package with kvch.extension-package/v1 manifest.",
         inputSchema: {
           type: "object",
           required: ["id", "name", "description"],
@@ -81,7 +81,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "kvch_validate_extension",
         description:
-          "Validates extension manifest schema, entrypoints, and isolation requirements without executing untrusted code.",
+          "Validates extension manifest schema, entrypoints, and isolation requirements.",
         inputSchema: {
           type: "object",
           required: ["extensionId"],
@@ -105,7 +105,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "kvch_run_sandbox_scan",
         description:
-          "Triggers a multi-vector attack simulation scan across the 10 core defense extensions in the Judge Execution Kernel sandbox.",
+          "Runs a local developer benchmark scan across the 10 defense extensions in the sandbox environment.",
         inputSchema: {
           type: "object",
           properties: {
@@ -116,7 +116,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "kvch_get_security_reports",
         description:
-          "Retrieves role-specific security intelligence reports (Senior Dev, Intern, HR, Management, or Master 10-Engine Report). STRICTLY gated by the host 5-layer fingerprint prefix.",
+          "Retrieves role-specific security intelligence reports (Senior Dev, Intern, HR, Management, or Master Report) verified by host session attestation.",
         inputSchema: {
           type: "object",
           properties: {
@@ -141,7 +141,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "kvch_execute_soar_containment",
         description:
-          "Executes automated SOAR active response containment playbook (process termination, nftables IP block, LaunchAgent purge).",
+          "Executes the automated remediation playbook (service reset, port binding isolation, local cleanup).",
         inputSchema: {
           type: "object",
           properties: {
