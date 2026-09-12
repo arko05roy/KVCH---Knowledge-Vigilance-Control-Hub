@@ -5,9 +5,11 @@ import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useReadContract } from "wagmi";
 import type { Abi, Address } from "viem";
+import { ZkNavHeader } from "@/components/zk-nav";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 
 const ROLE_VERIFIER = BigInt(1);
-const short = (a?: string) => (a ? `${a.slice(0, 10)}…${a.slice(-4)}` : "—");
+const short = (a?: string) => (a ? `${a.slice(0, 8)}…${a.slice(-4)}` : "—");
 
 type JoinRequest = { id: string; status: string; councilSetId: string | null };
 
@@ -29,19 +31,25 @@ export function VerifierOnboarding({
   const [fetchedFor, setFetchedFor] = useState<string | null>(null);
 
   const activeSetQ = useReadContract({
-    address: councilAddress, abi: councilAbi, functionName: "activeSetId", chainId,
+    address: councilAddress,
+    abi: councilAbi,
+    functionName: "activeSetId",
+    chainId,
   });
   const activeSet = (activeSetQ.data as bigint | undefined) ?? BigInt(0);
 
   const isVerifierQ = useReadContract({
-    address: councilAddress, abi: councilAbi, functionName: "isActiveMember",
+    address: councilAddress,
+    abi: councilAbi,
+    functionName: "isActiveMember",
     args: [activeSet, address ?? "0x0000000000000000000000000000000000000000", ROLE_VERIFIER],
-    chainId, query: { enabled: isConnected && activeSet > BigInt(0) },
+    chainId,
+    query: { enabled: isConnected && activeSet > BigInt(0) },
   });
   const isVerifier = Boolean(isVerifierQ.data);
   const wrongChain = isConnected && chain?.id !== chainId;
 
-  // Returning user: pick up an existing seat request for this wallet.
+  // Returning user: fetch existing seat request
   useEffect(() => {
     if (!address) return;
     let cancelled = false;
@@ -64,7 +72,8 @@ export function VerifierOnboarding({
   const lookupDone = Boolean(address) && fetchedFor === address;
 
   async function requestSeat() {
-    setBusy(true); setError("");
+    setBusy(true);
+    setError("");
     try {
       const r = await fetch("/api/zk/join", {
         method: "POST",
@@ -82,104 +91,146 @@ export function VerifierOnboarding({
     }
   }
 
-  const showForm = isConnected && !isVerifier && lookupDone && (!currentRequest || currentRequest.status === "rejected");
+  const showForm =
+    isConnected &&
+    !isVerifier &&
+    lookupDone &&
+    (!currentRequest || currentRequest.status === "rejected");
 
   return (
-    <main className="mx-auto max-w-xl p-8 font-mono text-sm">
-      <Link href="/zk/join" className="text-sky-400">← choose a role</Link>
-      <div className="mt-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Become a verifier</h1>
-        <ConnectButton />
-      </div>
-      <p className="mb-6 mt-2 text-neutral-500">
-        Verifiers independently re-verify UltraHonk proofs off-chain and sign EIP-712
-        attestations. The council accepts claims when M-of-N approve.
-      </p>
+    <div className="min-h-screen bg-[#010102] text-[#f7f8f8] selection:bg-[#5e6ad2]/30">
+      <ZkNavHeader />
 
-      {wrongChain && (
-        <p className="mb-4 border border-amber-700 p-3 text-amber-500">
-          wallet is on chain {chain?.id} — switch to chain {chainId} to check membership
-        </p>
-      )}
+      <main className="mx-auto max-w-xl px-4 py-12 sm:px-6 space-y-6">
+        
+        <Link
+          href="/zk/join"
+          className="text-[12px] text-[#8a8f98] hover:text-[#f7f8f8] transition-colors"
+        >
+          ← Choose role
+        </Link>
 
-      {!isConnected && (
-        <p className="border border-neutral-700 p-4 text-neutral-400">
-          connect the wallet you want to attest with — it becomes your on-chain identity
-        </p>
-      )}
-
-      {isConnected && isVerifier && (
-        <div className="border border-green-800 p-4">
-          <p className="text-green-400">you&apos;re an active council verifier</p>
-          <p className="mt-1 text-neutral-500">{short(address)} — duties: proof re-verification, attestation signing</p>
-          <Link className="mt-2 inline-block text-sky-400 underline" href="/zk/council">
-            open council dashboard →
-          </Link>
-        </div>
-      )}
-
-      {isConnected && !isVerifier && currentRequest && currentRequest.status !== "rejected" && (
-        <div className="border border-sky-800 p-4">
-          <p className="text-sky-400">
-            seat request {currentRequest.status}
-            {currentRequest.councilSetId ? ` — included in council set ${currentRequest.councilSetId}` : ""}
-          </p>
-          <p className="mt-1 text-neutral-500">
-            {currentRequest.status === "approved"
-              ? "Your key was registered in a new council set — it activates after the on-chain delay. This page recognizes you automatically once active."
-              : "Governance will see your request on the council dashboard and can include your key in the next council set."}
-          </p>
-          <Link className="mt-2 inline-block text-sky-400 underline" href="/zk/council">
-            watch council dashboard →
-          </Link>
-        </div>
-      )}
-
-      {showForm && (
-        <div className="space-y-4">
-          {currentRequest?.status === "rejected" && (
-            <p className="border border-red-900 p-3 text-red-400">
-              a previous request from this wallet was declined — you can request again
+        <div className="flex items-center justify-between border-b border-[#23252a] pb-4">
+          <div className="space-y-1">
+            <h1 className="text-xl font-semibold text-[#f7f8f8]">
+              Verifier Onboarding
+            </h1>
+            <p className="text-[13px] text-[#8a8f98]">
+              Re-verify UltraHonk proofs and vote in the M-of-N consensus quorum.
             </p>
-          )}
-          <p className="border border-neutral-700 p-4 text-neutral-400">
-            {short(address)} is not in the active council set. Request a seat —
-            governance includes your key in the next registered set.
-          </p>
-          <label className="block">
-            <span className="text-neutral-500">organization / name (optional)</span>
-            <input
-              className="mt-1 w-full border border-neutral-700 bg-transparent px-3 py-2"
-              placeholder="Verifier Co"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-            />
-          </label>
-          <label className="block">
-            <span className="text-neutral-500">why should we trust you? (optional)</span>
-            <textarea
-              className="mt-1 w-full border border-neutral-700 bg-transparent px-3 py-2"
-              rows={3}
-              placeholder="infra you run, jurisdiction, independence statement…"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </label>
-          <button
-            className="w-full border border-sky-600 px-4 py-2 text-sky-400 disabled:opacity-40"
-            disabled={busy || wrongChain}
-            onClick={requestSeat}
-          >
-            {busy ? "requesting…" : "request council seat"}
-          </button>
-          <p className="text-neutral-600">
-            requesting a seat does not change the council — a governor must register a
-            new set containing your key, then an activation delay applies.
-          </p>
+          </div>
+          <ConnectButton showBalance={false} />
         </div>
-      )}
 
-      {error && <p className="mt-4 text-red-400">{error}</p>}
-    </main>
+        {wrongChain && (
+          <div className="rounded-md border border-[#ff9900]/30 bg-[#ff9900]/10 p-3 text-[12.5px] text-[#ff9900]">
+            Wallet on chain {chain?.id}. Please switch to chain {chainId}.
+          </div>
+        )}
+
+        {!isConnected && (
+          <div className="rounded-lg border border-[#23252a] bg-[#0f1011] p-6 text-center space-y-3">
+            <p className="text-[13px] text-[#8a8f98]">
+              Connect the wallet you will use for signing on-chain verifications.
+            </p>
+            <div className="flex justify-center">
+              <ConnectButton />
+            </div>
+          </div>
+        )}
+
+        {isConnected && isVerifier && (
+          <div className="rounded-lg border border-[#2ea043]/30 bg-[#0f1011] p-5 space-y-3">
+            <div className="flex items-center gap-2 text-[#2ea043] text-[13px] font-medium">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Active Council Verifier</span>
+            </div>
+            <p className="text-[12px] font-mono text-[#8a8f98]">
+              Key: {address} · Council Set #{activeSet.toString()}
+            </p>
+            <Link
+              href="/zk/council"
+              className="inline-flex items-center gap-1 text-[13px] text-[#828fff] hover:underline"
+            >
+              <span>Council Dashboard</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        )}
+
+        {isConnected && !isVerifier && currentRequest && currentRequest.status !== "rejected" && (
+          <div className="rounded-lg border border-[#23252a] bg-[#0f1011] p-5 space-y-3">
+            <div className="text-[13px] font-medium text-[#f7f8f8]">
+              Seat Request {currentRequest.status}
+              {currentRequest.councilSetId && ` (Set #${currentRequest.councilSetId})`}
+            </div>
+            <p className="text-[12px] text-[#8a8f98] leading-relaxed">
+              {currentRequest.status === "approved"
+                ? "Your address was registered in a new council set and will activate after the on-chain delay."
+                : "Your seat application is queued. Council members can include your key in the next proposed set."}
+            </p>
+            <Link
+              href="/zk/council"
+              className="inline-flex items-center gap-1 text-[12px] text-[#828fff] hover:underline"
+            >
+              <span>Watch Council Status →</span>
+            </Link>
+          </div>
+        )}
+
+        {showForm && (
+          <div className="space-y-4 rounded-lg border border-[#23252a] bg-[#0f1011] p-5">
+            <div className="space-y-1">
+              <label className="text-[11px] font-mono uppercase text-[#8a8f98] block">
+                Wallet Address
+              </label>
+              <input
+                type="text"
+                disabled
+                value={address ?? ""}
+                className="w-full rounded-md border border-[#23252a] bg-[#08090a] px-3 py-2 font-mono text-[12px] text-[#8a8f98]"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-mono uppercase text-[#8a8f98] block">
+                Verifier / Organization Label
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. AuditNode-01 or SecurityCorp"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                className="w-full rounded-md border border-[#23252a] bg-[#08090a] px-3 py-2 text-[13px] text-[#f7f8f8] placeholder-[#62666d] outline-none focus:border-[#5e6ad2]"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-mono uppercase text-[#8a8f98] block">
+                Note (Optional)
+              </label>
+              <textarea
+                rows={2}
+                placeholder="Brief qualification or node uptime pledge"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className="w-full rounded-md border border-[#23252a] bg-[#08090a] px-3 py-2 text-[13px] text-[#f7f8f8] placeholder-[#62666d] outline-none focus:border-[#5e6ad2]"
+              />
+            </div>
+
+            {error && <p className="text-[12px] text-[#ff5555]">{error}</p>}
+
+            <button
+              disabled={busy || !label.trim()}
+              onClick={requestSeat}
+              className="w-full rounded-md bg-[#5e6ad2] px-3.5 py-2 text-[13px] font-medium text-white hover:bg-[#828fff] disabled:opacity-40 transition-colors"
+            >
+              {busy ? "Submitting request…" : "Submit Seat Request →"}
+            </button>
+          </div>
+        )}
+
+      </main>
+    </div>
   );
 }

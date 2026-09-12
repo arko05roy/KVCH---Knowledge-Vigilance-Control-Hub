@@ -1,0 +1,474 @@
+{
+  "findingId": "INC-2026-8891",
+  "findingTitle": "Multi-Stage Supply Chain RCE, Memory Injection & Database Exfiltration Campaign",
+  "severity": "critical",
+  "category": "supply_chain_rce_database_exposure",
+  "observedAt": "2026-09-13T01:45:00.000Z",
+  "simulationDuration": "120 Minutes (2-Hour Attack Window)",
+  "environment": "KVCH Judge Execution Kernel (Isolated Sandbox)",
+  "resource": {
+    "type": "workstation",
+    "id": "192.168.31.204",
+    "name": "MacBook-Pro-Dev03.lan",
+    "assetTag": "#WKSTN-0891"
+  },
+  "extensionsInvolved": [
+    "attack-surface-scanner",
+    "vpn-crypto-analyzer",
+    "phishing-hunter",
+    "threat-hunter-3000",
+    "malware-analyzer",
+    "credential-exposure-auditor",
+    "supply-chain-auditor",
+    "cookie-xss-auditor",
+    "aegisdb-zerotrust",
+    "edgeguard-sentinel",
+    "pr-assistant",
+    "edr-daemon"
+  ],
+  "reports": {
+    "srDev": {
+      "role": "sr-dev",
+      "title": "Technical Root Cause Analysis, Forensic Stack Trace & Hotfix Directives",
+      "summary": "Multi-stage breach simulation (#INC-2026-8891) correlated across 10 modular defense engines over a 120-minute sandbox run on MacBook-Pro-Dev03.lan. Vulnerability chain initiated via typosquatted package @kvch-internal/crypto-utils@1.4.2 merged in PR #4 and wildcard database listener (0.0.0.0:5432). Packed reverse shell (PID 14209, entropy H=7.942) connected to C2 IP 185.220.101.5:443. AegisDB Zero-Trust Proxy halted unpaginated mass table exfiltration at T+111m, and automated SOAR quarantine isolated the host.",
+      "metrics": {
+        "likelihoodScore": 96,
+        "businessImpactScore": 92,
+        "financialExposure": {
+          "min": "₹15,00,000",
+          "mostLikely": "₹48,00,000",
+          "max": "₹1,20,00,000",
+          "eal": "₹38,40,000"
+        },
+        "riskTrend": "Increasing"
+      },
+      "keyFindings": [
+        "attack-surface-scanner: Unbound PostgreSQL listener on 0.0.0.0:5432 and SMB 445.",
+        "edgeguard-sentinel: Origin IPv4 10.0.4.15 leaked via cf-connecting-ip header mismatch.",
+        "phishing-hunter: /etc/hosts tampered mapping auth.kvch.internal to 185.220.101.5.",
+        "supply-chain-auditor: Typosquatted package @kvch-internal/crypto-utils@1.4.2 containing curl | sh postinstall hook.",
+        "malware-analyzer: Dropped executable /tmp/.system_daemon with Shannon entropy H=7.942 matched YARA MALW_JS_REVERSE_SHELL.",
+        "threat-hunter-3000: Outbound reverse shell (PID 14209) to 185.220.101.5:443 & LaunchAgent persistence plist.",
+        "cookie-xss-auditor: DOM XSS vulnerability in dashboard-shell.tsx via location.hash leaking session JWTs.",
+        "credential-exposure-auditor: Exposed AWS/Stripe keys in .env & clipboard cryptocurrency replacer.",
+        "vpn-crypto-analyzer: Split-tunnel DNS leak on tun0 interface bypassing WireGuard tunnel.",
+        "aegisdb-zerotrust: Intercepted unpaginated SELECT * FROM users, salaries, private_keys; severed socket FD 42."
+      ],
+      "businessImpact": {
+        "operational": "Workstation isolated into quarantine network; production services uninterrupted.",
+        "financial": "Saved ₹72,00,000 through automated real-time AegisDB interception.",
+        "compliance": "Technical deficiencies flagged under ISO/IEC 27001 Control A.8.28 & A.13.1.1.",
+        "reputational": "Zero customer data exfiltrated across perimeter boundary; zero external press exposure."
+      },
+      "aiInsights": [
+        "Root cause was unvetted third-party dependency injection in PR #4 lacking mandatory peer review.",
+        "Entropy scanning (H > 7.2) immediately identified the packed binary before runtime execution."
+      ],
+      "recommendedActions": [
+        {
+          "action": "Execute automated SOAR script to kill PID 14209, block 185.220.101.5, and remove LaunchAgent plist",
+          "riskReductionPercent": 95,
+          "estimatedCost": "₹0 (Automated)",
+          "estimatedEffort": "2 minutes",
+          "priority": "HIGH",
+          "timeToImplement": "Immediate",
+          "rosi": "Infinite",
+          "type": "Quick Win"
+        },
+        {
+          "action": "Reconfigure PostgreSQL listen_addresses to 127.0.0.1 in postgresql.conf",
+          "riskReductionPercent": 90,
+          "estimatedCost": "₹0",
+          "estimatedEffort": "5 minutes",
+          "priority": "HIGH",
+          "timeToImplement": "Immediate",
+          "rosi": "Infinite",
+          "type": "Quick Win"
+        },
+        {
+          "action": "Roll back @kvch-internal/crypto-utils to pinned version 1.4.1 and deploy DOMPurify sanitization",
+          "riskReductionPercent": 85,
+          "estimatedCost": "₹0",
+          "estimatedEffort": "15 minutes",
+          "priority": "HIGH",
+          "timeToImplement": "Within 1 Hour",
+          "rosi": "Infinite",
+          "type": "Quick Win"
+        }
+      ],
+      "investmentOptimization": "Execute zero-cost configuration and SOAR isolation script immediately.",
+      "complianceMappings": [
+        {
+          "framework": "ISO/IEC 27001",
+          "controlId": "A.8.28",
+          "status": "Deficient",
+          "impactDescription": "Secure coding and peer review controls for package updates"
+        },
+        {
+          "framework": "ISO/IEC 27001",
+          "controlId": "A.13.1.1",
+          "status": "Deficient",
+          "impactDescription": "Network perimeter and socket listener controls"
+        },
+        {
+          "framework": "CIS Controls",
+          "controlId": "CIS-2.1",
+          "status": "Partial",
+          "impactDescription": "Software inventory and dependency hash verification"
+        }
+      ],
+      "scenarios": {
+        "scenarioA_NoAction": {
+          "residualRisk": "Critical (Attacker maintains active C2 & unpaginated DB exfiltration)",
+          "financialExposure": "₹1,20,00,000 Maximum Loss Exposure",
+          "complianceImpact": "Catastrophic regulatory non-compliance"
+        },
+        "scenarioB_Remediated": {
+          "residualRisk": "Minimal (Host isolated, C2 severed, socket bound to localhost)",
+          "financialExposure": "₹0 Residual Exposure",
+          "complianceImpact": "Audit-ready compliance posture",
+          "expectedLossReduction": "95% loss reduction"
+        }
+      },
+      "failureDifferentiation": {
+        "incidentType": "DDOS_ATTACK",
+        "targetLayer": "HOST_OS",
+        "reason": "Process tree telemetry, entropy analysis, and socket bindings confirm malicious multi-stage cyber campaign rather than operational server degradation."
+      },
+      "activeResponsePayload": {
+        "actionId": "ACT-01-KILL-QUARANTINE",
+        "actionName": "Execute Process Termination, IP Drop & Persistence Cleanup",
+        "command": "sudo kill -9 14209 && sudo nft add table inet kvch_quarantine && sudo nft add chain inet kvch_quarantine output { type filter hook output priority 0 \\; } && sudo nft add rule inet kvch_quarantine output ip daddr 185.220.101.5 drop && sudo rm -f /tmp/.system_daemon ~/Library/LaunchAgents/com.apple.sync.plist && sudo systemctl restart postgresql",
+        "recoveryTimeEst": "30s",
+        "status": "READY",
+        "autoExecutable": true
+      },
+      "finalVerdict": "Execute automated SOAR containment immediately: kill PID 14209, drop 185.220.101.5, remove LaunchAgent plist, and restrict PostgreSQL to localhost.",
+      "keyInsights": [
+        "Supply chain injection occurred via PR #4 lacking 2-person review",
+        "AegisDB Zero-Trust Proxy halted unpaginated SQL dump",
+        "Automated SOAR contained threat without production downtime"
+      ],
+      "actionItems": [
+        "Execute sudo kill -9 14209",
+        "Block 185.220.101.5 via nftables",
+        "Purge /tmp/.system_daemon and ~/Library/LaunchAgents/com.apple.sync.plist",
+        "Bind postgresql.conf to 127.0.0.1"
+      ],
+      "roleSpecificDetail": "Detailed process trees, YARA rules, config diffs, and SOAR scripts available in sr_dev_report.md.",
+      "generatedAt": "2026-09-13T01:45:00.000Z"
+    },
+    "intern": {
+      "role": "intern",
+      "title": "Guided Triage & Educational Forensic Walkthrough: 120-Min Sandbox Breach Simulation",
+      "summary": "Step-by-step educational incident response guide and triage walkthrough for junior security analysts based on the 120-minute sandbox attack campaign (#INC-2026-8891). This guide explains each attack vector in plain English, teaches how to correlate telemetry logs across all 10 modular extensions, and provides a structured checklist to verify Indicators of Compromise (IOCs) before escalating to senior leads.",
+      "metrics": {
+        "likelihoodScore": 96,
+        "businessImpactScore": 92,
+        "financialExposure": {
+          "min": "₹15,00,000",
+          "mostLikely": "₹48,00,000",
+          "max": "₹1,20,00,000",
+          "eal": "₹38,40,000"
+        },
+        "riskTrend": "Increasing"
+      },
+      "keyFindings": [
+        "Concept 1: Attack Surface Reconnaissance — Why exposing database ports on 0.0.0.0 is dangerous.",
+        "Concept 2: Supply Chain Poisoning — How an attacker can hide malicious code in package postinstall hooks.",
+        "Concept 3: Shannon Entropy — Why entropy scores above 7.2 indicate encrypted or packed malware.",
+        "Concept 4: Reverse TCP Shells — How outbound connections on port 443 deceive simple inbound firewall rules.",
+        "Concept 5: Zero-Trust AST Parsing — How database firewalls parse abstract syntax trees to stop mass data theft."
+      ],
+      "businessImpact": {
+        "operational": "Educational walkthrough: Learn how multi-stage attack chains navigate enterprise defenses.",
+        "financial": "Demonstrates why rapid analyst triage directly prevents ₹48L to ₹1.2Cr in breach liability.",
+        "compliance": "Teaches evidence handling and chain-of-custody documentation under CIS Controls v8.",
+        "reputational": "Builds team capability in spotting early-stage recon before data exfiltration occurs."
+      },
+      "aiInsights": [
+        "Key Learning Point: Always cross-reference package-lock.json hash integrity when dependencies are updated in pull requests.",
+        "Triage Tip: A process connecting outbound on port 443 that does not complete a standard TLS HTTP/2 or HTTP/1.1 handshake is highly suspicious."
+      ],
+      "recommendedActions": [
+        {
+          "action": "Complete guided verification checklist: Confirm PID 14209, C2 IP 185.220.101.5, and binary hash in sandbox",
+          "riskReductionPercent": 60,
+          "estimatedCost": "₹0 (Analyst Training)",
+          "estimatedEffort": "15 minutes",
+          "priority": "HIGH",
+          "timeToImplement": "Immediate",
+          "rosi": "N/A (Triage Training)",
+          "type": "Quick Win"
+        },
+        {
+          "action": "Document MITRE ATT&CK technique IDs (T1190, T1195.001, T1059.001, T1071.001) in internal incident ticket",
+          "riskReductionPercent": 40,
+          "estimatedCost": "₹0",
+          "estimatedEffort": "10 minutes",
+          "priority": "MEDIUM",
+          "timeToImplement": "Today",
+          "rosi": "N/A",
+          "type": "Quick Win"
+        }
+      ],
+      "investmentOptimization": "Guided triage protocol builds Junior SOC operational capabilities and speeds up MTTT (Mean Time To Triage).",
+      "complianceMappings": [
+        {
+          "framework": "CIS Controls",
+          "controlId": "CIS-2.1",
+          "status": "Partial",
+          "impactDescription": "Software asset inventory and dependency verification procedures"
+        },
+        {
+          "framework": "NIST CSF",
+          "controlId": "DE.CM-1",
+          "status": "Partial",
+          "impactDescription": "Network perimeter and process anomaly detection training"
+        }
+      ],
+      "scenarios": {
+        "scenarioA_NoAction": {
+          "residualRisk": "High (Unresolved learner query & missed IOC correlation)",
+          "financialExposure": "N/A",
+          "complianceImpact": "Incomplete forensic triage log"
+        },
+        "scenarioB_Remediated": {
+          "residualRisk": "Minimal (Triage completed & validated by Senior Lead)",
+          "financialExposure": "₹0 Residual Risk",
+          "complianceImpact": "Forensic triage log approved and archived",
+          "expectedLossReduction": "100% triage task completion"
+        }
+      },
+      "finalVerdict": "Execute guided triage checklist, correlate all 10 extension alerts, verify SHA-256 hash match, and submit documented findings to Senior SOC Lead.",
+      "keyInsights": [
+        "Supply chain backdoors execute automatically during npm install postinstall scripts",
+        "Entropy checks (H > 7.2) rapidly identify packed reverse shells without needing decompilation",
+        "Correlating network sockets with process IDs (lsof -i :443) confirms active command-and-control channels"
+      ],
+      "actionItems": [
+        "Run ps aux | grep node and identify foreign IP in socket connection",
+        "Inspect /tmp/.system_daemon hash against YARA rule database",
+        "Check package.json for unpinned external dependency versions",
+        "Submit verified incident worksheet to Senior Developer"
+      ],
+      "roleSpecificDetail": "Detailed walkthrough, five core security concepts, and step-by-step checklist available in intern_report.md.",
+      "generatedAt": "2026-09-13T01:45:00.000Z"
+    },
+    "hr": {
+      "role": "hr",
+      "title": "Personnel Governance, Access Audit & Regulatory Mandate Brief (120-Min Sandbox Attack)",
+      "summary": "Human resource access audit, insider threat assessment, and regulatory compliance brief for the 120-minute sandbox breach simulation (#INC-2026-8891). Forensic attribution traced the vulnerability introduction to an unreviewed pull request merge (PR #4) by employee Rohit Debnath (EMP-4029) on workstation #WKSTN-0891. Details employee attribution, workstation policy non-compliance, statutory compliance breach mandates under the Digital Personal Data Protection (DPDP) Act 2023 and ISO 27001, and an actionable employee retraining roadmap.",
+      "metrics": {
+        "likelihoodScore": 96,
+        "businessImpactScore": 92,
+        "financialExposure": {
+          "min": "₹15,00,000",
+          "mostLikely": "₹48,00,000",
+          "max": "₹1,20,00,000",
+          "eal": "₹38,40,000"
+        },
+        "riskTrend": "Increasing"
+      },
+      "keyFindings": [
+        "Committer Attribution: Rohit Debnath (Senior Frontend Engineer - Employee ID: EMP-4029) & Workstation MacBook-Pro-Dev03.lan (#WKSTN-0891).",
+        "Unauthorized Merge: PR #4 ('implemented ml model') merged without mandatory 2-person security signoff.",
+        "Workstation Policy Deviations: Personal USB peripheral connected on Tuesday; unapproved cloud sync on Thursday; split-tunnel VPN socket on Friday.",
+        "Regulatory Exposure: Digital Personal Data Protection (DPDP) Act 2023 Sec 8 statutory 72-hour notification protocol required if production data is compromised.",
+        "Standard Breaches: Non-compliance flagged under ISO 27001 Control A.8.28 (Secure Coding) & SEBI CSCRF Section 3.2 (Access Governance)."
+      ],
+      "businessImpact": {
+        "operational": "Engineering deployment paused pending mandatory access scope review and branch protection rule rollout.",
+        "financial": "Exposure to statutory regulatory penalties up to ₹1,20,00,000 under DPDP Act 2023 if unmitigated data breach occurred in production.",
+        "compliance": "Audit observations recorded against ISO 27001 A.8.28 and SEBI CSCRF; corrective action plan required.",
+        "reputational": "Internal trust audit required; zero external press exposure as attack was contained within sandbox boundary."
+      },
+      "aiInsights": [
+        "Forensic investigation reveals developer committed code from unhardened personal workstation without mandatory GPG commit signing.",
+        "Automating GitHub branch protection rules with mandatory 2-person approval eliminates 95% of human-factor supply chain vulnerabilities."
+      ],
+      "recommendedActions": [
+        {
+          "action": "Enforce mandatory GPG signed commits and GitHub branch protection requiring 2 senior security approvals on main branch",
+          "riskReductionPercent": 95,
+          "estimatedCost": "₹0 (Policy Configuration)",
+          "estimatedEffort": "30 minutes",
+          "priority": "HIGH",
+          "timeToImplement": "Immediate",
+          "rosi": "Infinite",
+          "type": "Quick Win"
+        },
+        {
+          "action": "Suspend production deployment keys for EMP-4029 and conduct access scope audit",
+          "riskReductionPercent": 80,
+          "estimatedCost": "₹0",
+          "estimatedEffort": "1 hour",
+          "priority": "HIGH",
+          "timeToImplement": "Within 24 hours",
+          "rosi": "High ROI Action",
+          "type": "Quick Win"
+        },
+        {
+          "action": "Conduct mandatory Secure Supply Chain & Workstation Hygiene workshop for all 14 engineering department personnel",
+          "riskReductionPercent": 75,
+          "estimatedCost": "₹50,000 (Internal Workshop)",
+          "estimatedEffort": "1 day",
+          "priority": "MEDIUM",
+          "timeToImplement": "Next 7 Days",
+          "rosi": "420% ROI",
+          "type": "Long-Term Investment"
+        }
+      ],
+      "investmentOptimization": "Zero-cost immediate HR policy enforcement (branch protection rules & GPG signing) combined with targeted engineering security hygiene training.",
+      "complianceMappings": [
+        {
+          "framework": "ISO/IEC 27001",
+          "controlId": "A.8.28",
+          "status": "Deficient",
+          "impactDescription": "Secure coding rules and peer review mechanisms prior to code integration"
+        },
+        {
+          "framework": "ISO/IEC 27001",
+          "controlId": "A.13.1.1",
+          "status": "Deficient",
+          "impactDescription": "Network boundary controls and restriction of external socket listeners"
+        },
+        {
+          "framework": "SEBI CSCRF",
+          "controlId": "CSCRF-Sec-3.2",
+          "status": "Deficient",
+          "impactDescription": "Access control governance and privilege separation for developer accounts"
+        },
+        {
+          "framework": "RBI Framework",
+          "controlId": "RBI-CS-G2",
+          "status": "Partial",
+          "impactDescription": "Third-party component risk management and vendor package audit"
+        }
+      ],
+      "scenarios": {
+        "scenarioA_NoAction": {
+          "residualRisk": "Critical (Policy violation unaddressed; high recurrence probability)",
+          "financialExposure": "₹1,20,00,000 Maximum Fine Exposure under DPDP Act 2023",
+          "complianceImpact": "Formal regulatory audit observation and potential compliance certification suspension"
+        },
+        "scenarioB_Remediated": {
+          "residualRisk": "Compliant (GPG signing, 2-person review & branch protection active)",
+          "financialExposure": "₹0 Regulatory Penalty Risk",
+          "complianceImpact": "Full regulatory compliance restored and audited",
+          "expectedLossReduction": "95% reduction in compliance risk exposure"
+        }
+      },
+      "finalVerdict": "Update access policies, enforce GPG commit signing and 2-reviewer PR protection immediately; schedule developer security retraining.",
+      "keyInsights": [
+        "Developer EMP-4029 committed malicious dependency without secondary approval",
+        "Workstation deviations (USB, unapproved VPN) paved pathway for security control bypass",
+        "Branch protection policy enforcement prevents unreviewed code merges"
+      ],
+      "actionItems": [
+        "Audit access scopes for Employee EMP-4029 (Rohit Debnath)",
+        "Enable GitHub Branch Protection rule requiring 2 security approvals on main branch",
+        "Enforce mandatory GPG signed commits across repository settings",
+        "Schedule Secure Supply Chain Security training session"
+      ],
+      "roleSpecificDetail": "Detailed attribution matrix, workstation audit logs, and DPDP / ISO statutory mandates available in hr_report.md.",
+      "generatedAt": "2026-09-13T01:45:00.000Z"
+    },
+    "management": {
+      "role": "management",
+      "title": "C-Suite Strategic Risk, FAIR Financial Exposure & Brand Protection Briefing",
+      "summary": "Executive cyber risk quantification, financial exposure analysis, and strategic governance briefing for the CEO, CTO, and CMO regarding the 120-minute sandbox attack simulation (#INC-2026-8891). Evaluated using the FAIR (Factor Analysis of Information Risk) framework, this brief outlines potential financial loss distributions, technical debt reduction, Return on Security Investment (ROSI), and proactive brand protection measures.",
+      "metrics": {
+        "likelihoodScore": 96,
+        "businessImpactScore": 92,
+        "financialExposure": {
+          "min": "₹15,00,000",
+          "mostLikely": "₹48,00,000",
+          "max": "₹1,20,00,000",
+          "eal": "₹38,40,000"
+        },
+        "riskTrend": "Increasing"
+      },
+      "keyFindings": [
+        "Potential Loss Avoided: ₹72,00,000 saved via automated SOAR & AegisDB socket containment within 30 minutes.",
+        "Expected Annual Loss (EAL): ₹38,40,000 without automated CI/CD supply chain guardrails.",
+        "Return on Security Investment (ROSI): 1,436% ROI on proposed ₹2,50,000 CI/CD security automation investment.",
+        "Business Continuity: Zero customer-facing downtime; 45 minutes of internal developer dashboard latency resolved.",
+        "Brand & Reputation: Zero customer data leaked; zero public press disclosure required."
+      ],
+      "businessImpact": {
+        "operational": "Zero customer application downtime; internal developer environment latency resolved in 45 minutes.",
+        "financial": "Saved ₹72L in potential breach costs; ₹48L most likely exposure without automated controls.",
+        "compliance": "SEBI/RBI/DPDP statutory penalties avoided due to automated containment before production exfiltration.",
+        "reputational": "Zero brand damage or customer trust degradation; proactive security posture demonstrated."
+      },
+      "aiInsights": [
+        "Executive Takeaway: A targeted ₹2.5L investment in automated CI/CD dependency security eliminates ₹35.9L in annual Expected Annual Loss (1,436% ROSI).",
+        "Board Assurance: KVCH automated zero-trust guardrails successfully prevented high-severity data exfiltration in real time."
+      ],
+      "recommendedActions": [
+        {
+          "action": "Approve ₹2,50,000 budget allocation for enterprise CI/CD supply chain firewall & AegisDB socket guardrails",
+          "riskReductionPercent": 94,
+          "estimatedCost": "₹2,50,000",
+          "estimatedEffort": "2 weeks implementation",
+          "priority": "HIGH",
+          "timeToImplement": "Immediate Approval",
+          "rosi": "1,436% ROI",
+          "type": "High ROI Action"
+        },
+        {
+          "action": "Authorize updated security policy mandating 2-person security review on all production configuration PRs",
+          "riskReductionPercent": 88,
+          "estimatedCost": "₹0",
+          "estimatedEffort": "1 day",
+          "priority": "HIGH",
+          "timeToImplement": "24 hours",
+          "rosi": "Infinite",
+          "type": "Quick Win"
+        }
+      ],
+      "investmentOptimization": "Strategic spend of ₹2,50,000 eliminates ₹38,40,000 in Expected Annual Loss, yielding an annual net savings of ₹35,90,000.",
+      "complianceMappings": [
+        {
+          "framework": "ISO/IEC 27001",
+          "controlId": "A.5.1",
+          "status": "Compliant",
+          "impactDescription": "Information security policies and board governance oversight"
+        },
+        {
+          "framework": "SEBI CSCRF",
+          "controlId": "CSCRF-Gov-1",
+          "status": "Partial",
+          "impactDescription": "Board oversight of cyber risk financial quantification"
+        }
+      ],
+      "scenarios": {
+        "scenarioA_NoAction": {
+          "residualRisk": "High (92% likelihood of recurring supply chain incident within 6 months)",
+          "financialExposure": "₹1,20,00,000 Maximum Loss Exposure",
+          "complianceImpact": "Formal regulatory audit observation and potential fine"
+        },
+        "scenarioB_Remediated": {
+          "residualRisk": "Minimal (Residual EAL: ₹2,50,000)",
+          "financialExposure": "₹0 Residual Breach Exposure",
+          "complianceImpact": "Full regulatory compliance & board assurance",
+          "expectedLossReduction": "₹35,90,000 Net Annual Savings"
+        }
+      },
+      "finalVerdict": "Sandbox simulation validated threat engine efficacy; incident contained with zero customer data loss. Approve ₹2.5L CI/CD security automation allocation immediately.",
+      "keyInsights": [
+        "Immediate automated containment protected the enterprise from a potential ₹72L breach loss",
+        "EAL without automated supply chain controls is ₹38.4L per year",
+        "Recommended security investment delivers an unprecedented 1,436% ROSI"
+      ],
+      "actionItems": [
+        "CEO: Sign board resolution authorizing updated cyber risk governance policy",
+        "CTO: Oversee integration of automated CI/CD dependency firewall into build pipelines",
+        "CMO: File proactive zero-trust customer trust assurance briefing"
+      ],
+      "roleSpecificDetail": "Detailed FAIR financial loss modeling, C-Suite persona alignment (CEO, CTO, CMO), and strategic budget matrix available in management_report.md.",
+      "generatedAt": "2026-09-13T01:45:00.000Z"
+    }
+  }
+}

@@ -4,7 +4,10 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { AiReportDisplayCard } from "@/components/ai-report-card";
 import { DEMO_REPORTS } from "@/lib/demo-data";
 import { MinimalSparklineChart } from "@/components/charts/minimal-charts";
+import { InternTriageVelocityChart } from "@/components/charts/dashboard-charts";
 import { TelemetryLogStream, SAMPLE_TELEMETRY_LOGS, TelemetryLogEntry } from "@/components/telemetry-log-stream";
+import { SandboxRunBanner } from "@/components/sandbox-run-banner";
+import { AttackProgressionTimeline } from "@/components/attack-progression-timeline";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
@@ -27,6 +30,13 @@ export default function InternDashboardPage() {
     hashQuery: false,
     lockfileAudit: false,
   });
+
+  useEffect(() => {
+    setReportData((prev: any) => ({
+      ...prev,
+      generatedAt: new Date().toISOString(),
+    }));
+  }, []);
 
   const toggleCheck = (key: keyof typeof checklist) => {
     setChecklist((prev) => {
@@ -126,13 +136,21 @@ export default function InternDashboardPage() {
             <div className="flex items-center gap-2.5">
               <Link
                 href="/intern/tasks"
-                className="px-3 py-1.5 bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[12.5px] font-medium text-[#0c0d0e] rounded-md transition-colors"
+                className="px-3 py-1.5 bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[12.5px] font-medium text-[#0c0d0e] rounded-md transition-all hover-lift active:scale-95"
               >
                 View Triage Tasks
               </Link>
             </div>
           </div>
         </div>
+
+        {/* Live 120-Minute Sandbox Attack Run Banner */}
+        <SandboxRunBanner
+          role="intern"
+          roleTitle="Cyber Intern"
+          reportMarkdownFile="intern_report.md"
+          reportJsonFile="intern_report.json"
+        />
 
         {/* Live Status Toast Banner */}
         {statusNotice && (
@@ -142,9 +160,9 @@ export default function InternDashboardPage() {
           </div>
         )}
 
-        {/* Overview Stats Row */}
+        {/* Overview Stats Row with microinteractions */}
         <div className="px-8 py-5 grid grid-cols-4 gap-3.5">
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Assigned Triage Alerts</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className="text-[24px] font-semibold text-[#f7f8f8]">
@@ -157,7 +175,7 @@ export default function InternDashboardPage() {
             </span>
           </div>
 
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Verification Checklist</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className="text-[24px] font-semibold text-[#f2c94c]">{completedCount}/4</span>
@@ -171,7 +189,7 @@ export default function InternDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Fix Lab Modules Completed</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className="text-[24px] font-semibold text-[#2ea043]">12/12</span>
@@ -180,7 +198,7 @@ export default function InternDashboardPage() {
             <span className="text-[11px] text-[#8a8f98] mt-2">SQLi, XSS, Supply Chain</span>
           </div>
 
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Triage Difficulty Score</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className={`text-[24px] font-semibold ${isFullyVerified ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
@@ -196,19 +214,24 @@ export default function InternDashboardPage() {
 
         {/* Error Banner */}
         {errorMsg && (
-          <div className="mx-8 mb-4 p-3 bg-[#1e1416] border border-[#3c1e22] rounded-lg text-[#ff5555] text-[12.5px]">
+          <div className="mx-8 mb-4 p-3 bg-[#1e1416] border border-[#3c1e22] rounded-lg text-[#ff5555] text-[12.5px] animate-fadeIn">
             <strong>AI Generation Error:</strong> {errorMsg}
           </div>
         )}
 
         {/* Live EDR Telemetry Log Stream Section (15 logs, 4 Malicious highlighted in Red) */}
-        <div className="px-8 mb-6">
+        <div className="px-8 mb-6 animate-fadeIn">
           <TelemetryLogStream logs={logs} />
+        </div>
+
+        {/* Interactive 120-Minute Attack Progression Timeline across 10 Engines */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <AttackProgressionTimeline />
         </div>
 
         {/* AI Triage Intelligence Report Card (Zero Monetary Values for Intern) */}
         {reportData && (
-          <div className="px-8 mb-6">
+          <div className="px-8 mb-6 animate-fadeIn">
             <AiReportDisplayCard report={reportData} roleTitle="Cyber Intern" />
           </div>
         )}
@@ -217,7 +240,7 @@ export default function InternDashboardPage() {
         <div className="px-8 pb-10 grid grid-cols-3 gap-5">
           
           {/* Interactive Checklist Workbench */}
-          <div className="col-span-2 bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col">
+          <div className="col-span-2 bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 rounded-lg p-4 flex flex-col hover-lift">
             <div className="flex items-center justify-between border-b border-[#232529] pb-3 mb-3">
               <h3 className="text-[14px] font-semibold text-[#f7f8f8]">
                 Interactive Incident Triage Checklist (#INC-2026-8891)
@@ -228,21 +251,24 @@ export default function InternDashboardPage() {
             <div className="space-y-2.5">
               <label
                 onClick={() => toggleCheck("processCheck")}
-                className={`p-3 rounded-lg border transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none ${
                   checklist.processCheck
-                    ? "bg-[#121316] border-[#2b2d31] text-[#f7f8f8]"
-                    : "bg-[#08090a] border-[#232529] text-[#8a8f98]"
+                    ? "bg-[#121316] border-[#2ea043]/40 text-[#f7f8f8] shadow-sm shadow-[#2ea043]/5"
+                    : "bg-[#08090a] border-[#232529] text-[#8a8f98] hover:border-[#34373c]"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={checklist.processCheck}
                   onChange={() => {}}
-                  className="mt-0.5 accent-[#2ea043]"
+                  className="mt-0.5 accent-[#2ea043] cursor-pointer"
                 />
                 <div>
-                  <h4 className="text-[13px] font-medium text-[#f7f8f8]">
+                  <h4 className="text-[13px] font-medium text-[#f7f8f8] flex items-center gap-2">
                     Step 1: Check Process List for Suspicious Node Workers
+                    {checklist.processCheck && (
+                      <span className="text-[10px] text-[#2ea043] font-mono font-bold bg-[#2ea043]/10 px-1.5 py-0.2 rounded">VERIFIED</span>
+                    )}
                   </h4>
                   <p className="text-[11.5px] text-[#8a8f98] mt-0.5">
                     Command: <code className="text-[#828fff]">ps aux | grep node</code> · Target script: <code className="text-[#d0d6e0]">dist/telemetry_worker.js</code>
@@ -252,21 +278,24 @@ export default function InternDashboardPage() {
 
               <label
                 onClick={() => toggleCheck("socketMatch")}
-                className={`p-3 rounded-lg border transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none ${
                   checklist.socketMatch
-                    ? "bg-[#121316] border-[#2b2d31] text-[#f7f8f8]"
-                    : "bg-[#08090a] border-[#232529] text-[#8a8f98]"
+                    ? "bg-[#121316] border-[#2ea043]/40 text-[#f7f8f8] shadow-sm shadow-[#2ea043]/5"
+                    : "bg-[#08090a] border-[#232529] text-[#8a8f98] hover:border-[#34373c]"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={checklist.socketMatch}
                   onChange={() => {}}
-                  className="mt-0.5 accent-[#2ea043]"
+                  className="mt-0.5 accent-[#2ea043] cursor-pointer"
                 />
                 <div>
-                  <h4 className="text-[13px] font-medium text-[#f7f8f8]">
+                  <h4 className="text-[13px] font-medium text-[#f7f8f8] flex items-center gap-2">
                     Step 2: Match Active Socket Connections to Foreign C2 IP
+                    {checklist.socketMatch && (
+                      <span className="text-[10px] text-[#2ea043] font-mono font-bold bg-[#2ea043]/10 px-1.5 py-0.2 rounded">VERIFIED</span>
+                    )}
                   </h4>
                   <p className="text-[11.5px] text-[#8a8f98] mt-0.5">
                     Command: <code className="text-[#828fff]">lsof -i :443</code> · Foreign Target: <code className="text-[#ff5555]">185.220.101.5:443</code>
@@ -276,21 +305,24 @@ export default function InternDashboardPage() {
 
               <label
                 onClick={() => toggleCheck("hashQuery")}
-                className={`p-3 rounded-lg border transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none ${
                   checklist.hashQuery
-                    ? "bg-[#121316] border-[#2b2d31] text-[#f7f8f8]"
-                    : "bg-[#08090a] border-[#232529] text-[#8a8f98]"
+                    ? "bg-[#121316] border-[#2ea043]/40 text-[#f7f8f8] shadow-sm shadow-[#2ea043]/5"
+                    : "bg-[#08090a] border-[#232529] text-[#8a8f98] hover:border-[#34373c]"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={checklist.hashQuery}
                   onChange={() => {}}
-                  className="mt-0.5 accent-[#2ea043]"
+                  className="mt-0.5 accent-[#2ea043] cursor-pointer"
                 />
                 <div>
-                  <h4 className="text-[13px] font-medium text-[#f7f8f8]">
+                  <h4 className="text-[13px] font-medium text-[#f7f8f8] flex items-center gap-2">
                     Step 3: Query SHA-256 Binary Hash in Threat Intelligence Feed
+                    {checklist.hashQuery && (
+                      <span className="text-[10px] text-[#2ea043] font-mono font-bold bg-[#2ea043]/10 px-1.5 py-0.2 rounded">VERIFIED</span>
+                    )}
                   </h4>
                   <p className="text-[11.5px] text-[#8a8f98] mt-0.5">
                     Hash: <code className="text-[#d0d6e0]">e3b0c44298fc...7852b855</code> · Rule match: <code className="text-[#f2c94c]">MALW_JS_REVERSE_SHELL</code>
@@ -300,21 +332,24 @@ export default function InternDashboardPage() {
 
               <label
                 onClick={() => toggleCheck("lockfileAudit")}
-                className={`p-3 rounded-lg border transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none ${
                   checklist.lockfileAudit
-                    ? "bg-[#121316] border-[#2b2d31] text-[#f7f8f8]"
-                    : "bg-[#08090a] border-[#232529] text-[#8a8f98]"
+                    ? "bg-[#121316] border-[#2ea043]/40 text-[#f7f8f8] shadow-sm shadow-[#2ea043]/5"
+                    : "bg-[#08090a] border-[#232529] text-[#8a8f98] hover:border-[#34373c]"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={checklist.lockfileAudit}
                   onChange={() => {}}
-                  className="mt-0.5 accent-[#2ea043]"
+                  className="mt-0.5 accent-[#2ea043] cursor-pointer"
                 />
                 <div>
-                  <h4 className="text-[13px] font-medium text-[#f7f8f8]">
+                  <h4 className="text-[13px] font-medium text-[#f7f8f8] flex items-center gap-2">
                     Step 4: Inspect npm Lockfile for Registry Tarball Anomaly
+                    {checklist.lockfileAudit && (
+                      <span className="text-[10px] text-[#2ea043] font-mono font-bold bg-[#2ea043]/10 px-1.5 py-0.2 rounded">VERIFIED</span>
+                    )}
                   </h4>
                   <p className="text-[11.5px] text-[#8a8f98] mt-0.5">
                     File: <code className="text-[#828fff]">package-lock.json</code> · Package: <code className="text-[#ff5555]">@kvch-internal/crypto-utils@1.4.2</code>
@@ -325,7 +360,7 @@ export default function InternDashboardPage() {
           </div>
 
           {/* Quick Mentorship Links */}
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 rounded-lg p-4 flex flex-col justify-between hover-lift">
             <div>
               <h3 className="text-[14px] font-semibold text-[#f7f8f8] mb-3">
                 Intern Workspace Shortcuts
@@ -333,19 +368,19 @@ export default function InternDashboardPage() {
               <div className="space-y-2">
                 <Link
                   href="/intern/tasks"
-                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] rounded text-[12.5px] text-[#f7f8f8] transition-colors"
+                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] hover:border-[#34373c] rounded text-[12.5px] text-[#f7f8f8] transition-all active:scale-[0.98]"
                 >
                   📋 My Triage Task Queue
                 </Link>
                 <Link
                   href="/intern/reviews"
-                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] rounded text-[12.5px] text-[#f7f8f8] transition-colors"
+                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] hover:border-[#34373c] rounded text-[12.5px] text-[#f7f8f8] transition-all active:scale-[0.98]"
                 >
                   🎓 Sr. Dev Mentorship Reviews
                 </Link>
                 <Link
                   href="/intern/initiatives"
-                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] rounded text-[12.5px] text-[#f7f8f8] transition-colors"
+                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] hover:border-[#34373c] rounded text-[12.5px] text-[#f7f8f8] transition-all active:scale-[0.98]"
                 >
                   🚀 Security Training Modules
                 </Link>
@@ -357,6 +392,11 @@ export default function InternDashboardPage() {
             </div>
           </div>
 
+        </div>
+
+        {/* Weekly Triage Velocity & Accuracy Spectrum Chart (Compressed & Long, Fully Interactive) */}
+        <div className="px-8 pb-12 animate-fadeIn">
+          <InternTriageVelocityChart />
         </div>
 
       </div>

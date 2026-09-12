@@ -8,10 +8,10 @@ import {
   MinimalSparklineChart,
   SemiCircleGaugeChart
 } from "@/components/charts/minimal-charts";
+import { PolicyViolationHeatmapChart } from "@/components/charts/dashboard-charts";
+import { SandboxRunBanner } from "@/components/sandbox-run-banner";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
-
-
 
 export default function HrDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -20,6 +20,13 @@ export default function HrDashboardPage() {
   const [activeRange, setActiveRange] = useState("1W");
   const [remediationEnforced, setRemediationEnforced] = useState(false);
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    setReportData((prev: any) => ({
+      ...prev,
+      generatedAt: new Date().toISOString(),
+    }));
+  }, []);
 
   // 10-Second Auto-Stream State
   const [autoRun, setAutoRun] = useState(false);
@@ -126,7 +133,7 @@ export default function HrDashboardPage() {
                       setActiveRange(r);
                       setStatusNotice(`HR Audit timeline switched to ${r}. Compliance score updated.`);
                     }}
-                    className={`px-2.5 py-1 text-[11px] font-mono font-medium rounded-full transition-all ${activeRange === r
+                    className={`px-2.5 py-1 text-[11px] font-mono font-medium rounded-full transition-all active:scale-95 ${activeRange === r
                         ? "bg-[#282a30] text-[#f7f8f8] border border-[#383b42] shadow-sm"
                         : "text-[#8a8f98] hover:text-[#d0d6e0]"
                       }`}
@@ -138,7 +145,7 @@ export default function HrDashboardPage() {
 
               <button
                 onClick={handleEnforceBaseline}
-                className={`px-4 py-2 text-[12.5px] font-bold text-[#0c0d0e] rounded-xl transition-all shadow-md ${remediationEnforced ? "bg-[#2ea043] text-white" : "bg-[#f7f8f8] hover:bg-[#e0e0e0]"
+                className={`px-4 py-2 text-[12.5px] font-bold rounded-xl transition-all shadow-md hover-lift active:scale-95 ${remediationEnforced ? "bg-[#2ea043] text-white" : "bg-[#f7f8f8] text-[#0c0d0e] hover:bg-[#e0e0e0]"
                   }`}
               >
                 {remediationEnforced ? "✓ Baseline Enforced" : "Enforce Policy Baseline"}
@@ -146,6 +153,14 @@ export default function HrDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Live 120-Minute Sandbox Attack Run Banner */}
+        <SandboxRunBanner
+          role="hr"
+          roleTitle="HR & Compliance"
+          reportMarkdownFile="hr_report.md"
+          reportJsonFile="hr_report.json"
+        />
 
         {/* Live Status Toast Banner */}
         {statusNotice && (
@@ -159,7 +174,7 @@ export default function HrDashboardPage() {
         <div className="px-8 py-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
           {/* Card 1: Neon Highlight Card */}
-          <div className="bg-gradient-to-br from-[#1a1810] to-[#0c0d0e] border border-[#f2c94c]/40 hover:border-[#f2c94c]/80 transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl shadow-[#f2c94c]/5 group">
+          <div className="bg-gradient-to-br from-[#1a1810] to-[#0c0d0e] border border-[#f2c94c]/40 hover:border-[#f2c94c]/80 transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl shadow-[#f2c94c]/5 group hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-bold uppercase tracking-wider text-[#f2c94c]">Policy Compliance ({activeRange})</span>
               <span className="px-2 py-0.5 text-[10.5px] font-bold font-mono text-[#f2c94c] bg-[#f2c94c]/10 rounded-full border border-[#f2c94c]/30 flex items-center gap-1">
@@ -178,7 +193,7 @@ export default function HrDashboardPage() {
           </div>
 
           {/* Card 2: Committer Accountability */}
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Committer Accountability</span>
               <span className="px-2 py-0.5 text-[10.5px] font-mono font-semibold text-[#828fff] bg-[#828fff]/10 rounded-full border border-[#828fff]/20">
@@ -196,7 +211,7 @@ export default function HrDashboardPage() {
           </div>
 
           {/* Card 3: Active Deficiencies */}
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Policy Deficiencies</span>
               <span className="px-2 py-0.5 text-[10.5px] font-bold text-[#ff5555] bg-[#ff5555]/10 rounded-full border border-[#ff5555]/30">
@@ -214,7 +229,7 @@ export default function HrDashboardPage() {
           </div>
 
           {/* Card 4: Training Completion Rate */}
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Security Training Status</span>
               <span className="px-2 py-0.5 text-[10.5px] font-bold text-[#2ea043] bg-[#2ea043]/10 rounded-full border border-[#2ea043]/30">
@@ -235,23 +250,28 @@ export default function HrDashboardPage() {
 
         {/* Error Banner */}
         {errorMsg && (
-          <div className="mx-8 mb-4 p-4 bg-[#1e1416] border border-[#ff5555]/40 rounded-xl text-[#ff5555] text-[12.5px] shadow-lg">
+          <div className="mx-8 mb-4 p-4 bg-[#1e1416] border border-[#ff5555]/40 rounded-xl text-[#ff5555] text-[12.5px] shadow-lg animate-fadeIn">
             <strong>AI Generation Error:</strong> {errorMsg}
           </div>
         )}
 
         {/* Live AI Report Card */}
         {reportData && (
-          <div className="px-8 mb-6">
+          <div className="px-8 mb-6 animate-fadeIn">
             <AiReportDisplayCard report={reportData} roleTitle="HR & Compliance" />
           </div>
         )}
+
+        {/* Interactive Policy Violation Activity Heatmap Chart */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <PolicyViolationHeatmapChart />
+        </div>
 
         {/* Main Interactive Grid: Semi-Circle Gauge + Attribution Matrix + HR Shortcuts */}
         <div className="px-8 pb-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Interactive Semi-Circle Risk & Compliance Gauge */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 hover-lift">
             <SemiCircleGaugeChart
               value={68}
               max={100}
@@ -266,7 +286,7 @@ export default function HrDashboardPage() {
           </div>
 
           {/* Committer Attribution Matrix Card */}
-          <div className="lg:col-span-2 bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col space-y-4 shadow-xl">
+          <div className="lg:col-span-2 bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col space-y-4 shadow-xl hover-lift">
             <div className="flex items-center justify-between border-b border-[#1e2024] pb-3">
               <div>
                 <h3 className="text-[15px] font-bold text-[#f7f8f8] tracking-tight">

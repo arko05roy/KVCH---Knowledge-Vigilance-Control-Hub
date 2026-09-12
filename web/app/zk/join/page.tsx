@@ -1,52 +1,102 @@
 import Link from "next/link";
+import { ZkNavHeader } from "@/components/zk-nav";
+import { ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default function JoinPage() {
   return (
-    <main className="mx-auto max-w-4xl p-8 font-mono text-sm">
-      <Link href="/zk" className="text-sky-400">← zk dashboard</Link>
-      <h1 className="mb-2 mt-6 text-xl font-bold">Join the KVCH verification network</h1>
-      <p className="mb-8 text-neutral-500">
-        Two ways in — pick the role that fits you. No raw data ever leaves your side:
-        claims are minimized, proofs are verified off-chain.
-      </p>
+    <div className="min-h-screen bg-[#010102] text-[#f7f8f8] selection:bg-[#5e6ad2]/30">
+      <ZkNavHeader />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Link
-          href="/zk/join/company"
-          className="block border border-neutral-700 p-6 transition-colors hover:border-sky-500"
-        >
-          <h2 className="mb-2 font-bold text-sky-400">I&apos;m a company</h2>
-          <p className="mb-4 text-neutral-400">
-            Anchor minimized, ZK-proven claims about your security posture on Celo —
-            without exposing findings, witnesses, or raw risk values.
+      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 space-y-8">
+        
+        {/* Header */}
+        <div className="space-y-1.5 border-b border-[#23252a] pb-6">
+          <h1 className="text-xl font-semibold tracking-tight text-[#f7f8f8]">
+            Join Verification Network
+          </h1>
+          <p className="text-[13px] text-[#8a8f98]">
+            Select your role in the decentralized security posture mesh. Zero raw findings or witness material ever leave your premises.
           </p>
-          <ul className="mb-4 list-inside list-disc text-neutral-500">
-            <li>register a company code</li>
-            <li>prove your first claim in one click</li>
-            <li>publish through the verifier council</li>
-          </ul>
-          <span className="text-sky-400">start publishing →</span>
-        </Link>
+        </div>
 
-        <Link
-          href="/zk/join/verifier"
-          className="block border border-neutral-700 p-6 transition-colors hover:border-sky-500"
-        >
-          <h2 className="mb-2 font-bold text-sky-400">I&apos;m a stakeholder / verifier</h2>
-          <p className="mb-4 text-neutral-400">
-            Join the independent verification council — re-verify UltraHonk proofs,
-            sign attestations, and vote claims on-chain as part of the M-of-N quorum.
-          </p>
-          <ul className="mb-4 list-inside list-disc text-neutral-500">
-            <li>connect your wallet</li>
-            <li>request a council seat</li>
-            <li>governance activates you in the next set</li>
-          </ul>
-          <span className="text-sky-400">request a seat →</span>
-        </Link>
-      </div>
-    </main>
+        {/* 2 Roles Grid */}
+        <div className="grid gap-4 md:grid-cols-2">
+          
+          {/* Company */}
+          <div className="flex flex-col justify-between rounded-lg border border-[#23252a] bg-[#0f1011] p-6 space-y-6 hover:border-[#34343a] transition-colors">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase text-[#8a8f98]">Role 01</span>
+                <h2 className="text-[16px] font-semibold text-[#f7f8f8]">Company Publisher</h2>
+              </div>
+              <p className="text-[13px] text-[#8a8f98] leading-relaxed">
+                Anchor ZK-proven claims about your security posture and compliance on Celo without exposing underlying vulnerability telemetry.
+              </p>
+              <ul className="space-y-1.5 text-[12.5px] text-[#d0d6e0]">
+                <li className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#5e6ad2]" />
+                  <span>Register company code on-chain</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#5e6ad2]" />
+                  <span>Synthesize 1-click UltraHonk proofs</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#5e6ad2]" />
+                  <span>Publish claims through verifier council</span>
+                </li>
+              </ul>
+            </div>
+
+            <Link
+              href="/zk/join/company"
+              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[#5e6ad2] px-3.5 py-2 text-[13px] font-medium text-white hover:bg-[#828fff] transition-colors"
+            >
+              <span>Register Company</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {/* Verifier */}
+          <div className="flex flex-col justify-between rounded-lg border border-[#23252a] bg-[#0f1011] p-6 space-y-6 hover:border-[#34343a] transition-colors">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase text-[#8a8f98]">Role 02</span>
+                <h2 className="text-[16px] font-semibold text-[#f7f8f8]">Verifier Council</h2>
+              </div>
+              <p className="text-[13px] text-[#8a8f98] leading-relaxed">
+                Join the independent verification council. Re-verify UltraHonk SNARK proofs off-chain, sign EIP-712 attestations, and vote in the quorum.
+              </p>
+              <ul className="space-y-1.5 text-[12.5px] text-[#d0d6e0]">
+                <li className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#5e6ad2]" />
+                  <span>Connect Web3 wallet</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#5e6ad2]" />
+                  <span>Submit seat request to governance</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#5e6ad2]" />
+                  <span>Vote in M-of-N attestation quorum</span>
+                </li>
+              </ul>
+            </div>
+
+            <Link
+              href="/zk/join/verifier"
+              className="inline-flex items-center justify-center gap-1.5 rounded-md border border-[#23252a] bg-[#141516] px-3.5 py-2 text-[13px] font-medium text-[#f7f8f8] hover:bg-[#18191a] transition-colors"
+            >
+              <span>Request Verifier Seat</span>
+              <ArrowRight className="h-3.5 w-3.5 text-[#8a8f98]" />
+            </Link>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
   );
 }

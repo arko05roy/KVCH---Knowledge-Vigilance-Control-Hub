@@ -1,6 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell,
+} from "recharts";
 
 /** Sparkline Line Chart for Risk & Policy Metrics */
 export function MinimalSparklineChart({
@@ -53,16 +63,16 @@ export function MinimalSparklineChart({
   );
 }
 
-/** Interactive Semi-Circle Gauge Meter (Fear & Greed / Risk Index style) */
+/** Interactive Semi-Circle Gauge Meter (Linear-inspired Cyber Risk & Compliance Index) */
 export function SemiCircleGaugeChart({
   value = 68,
   max = 100,
-  title = "Cyber Risk & Compliance Index",
-  statusLabel = "HIGH EXPOSURE",
+  title = "Insider Risk & Audit Index",
+  statusLabel = "HIGH RISK EXPOSURE",
   history = [
-    { label: "Yesterday", score: 70 },
-    { label: "Last Week", score: 50 },
-    { label: "Last Month", score: 54 }
+    { label: "Prev Audit", score: 70 },
+    { label: "30-Day Avg", score: 50 },
+    { label: "Target", score: 20 }
   ]
 }: {
   value?: number;
@@ -72,10 +82,24 @@ export function SemiCircleGaugeChart({
   history?: { label: string; score: number }[];
 }) {
   const [activeTab, setActiveTab] = useState("1W");
-  const percentage = Math.min(Math.max(value / max, 0), 1);
+
+  // Dynamic values per time-range filter
+  const rangeValues: Record<string, { val: number; label: string }> = {
+    "1D": { val: 64, label: "ELEVATED RISK" },
+    "1W": { val: value, label: statusLabel },
+    "1M": { val: 52, label: "MODERATE RISK" },
+    "1Y": { val: 38, label: "LOW EXPOSURE" }
+  };
+
+  const currentVal = rangeValues[activeTab]?.val ?? value;
+  const currentLabel = rangeValues[activeTab]?.label ?? statusLabel;
+
+  const percentage = Math.min(Math.max(currentVal / max, 0), 1);
+  // Radius = 84, center = (110, 100).
+  // Arc runs from 180° (left) to 0° (right). Angle in radians:
   const angle = Math.PI * (1 - percentage);
-  const needleX = 100 + 65 * Math.cos(angle);
-  const needleY = 95 - 65 * Math.sin(angle);
+  const needleX = 110 - 84 * Math.cos(percentage * Math.PI);
+  const needleY = 100 - 84 * Math.sin(percentage * Math.PI);
 
   const getStatusColor = (val: number) => {
     if (val >= 80) return "text-[#ff5555] bg-[#ff5555]/10 border-[#ff5555]/30";
@@ -84,17 +108,21 @@ export function SemiCircleGaugeChart({
   };
 
   return (
-    <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[13.5px] font-semibold text-[#f7f8f8] tracking-tight">{title}</span>
-        <div className="flex items-center gap-1 bg-[#14161a] border border-[#232529] p-0.5 rounded-full">
+    <div className="bg-[#0c0d0e] border border-[#23252a] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+      {/* Header with Title and Linear Segmented Range Pills */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-[#f2c94c]" />
+          <span className="text-[13.5px] font-semibold text-[#f7f8f8] tracking-tight">{title}</span>
+        </div>
+        <div className="flex items-center gap-1 bg-[#141516] border border-[#23252a] p-0.5 rounded-full">
           {["1D", "1W", "1M", "1Y"].map((t) => (
             <button
               key={t}
               onClick={() => setActiveTab(t)}
-              className={`px-2 py-0.5 text-[10px] font-mono font-medium rounded-full transition-colors ${
+              className={`px-2 py-0.5 text-[10px] font-mono font-medium rounded-full transition-all duration-200 active:scale-95 ${
                 activeTab === t
-                  ? "bg-[#282a30] text-[#f7f8f8] border border-[#383b42]"
+                  ? "bg-[#282a30] text-[#f7f8f8] border border-[#383b42] shadow-sm"
                   : "text-[#8a8f98] hover:text-[#d0d6e0]"
               }`}
             >
@@ -104,47 +132,86 @@ export function SemiCircleGaugeChart({
         </div>
       </div>
 
-      {/* SVG Semi-Circle Gauge */}
-      <div className="relative flex flex-col items-center justify-center my-3">
-        <svg viewBox="0 0 200 115" className="w-52 h-30 overflow-visible">
+      {/* SVG Semi-Circle Gauge with Linear Hairline Arc & Glowing Indicator */}
+      <div className="relative flex flex-col items-center justify-center my-2 select-none">
+        <svg viewBox="0 0 220 120" className="w-56 h-32 overflow-visible">
           <defs>
-            <linearGradient id="gauge-grad-full" x1="0%" y1="0%" x2="100%" y2="0%">
+            {/* Linear-grade gradient tailored to risk spectrum */}
+            <linearGradient id="linearGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#2ea043" />
-              <stop offset="35%" stopColor="#828fff" />
+              <stop offset="40%" stopColor="#5e6ad2" />
               <stop offset="70%" stopColor="#f2c94c" />
               <stop offset="100%" stopColor="#ff5555" />
             </linearGradient>
+            <filter id="needleGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
-          {/* Background Arc */}
+
+          {/* Faint Outer Perimeter Track */}
           <path
-            d="M 20 95 A 80 80 0 0 1 180 95"
+            d="M 18 100 A 92 92 0 0 1 202 100"
             fill="none"
-            stroke="#1a1c20"
-            strokeWidth="16"
+            stroke="#16171a"
+            strokeWidth="1"
+            strokeDasharray="2 6"
+          />
+
+          {/* Main Background Arc Track (Hairline 6px) */}
+          <path
+            d="M 26 100 A 84 84 0 0 1 194 100"
+            fill="none"
+            stroke="#1c1e23"
+            strokeWidth="6"
             strokeLinecap="round"
           />
-          {/* Colored Gradient Arc */}
+
+          {/* Active Gradient Arc Track (Hairline 6px) */}
           <path
-            d="M 20 95 A 80 80 0 0 1 180 95"
+            d="M 26 100 A 84 84 0 0 1 194 100"
             fill="none"
-            stroke="url(#gauge-grad-full)"
-            strokeWidth="16"
+            stroke="url(#linearGaugeGrad)"
+            strokeWidth="6"
             strokeLinecap="round"
-            strokeDasharray="251.2"
-            strokeDashoffset={251.2 * (1 - percentage)}
-            className="transition-all duration-1000 ease-out"
+            strokeDasharray="263.9"
+            strokeDashoffset={263.9 * (1 - percentage)}
+            className="transition-all duration-700 ease-out"
           />
-          {/* Glowing Needle Indicator Marker */}
-          <circle cx={needleX} cy={needleY} r="8" fill="#ffffff" className="shadow-lg shadow-white/50 transition-all duration-700" />
-          <circle cx={needleX} cy={needleY} r="4" fill="#0c0d0e" />
+
+          {/* Glowing Pinpoint Marker - Positioned cleanly on the arc perimeter */}
+          <circle
+            cx={needleX}
+            cy={needleY}
+            r="7"
+            fill="#5e6ad2"
+            fillOpacity="0.25"
+            className="transition-all duration-700 ease-out"
+          />
+          <circle
+            cx={needleX}
+            cy={needleY}
+            r="4"
+            fill="#ffffff"
+            stroke="#121316"
+            strokeWidth="1.5"
+            filter="url(#needleGlow)"
+            className="transition-all duration-700 ease-out cursor-pointer"
+          />
+
+          {/* Scale Labels */}
+          <text x="24" y="115" fill="#62666d" fontSize="9" fontFamily="monospace" textAnchor="middle">0</text>
+          <text x="110" y="24" fill="#62666d" fontSize="8" fontFamily="monospace" textAnchor="middle">50</text>
+          <text x="196" y="115" fill="#62666d" fontSize="9" fontFamily="monospace" textAnchor="middle">100</text>
         </svg>
 
-        <div className="absolute bottom-0 flex flex-col items-center">
-          <span className="text-[34px] font-extrabold text-[#f7f8f8] leading-none tracking-tight">
-            {value}
+        {/* Center Typography & Badge with Generous Breathing Room */}
+        <div className="absolute bottom-1 flex flex-col items-center">
+          <span className="text-[38px] font-bold text-[#f7f8f8] leading-none tracking-tight font-sans">
+            {currentVal}
           </span>
-          <span className={`text-[10px] font-bold uppercase tracking-wider mt-1 px-2.5 py-0.5 rounded-full border ${getStatusColor(value)}`}>
-            {statusLabel}
+          <span className={`text-[9.5px] font-mono font-semibold uppercase tracking-wider mt-1 px-2.5 py-0.5 rounded-full border ${getStatusColor(currentVal)}`}>
+            {currentLabel}
           </span>
         </div>
       </div>
@@ -152,7 +219,10 @@ export function SemiCircleGaugeChart({
       {/* Historical Sub-Pills */}
       <div className="grid grid-cols-3 gap-2.5 pt-3 border-t border-[#1e2024]">
         {history.map((h, i) => (
-          <div key={i} className="bg-[#121316] border border-[#232529] hover:border-[#2f3238] transition-colors rounded-xl p-2 flex flex-col items-center">
+          <div
+            key={i}
+            className="bg-[#121316] border border-[#23252a] hover:border-[#34373c] transition-colors rounded-xl p-2 flex flex-col items-center hover-lift"
+          >
             <span className="text-[10px] text-[#8a8f98] font-medium">{h.label}</span>
             <span className="text-[13px] font-bold text-[#f7f8f8] mt-0.5 font-mono">{h.score}</span>
           </div>
@@ -164,20 +234,45 @@ export function SemiCircleGaugeChart({
 
 /** FAIR Financial Exposure Bar Chart */
 export function FinancialExposureBarChart() {
+  const [mounted, setMounted] = useState(false);
   const [selectedBar, setSelectedBar] = useState<number | null>(2);
 
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const bars = [
-    { label: "Min Loss", value: "₹15,00,000", heightPercent: 25, color: "#38bdf8", badge: "Baseline Min" },
-    { label: "Most Likely", value: "₹48,00,000", heightPercent: 60, color: "#f2c94c", badge: "Likely Exposure" },
-    { label: "EAL (Annual)", value: "₹38,40,000", heightPercent: 48, color: "#828fff", badge: "Expected Loss" },
-    { label: "Max Exposure", value: "₹1,20,00,000", heightPercent: 95, color: "#ff5555", badge: "Tail Risk VaR" },
+    { label: "Min Loss", amount: "₹15.0L", valLakhs: 15, color: "#38bdf8", badge: "Baseline Min" },
+    { label: "Most Likely", amount: "₹48.0L", valLakhs: 48, color: "#f2c94c", badge: "Likely Exposure" },
+    { label: "EAL (Annual)", amount: "₹38.4L", valLakhs: 38.4, color: "#828fff", badge: "Expected Loss" },
+    { label: "Max Exposure", amount: "₹120.0L", valLakhs: 120, color: "#ff5555", badge: "Tail Risk VaR" },
   ];
 
+  const CustomExposureTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-[#0c0d0e] border border-[#23252a] rounded-lg p-2.5 shadow-2xl text-[11px] font-mono">
+          <div className="text-[#f7f8f8] font-bold border-b border-[#1f2125] pb-1 mb-1">
+            {data.label}
+          </div>
+          <div className="text-[#828fff]">
+            Value: <strong className="text-[#f7f8f8]">{data.amount}</strong>
+          </div>
+          <div className="text-[10px] text-[#8a8f98] mt-0.5">{data.badge}</div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="w-full bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+    <div className="w-full bg-[#0c0d0e] border border-[#23252a] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift">
       <div className="flex items-center justify-between mb-3 border-b border-[#1e2024] pb-3">
         <div>
-          <h3 className="text-[14px] font-semibold text-[#f7f8f8] tracking-tight">FAIR Probabilistic Financial Loss Distribution</h3>
+          <h3 className="text-[14px] font-semibold text-[#f7f8f8] tracking-tight">
+            FAIR Probabilistic Financial Loss Distribution
+          </h3>
           <p className="text-[11.5px] text-[#8a8f98]">10,000 Monte Carlo draws for Incident #INC-2026-8891</p>
         </div>
         <span className="px-2.5 py-1 bg-[#18191d] border border-[#2b2d32] text-[#828fff] text-[11px] font-mono rounded-full font-semibold">
@@ -185,42 +280,52 @@ export function FinancialExposureBarChart() {
         </span>
       </div>
 
-      <div className="h-44 flex items-end justify-between gap-4 pt-6 pb-2 px-3 border-b border-[#1e2024]">
-        {bars.map((bar, i) => (
-          <div
-            key={i}
-            onClick={() => setSelectedBar(i)}
-            className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer"
-          >
-            <div className={`text-[11.5px] font-bold font-mono mb-1.5 transition-all ${selectedBar === i ? "text-[#f7f8f8] scale-110" : "text-[#8a8f98]"}`}>
-              {bar.value}
-            </div>
-            <div
-              className={`w-full rounded-t-lg transition-all duration-500 ease-out group-hover:brightness-125 shadow-lg relative ${selectedBar === i ? "ring-2 ring-white/50" : ""}`}
-              style={{
-                height: `${bar.heightPercent}%`,
-                backgroundColor: bar.color,
-                boxShadow: `0 0 16px ${bar.color}40`,
+      <div className="h-48 w-full pt-2">
+        {mounted ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={bars}
+              onClick={(e) => {
+                if (e && e.activeTooltipIndex !== undefined) {
+                  setSelectedBar(Number(e.activeTooltipIndex));
+                }
               }}
+              margin={{ top: 15, right: 10, left: -20, bottom: 0 }}
             >
-              {selectedBar === i && (
-                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#18191d] text-[10px] text-[#f7f8f8] font-mono px-2 py-0.5 rounded border border-[#34373c] whitespace-nowrap shadow-xl">
-                  {bar.badge}
-                </div>
-              )}
-            </div>
+              <CartesianGrid strokeDasharray="3 3" stroke="#18191c" vertical={false} />
+              <XAxis dataKey="label" stroke="#62666d" fontSize={11} tickLine={false} axisLine={{ stroke: "#1f2125" }} />
+              <YAxis stroke="#62666d" fontSize={10} tickLine={false} axisLine={{ stroke: "#1f2125" }} unit="L" />
+              <Tooltip content={<CustomExposureTooltip />} cursor={{ fill: "rgba(255, 255, 255, 0.04)" }} />
+              <Bar dataKey="valLakhs" radius={[6, 6, 0, 0]} maxBarSize={32}>
+                {bars.map((entry, index) => (
+                  <Cell
+                    key={`cell-bar-${index}`}
+                    fill={entry.color}
+                    stroke={selectedBar === index ? "#ffffff" : "transparent"}
+                    strokeWidth={selectedBar === index ? 1.5 : 0}
+                    className="cursor-pointer transition-all"
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full w-full flex items-center justify-center text-xs text-[#62666d] font-mono">
+            Loading Exposure Chart...
           </div>
-        ))}
+        )}
       </div>
 
-      <div className="flex justify-between gap-2 pt-3 text-[11.5px] text-[#8a8f98] font-mono">
+      <div className="flex justify-between gap-2 pt-3 border-t border-[#1e2024] text-[11.5px] text-[#8a8f98] font-mono">
         {bars.map((bar, i) => (
           <span
             key={i}
             onClick={() => setSelectedBar(i)}
-            className={`flex-1 text-center truncate cursor-pointer transition-colors ${selectedBar === i ? "text-[#f7f8f8] font-bold" : "hover:text-[#d0d6e0]"}`}
+            className={`flex-1 text-center truncate cursor-pointer transition-colors ${
+              selectedBar === i ? "text-[#f7f8f8] font-bold" : "hover:text-[#d0d6e0]"
+            }`}
           >
-            {bar.label}
+            {bar.amount}
           </span>
         ))}
       </div>

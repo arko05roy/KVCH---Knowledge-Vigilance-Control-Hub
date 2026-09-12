@@ -8,6 +8,8 @@ import {
   MinimalSparklineChart,
   SemiCircleGaugeChart
 } from "@/components/charts/minimal-charts";
+import { MonteCarloVaRCurveChart } from "@/components/charts/dashboard-charts";
+import { SandboxRunBanner } from "@/components/sandbox-run-banner";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
@@ -18,6 +20,13 @@ export default function ManagementDashboardPage() {
   const [approvedBudget, setApprovedBudget] = useState(false);
   const [activeRange, setActiveRange] = useState("1W");
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    setReportData((prev: any) => ({
+      ...prev,
+      generatedAt: new Date().toISOString(),
+    }));
+  }, []);
 
   // 10-Second Auto-Stream State
   const [autoRun, setAutoRun] = useState(false);
@@ -124,7 +133,7 @@ export default function ManagementDashboardPage() {
                       setActiveRange(r);
                       setStatusNotice(`Timeline horizon switched to ${r}. Metrics recalculated.`);
                     }}
-                    className={`px-2.5 py-1 text-[11px] font-mono font-medium rounded-full transition-all ${
+                    className={`px-2.5 py-1 text-[11px] font-mono font-medium rounded-full transition-all active:scale-95 ${
                       activeRange === r
                         ? "bg-[#282a30] text-[#f7f8f8] border border-[#383b42] shadow-sm"
                         : "text-[#8a8f98] hover:text-[#d0d6e0]"
@@ -137,7 +146,7 @@ export default function ManagementDashboardPage() {
 
               <button
                 onClick={handleToggleBudget}
-                className={`px-4 py-2 text-[12.5px] font-bold text-[#ffffff] rounded-xl transition-all shadow-md ${
+                className={`px-4 py-2 text-[12.5px] font-bold text-[#ffffff] rounded-xl transition-all shadow-md hover-lift active:scale-95 ${
                   approvedBudget ? "bg-[#2ea043] hover:bg-[#278637]" : "bg-[#ff5555] hover:bg-[#e04444]"
                 }`}
               >
@@ -146,6 +155,14 @@ export default function ManagementDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Live 120-Minute Sandbox Attack Run Banner */}
+        <SandboxRunBanner
+          role="management"
+          roleTitle="Executive Management"
+          reportMarkdownFile="management_report.md"
+          reportJsonFile="management_report.json"
+        />
 
         {/* Live Status Toast Banner */}
         {statusNotice && (
@@ -159,7 +176,7 @@ export default function ManagementDashboardPage() {
         <div className="px-8 py-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: Neon Highlight Card (Breach Loss Avoided) */}
-          <div className="bg-gradient-to-br from-[#0f1f14] to-[#0c0d0e] border border-[#2ea043]/40 hover:border-[#2ea043]/80 transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl shadow-[#2ea043]/5 group">
+          <div className="bg-gradient-to-br from-[#0f1f14] to-[#0c0d0e] border border-[#2ea043]/40 hover:border-[#2ea043]/80 transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl shadow-[#2ea043]/5 group hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-bold uppercase tracking-wider text-[#2ea043]">Breach Loss Avoided ({activeRange})</span>
               <span className="px-2 py-0.5 text-[10.5px] font-bold font-mono text-[#2ea043] bg-[#2ea043]/10 rounded-full border border-[#2ea043]/30 flex items-center gap-1">
@@ -177,7 +194,7 @@ export default function ManagementDashboardPage() {
           </div>
 
           {/* Card 2: Expected Annual Loss (EAL) */}
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Expected Annual Loss (EAL)</span>
               <span className={`px-2 py-0.5 text-[10.5px] font-bold font-mono rounded-full border ${
@@ -201,7 +218,7 @@ export default function ManagementDashboardPage() {
           </div>
 
           {/* Card 3: Return on Security Investment (ROSI) */}
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Return on Investment (ROSI)</span>
               <span className="px-2 py-0.5 text-[10.5px] font-bold text-[#828fff] bg-[#828fff]/10 rounded-full border border-[#828fff]/30">
@@ -219,7 +236,7 @@ export default function ManagementDashboardPage() {
           </div>
 
           {/* Card 4: War Room Escalations */}
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between shadow-xl hover-lift cursor-default">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-medium text-[#8a8f98]">Active Escalations</span>
               <span className="px-2 py-0.5 text-[10.5px] font-mono font-bold text-[#ff5555] bg-[#ff5555]/10 rounded-full border border-[#ff5555]/30">
@@ -240,23 +257,28 @@ export default function ManagementDashboardPage() {
 
         {/* Error Banner */}
         {errorMsg && (
-          <div className="mx-8 mb-4 p-4 bg-[#1e1416] border border-[#ff5555]/40 rounded-xl text-[#ff5555] text-[12.5px] shadow-lg">
+          <div className="mx-8 mb-4 p-4 bg-[#1e1416] border border-[#ff5555]/40 rounded-xl text-[#ff5555] text-[12.5px] shadow-lg animate-fadeIn">
             <strong>AI Generation Error:</strong> {errorMsg}
           </div>
         )}
 
         {/* Live AI Executive Briefing Card */}
         {reportData && (
-          <div className="px-8 mb-6">
+          <div className="px-8 mb-6 animate-fadeIn">
             <AiReportDisplayCard report={reportData} roleTitle="Executive Management" />
           </div>
         )}
+
+        {/* Interactive Monte Carlo Value-at-Risk Distribution Curve */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <MonteCarloVaRCurveChart />
+        </div>
 
         {/* FAIR Financial Loss Chart & Semi-Circle Risk Gauge & CISO Decision Desk */}
         <div className="px-8 pb-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Interactive Semi-Circle Risk Gauge */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 hover-lift">
             <SemiCircleGaugeChart
               value={82}
               max={100}
@@ -271,7 +293,7 @@ export default function ManagementDashboardPage() {
           </div>
 
           {/* FAIR Financial Exposure Chart Card */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 hover-lift">
             <FinancialExposureBarChart />
           </div>
 
@@ -279,7 +301,7 @@ export default function ManagementDashboardPage() {
 
         {/* CISO Board Decision Desk & Shortcuts Row */}
         <div className="px-8 pb-12">
-          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-6 shadow-xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-300 rounded-2xl p-6 shadow-xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-center hover-lift">
             
             <div className="lg:col-span-2 space-y-2">
               <div className="flex items-center gap-2">
@@ -300,10 +322,10 @@ export default function ManagementDashboardPage() {
               <button
                 onClick={() => setApprovedBudget(true)}
                 disabled={approvedBudget}
-                className={`w-full py-3 text-[13px] font-bold rounded-xl transition-all duration-300 shadow-md ${
+                className={`w-full py-3 text-[13px] font-bold rounded-xl transition-all duration-300 shadow-md active:scale-98 ${
                   approvedBudget
                     ? "bg-[#2ea043]/20 border border-[#2ea043]/50 text-[#2ea043] shadow-[#2ea043]/10"
-                    : "bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[#0c0d0e] hover:shadow-xl cursor-pointer"
+                    : "bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[#0c0d0e] hover:shadow-xl cursor-pointer hover-lift"
                 }`}
               >
                 {approvedBudget ? "✓ Approved & Funded by CISO" : "Approve ₹2.5L Budget Allocation"}
@@ -312,13 +334,13 @@ export default function ManagementDashboardPage() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/management/escalations"
-                  className="flex-1 py-2 text-center bg-[#14161a] hover:bg-[#1c1e24] border border-[#232529] rounded-xl text-[12px] font-semibold text-[#f7f8f8] transition-colors"
+                  className="flex-1 py-2 text-center bg-[#14161a] hover:bg-[#1c1e24] border border-[#232529] hover:border-[#34373c] rounded-xl text-[12px] font-semibold text-[#f7f8f8] transition-all active:scale-95"
                 >
                   🚨 Active Escalations
                 </Link>
                 <Link
                   href="/management/investment"
-                  className="flex-1 py-2 text-center bg-[#14161a] hover:bg-[#1c1e24] border border-[#232529] rounded-xl text-[12px] font-semibold text-[#828fff] transition-colors"
+                  className="flex-1 py-2 text-center bg-[#14161a] hover:bg-[#1c1e24] border border-[#232529] hover:border-[#34373c] rounded-xl text-[12px] font-semibold text-[#828fff] transition-all active:scale-95"
                 >
                   💰 ROI Scorecard
                 </Link>

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import * as tar from "tar";
-import { verifyHardwareSignature, verifyHardwareProfile, type ExtensionManifest } from "@arko05roy/kvch-extension";
+import type { ExtensionManifest } from "@arko05roy/kvch-extension";
 import { selectAdapter, verifyAdapterRuntime, type AdapterDescriptor } from "./adapters";
 import { parseFindingsJsonl, type FindingEnvelope } from "./findings";
 import { runShellCommand, type ProcessResult } from "./process";

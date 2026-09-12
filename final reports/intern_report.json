@@ -1,0 +1,97 @@
+{
+  "role": "intern",
+  "title": "Guided Triage & Educational Forensic Walkthrough: 120-Min Sandbox Breach Simulation",
+  "summary": "Step-by-step educational incident response guide and triage walkthrough for junior security analysts based on the 120-minute sandbox attack campaign (#INC-2026-8891). This guide explains each attack vector in plain English, teaches how to correlate telemetry logs across all 10 modular extensions, and provides a structured checklist to verify Indicators of Compromise (IOCs) before escalating to senior leads.",
+  "metrics": {
+    "likelihoodScore": 96,
+    "businessImpactScore": 92,
+    "financialExposure": {
+      "min": "₹15,00,000",
+      "mostLikely": "₹48,00,000",
+      "max": "₹1,20,00,000",
+      "eal": "₹38,40,000"
+    },
+    "riskTrend": "Increasing"
+  },
+  "keyFindings": [
+    "Concept 1: Attack Surface Reconnaissance — Why exposing database ports on 0.0.0.0 is dangerous.",
+    "Concept 2: Supply Chain Poisoning — How an attacker can hide malicious code in package postinstall hooks.",
+    "Concept 3: Shannon Entropy — Why entropy scores above 7.2 indicate encrypted or packed malware.",
+    "Concept 4: Reverse TCP Shells — How outbound connections on port 443 deceive simple inbound firewall rules.",
+    "Concept 5: Zero-Trust AST Parsing — How database firewalls parse abstract syntax trees to stop mass data theft."
+  ],
+  "businessImpact": {
+    "operational": "Educational walkthrough: Learn how multi-stage attack chains navigate enterprise defenses.",
+    "financial": "Demonstrates why rapid analyst triage directly prevents ₹48L to ₹1.2Cr in breach liability.",
+    "compliance": "Teaches evidence handling and chain-of-custody documentation under CIS Controls v8.",
+    "reputational": "Builds team capability in spotting early-stage recon before data exfiltration occurs."
+  },
+  "aiInsights": [
+    "Key Learning Point: Always cross-reference package-lock.json hash integrity when dependencies are updated in pull requests.",
+    "Triage Tip: A process connecting outbound on port 443 that does not complete a standard TLS HTTP/2 or HTTP/1.1 handshake is highly suspicious."
+  ],
+  "recommendedActions": [
+    {
+      "action": "Complete guided verification checklist: Confirm PID 14209, C2 IP 185.220.101.5, and binary hash in sandbox",
+      "riskReductionPercent": 60,
+      "estimatedCost": "₹0 (Analyst Training)",
+      "estimatedEffort": "15 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Immediate",
+      "rosi": "N/A (Triage Training)",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Document MITRE ATT&CK technique IDs (T1190, T1195.001, T1059.001, T1071.001) in internal incident ticket",
+      "riskReductionPercent": 40,
+      "estimatedCost": "₹0",
+      "estimatedEffort": "10 minutes",
+      "priority": "MEDIUM",
+      "timeToImplement": "Today",
+      "rosi": "N/A",
+      "type": "Quick Win"
+    }
+  ],
+  "investmentOptimization": "Guided triage protocol builds Junior SOC operational capabilities and speeds up MTTT (Mean Time To Triage).",
+  "complianceMappings": [
+    {
+      "framework": "CIS Controls",
+      "controlId": "CIS-2.1",
+      "status": "Partial",
+      "impactDescription": "Software asset inventory and dependency verification procedures"
+    },
+    {
+      "framework": "NIST CSF",
+      "controlId": "DE.CM-1",
+      "status": "Partial",
+      "impactDescription": "Network perimeter and process anomaly detection training"
+    }
+  ],
+  "scenarios": {
+    "scenarioA_NoAction": {
+      "residualRisk": "High (Unresolved learner query & missed IOC correlation)",
+      "financialExposure": "N/A",
+      "complianceImpact": "Incomplete forensic triage log"
+    },
+    "scenarioB_Remediated": {
+      "residualRisk": "Minimal (Triage completed & validated by Senior Lead)",
+      "financialExposure": "₹0 Residual Risk",
+      "complianceImpact": "Forensic triage log approved and archived",
+      "expectedLossReduction": "100% triage task completion"
+    }
+  },
+  "finalVerdict": "Execute guided triage checklist, correlate all 10 extension alerts, verify SHA-256 hash match, and submit documented findings to Senior SOC Lead.",
+  "keyInsights": [
+    "Supply chain backdoors execute automatically during npm install postinstall scripts",
+    "Entropy checks (H > 7.2) rapidly identify packed reverse shells without needing decompilation",
+    "Correlating network sockets with process IDs (lsof -i :443) confirms active command-and-control channels"
+  ],
+  "actionItems": [
+    "Run ps aux | grep node and identify foreign IP in socket connection",
+    "Inspect /tmp/.system_daemon hash against YARA rule database",
+    "Check package.json for unpinned external dependency versions",
+    "Submit verified incident worksheet to Senior Developer"
+  ],
+  "roleSpecificDetail": "Detailed walkthrough, five core security concepts, and step-by-step checklist available in intern_report.md.",
+  "generatedAt": "2026-09-13T01:45:00.000Z"
+}

@@ -25,6 +25,7 @@ export function executeTieredSoarPolicy(params: {
       action_type: "LOG_ONLY",
       action_description: `Dispatched to SIEM indexer and logged on dashboard. No active host disruption taken.`,
       status: "EXECUTED",
+      execution_status: "EXECUTED",
       executed_at: timestamp,
     };
   }
@@ -35,6 +36,7 @@ export function executeTieredSoarPolicy(params: {
       action_type: "QUARANTINE_THROTTLE",
       action_description: `Process '${process_name}' (PID: ${pid}) throttled to 10kbps and moved to memory sandbox pending analyst disposition.`,
       status: "EXECUTED",
+      execution_status: "EXECUTED",
       executed_at: timestamp,
     };
   }
@@ -45,6 +47,7 @@ export function executeTieredSoarPolicy(params: {
       action_type: "AUTO_ISOLATE",
       action_description: `CRITICAL THREAT: Auto-isolated host '${asset.hostname}' (${asset.asset_criticality}) from subnet. Terminated malicious process PID: ${pid} ('${process_name}').`,
       status: "EXECUTED",
+      execution_status: "EXECUTED",
       executed_at: timestamp,
     };
   }
@@ -53,6 +56,7 @@ export function executeTieredSoarPolicy(params: {
     action_type: "QUARANTINE_THROTTLE",
     action_description: `Asset-Tier Guardrail: '${asset.hostname}' is ${asset.asset_criticality} (Threshold ${asset.auto_isolate_confidence_threshold}%). Confidence ${confidence_score}% below threshold for full host drop. Quarantining PID ${pid}.`,
     status: "SKIPPED_ASSET_THRESHOLD",
+    execution_status: "SKIPPED_ASSET_THRESHOLD",
     executed_at: timestamp,
   };
 }

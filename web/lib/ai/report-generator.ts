@@ -112,14 +112,20 @@ INPUT TELEMETRY ENVELOPE (kvch.finding/v1):
 ${JSON.stringify(finding, null, 2)}
 
 ---------------------------------------------------
-EXTENSIONS TELEMETRY CORRELATION:
+EXTENSIONS TELEMETRY CORRELATION (10 CORE ENGINES + GOVERNANCE):
 ---------------------------------------------------
-Incorporate evidence, indicators, baseline, and extension-specific details for the 5 KVCH modules:
-1. attack-surface-scanner: Parse open_ports (e.g. 445/SMB, 5432/PostgreSQL), exposed_buckets_count, subdomains, SSL/TLS certificates.
-2. vpn-crypto-analyzer: Parse PCAP traffic, IKE negotiations, weak ciphers, unencrypted socket listeners.
-3. phishing-hunter: Parse typosquatting domains, WHOIS intelligence, DNS recon, ML risk scores.
-4. threat-hunter-3000: Parse packet sniffers, threat intel IOCs, MITRE ATT&CK mappings, auto-firewall rules.
-5. malware-analyzer: Parse MD5/SHA-256 hashes, YARA rule matches, PE/ELF executable headers, Shannon entropy.
+Incorporate evidence, indicators, baseline, and extension-specific details for all KVCH modules:
+1. attack-surface-scanner: Parse listening ports (netstat/lsof e.g. 5432/PostgreSQL on 0.0.0.0, SMB 445), exposed database sockets, unencrypted HTTP, and missing HSTS headers.
+2. vpn-crypto-analyzer: Parse interface tables (tun0, wg0), split-tunnel DNS leaks, unencrypted DNS queries, and active Web3 wallet processes (MetaMask, Phantom, Ledger).
+3. phishing-hunter: Parse /etc/hosts DNS hijacking, homograph domain patterns, punycode lookups, and untrusted browser extension update_url endpoints.
+4. threat-hunter-3000: Process tree auditor (ps -ax), autostart persistence checkers (~/Library/LaunchAgents, /etc/cron.*), hidden processes in /tmp, and obfuscated base64 reverse shell scripts.
+5. malware-analyzer: Mach-O/ELF/PE binary headers, Shannon entropy ($H > 7.2$) indicating packed/encrypted payloads, and audits of /tmp & ~/Downloads.
+6. credential-exposure-auditor: Scans repositories, .env, and SSH/AWS keys for exposed secrets; detects AST deobfuscation, BIP39 seed phrases, private keys, and clipboard clipper address replacers.
+7. supply-chain-auditor: Audits lockfiles (package-lock.json, pnpm-lock.yaml), detects dependency typosquatting via Levenshtein distance, and flags malicious postinstall scripts (curl | bash).
+8. cookie-xss-auditor: Audits local SQLite3 browser cookie stores for missing HttpOnly/Secure flags, flags unencrypted JWT storage, and scans client DOM sinks (innerHTML, eval, document.write).
+9. aegisdb-zerotrust: Intercepts database connection sockets and ORM query builders (Postgres, Mongo, ChromaDB); normalizes AST queries, halts unpaginated mass dumps, and kills rogue sockets.
+10. edgeguard-sentinel: Active edge-proxy monitor inspecting response headers (cf-ray, CORS, CSP), executing micro-fuzzing loops, and preventing origin IP leaks.
+11. developer-governance: PR Assistant, Code Review Explainer, Test Generator, Doc Builder, Lint Auto-Fixer, Pattern Learner.
 
 ---------------------------------------------------
 ASSET CRITICALITY & FINANCIAL SCALING RULES (CRITICAL):

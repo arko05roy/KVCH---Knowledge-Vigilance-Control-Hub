@@ -4,8 +4,11 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { AiReportDisplayCard } from "@/components/ai-report-card";
 import { DEMO_REPORTS } from "@/lib/demo-data";
 import { MinimalSparklineChart } from "@/components/charts/minimal-charts";
+import { AttackSurfaceExposureChart } from "@/components/charts/dashboard-charts";
 import { CodeDiffViewer } from "@/components/code-diff-viewer";
 import { TelemetryLogStream, SAMPLE_TELEMETRY_LOGS, TelemetryLogEntry } from "@/components/telemetry-log-stream";
+import { SandboxRunBanner } from "@/components/sandbox-run-banner";
+import { AttackProgressionTimeline } from "@/components/attack-progression-timeline";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
@@ -30,6 +33,13 @@ export default function SrDevDashboardPage() {
     setCopiedCmd(label);
     setTimeout(() => setCopiedCmd(null), 2000);
   };
+
+  useEffect(() => {
+    setReportData((prev: any) => ({
+      ...prev,
+      generatedAt: new Date().toISOString(),
+    }));
+  }, []);
 
   const handleExecuteContainment = () => {
     setContainmentExecuted(true);
@@ -118,13 +128,21 @@ export default function SrDevDashboardPage() {
             <div className="flex items-center gap-2.5">
               <Link
                 href="/extensions"
-                className="px-3 py-1.5 bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[12.5px] font-medium text-[#0c0d0e] rounded-md transition-colors"
+                className="px-3 py-1.5 bg-[#f7f8f8] hover:bg-[#e0e0e0] text-[12.5px] font-medium text-[#0c0d0e] rounded-md transition-all hover-lift active:scale-95"
               >
                 + Upload Extension
               </Link>
             </div>
           </div>
         </div>
+
+        {/* Live 120-Minute Sandbox Attack Run Banner */}
+        <SandboxRunBanner
+          role="srDev"
+          roleTitle="Senior Developer"
+          reportMarkdownFile="sr_dev_report.md"
+          reportJsonFile="sr_dev_report.json"
+        />
 
         {/* Live Status Toast Banner */}
         {statusNotice && (
@@ -134,24 +152,29 @@ export default function SrDevDashboardPage() {
           </div>
         )}
 
-        {/* Overview Stats Row */}
+        {/* Overview Stats Row with microinteractions */}
         <div className="px-8 py-5 grid grid-cols-4 gap-3.5">
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Active Threat Extensions</span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-[24px] font-semibold text-[#f7f8f8]">8/8</span>
-              <MinimalSparklineChart data={[5, 6, 8, 7, 8, 8, 8]} color="#828fff" />
+              <span className="text-[24px] font-semibold text-[#f7f8f8]">10/10</span>
+              <MinimalSparklineChart data={[6, 7, 8, 9, 10, 10, 10]} color="#828fff" />
             </div>
-            <span className="text-[11px] text-[#2ea043] mt-2">All EDR extension engines active</span>
+            <span className="text-[11px] text-[#2ea043] mt-2 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2ea043] animate-pulse"></span>
+              All 10 EDR extension engines active
+            </span>
           </div>
 
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Active C2 Connection</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className={`text-[24px] font-semibold ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
                 {containmentExecuted ? "0" : "1"}
               </span>
-              <span className={`text-[11px] font-mono ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+              <span className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                containmentExecuted ? "text-[#2ea043] bg-[#2ea043]/10 border-[#2ea043]/30" : "text-[#ff5555] bg-[#ff5555]/10 border-[#ff5555]/30"
+              }`}>
                 {containmentExecuted ? "CONTAINED" : "PID 14209"}
               </span>
             </div>
@@ -160,7 +183,7 @@ export default function SrDevDashboardPage() {
             </span>
           </div>
 
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Ollama AI Local Engine</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className="text-[24px] font-semibold text-[#2ea043]">ONLINE</span>
@@ -169,13 +192,15 @@ export default function SrDevDashboardPage() {
             <span className="text-[11px] text-[#8a8f98] mt-2">qwen2.5-coder:7b active</span>
           </div>
 
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 hover-lift rounded-lg p-4 flex flex-col justify-between cursor-default">
             <span className="text-[11.5px] font-medium text-[#8a8f98]">Incident Severity Score</span>
             <div className="flex items-baseline justify-between mt-2">
               <span className={`text-[24px] font-semibold ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
                 {containmentExecuted ? "14" : "92"}
               </span>
-              <span className={`text-[11px] font-mono ${containmentExecuted ? "text-[#2ea043]" : "text-[#ff5555]"}`}>
+              <span className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                containmentExecuted ? "text-[#2ea043] bg-[#2ea043]/10 border-[#2ea043]/30" : "text-[#ff5555] bg-[#ff5555]/10 border-[#ff5555]/30"
+              }`}>
                 {containmentExecuted ? "LOW" : "CRITICAL"}
               </span>
             </div>
@@ -187,19 +212,29 @@ export default function SrDevDashboardPage() {
 
         {/* Error Banner */}
         {errorMsg && (
-          <div className="mx-8 mb-4 p-3 bg-[#1e1416] border border-[#3c1e22] rounded-lg text-[#ff5555] text-[12.5px]">
+          <div className="mx-8 mb-4 p-3 bg-[#1e1416] border border-[#3c1e22] rounded-lg text-[#ff5555] text-[12.5px] animate-fadeIn">
             <strong>AI Generation Error:</strong> {errorMsg}
           </div>
         )}
 
+        {/* Interactive 120-Minute Attack Progression Timeline across 10 Engines */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <AttackProgressionTimeline />
+        </div>
+
+        {/* Real-Time Attack Surface Exposure & Port Binding Map Chart */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <AttackSurfaceExposureChart />
+        </div>
+
         {/* Live EDR Telemetry Log Stream Section (15-20 logs, 4 Malicious highlighted in Red) */}
-        <div className="px-8 mb-6">
+        <div className="px-8 mb-6 animate-fadeIn">
           <TelemetryLogStream logs={logs} />
         </div>
 
         {/* Technical AI Report Card */}
         {reportData && (
-          <div className="px-8 mb-6">
+          <div className="px-8 mb-6 animate-fadeIn">
             <AiReportDisplayCard report={reportData} roleTitle="Senior Developer" />
           </div>
         )}
@@ -208,28 +243,35 @@ export default function SrDevDashboardPage() {
         <div className="px-8 pb-10 grid grid-cols-3 gap-5">
           
           {/* Containment Terminal & Code Diffs */}
-          <div className="col-span-2 bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col space-y-3.5">
+          <div className="col-span-2 bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 rounded-lg p-4 flex flex-col space-y-3.5 hover-lift">
             <div className="flex items-center justify-between border-b border-[#232529] pb-3">
               <h3 className="text-[14px] font-semibold text-[#f7f8f8]">
                 Technical Forensic Workbench & One-Touch Shell Actions
               </h3>
-              <span className="text-[11px] text-[#2ea043] font-mono">Real-Time Telemetry</span>
+              <span className="text-[11px] text-[#2ea043] font-mono flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2ea043] animate-pulse"></span>
+                Real-Time Telemetry
+              </span>
             </div>
 
             {/* Terminal Command 1: Kill PID */}
-            <div className="bg-[#08090a] border border-[#232529] rounded p-3 font-mono text-[12px]">
+            <div className="bg-[#08090a] border border-[#232529] hover:border-[#34373c] transition-colors rounded p-3 font-mono text-[12px]">
               <div className="flex items-center justify-between text-[#8a8f98] mb-1">
                 <span>Command 1: Terminate Malicious C2 Reverse Shell Process</span>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handleExecuteContainment}
-                    className="text-[11px] font-semibold text-[#2ea043] bg-[#2ea043]/10 border border-[#2ea043]/30 px-2 py-0.5 rounded hover:bg-[#2ea043]/20 transition-colors"
+                    className={`text-[11px] font-semibold px-2.5 py-1 rounded transition-all active:scale-95 ${
+                      containmentExecuted
+                        ? "text-[#2ea043] bg-[#2ea043]/15 border border-[#2ea043]/40 shadow-sm"
+                        : "text-[#2ea043] bg-[#2ea043]/10 border border-[#2ea043]/30 hover:bg-[#2ea043]/20"
+                    }`}
                   >
                     {containmentExecuted ? "✓ Executed & Isolated" : "⚡ Run Shell Containment"}
                   </button>
                   <button
                     onClick={() => copyToClipboard("sudo kill -9 14209", "cmd1")}
-                    className="text-[11px] text-[#828fff] hover:underline"
+                    className="text-[11px] text-[#828fff] hover:underline active:scale-95 transition-transform"
                   >
                     {copiedCmd === "cmd1" ? "✓ Copied!" : "Copy Command"}
                   </button>
@@ -241,12 +283,12 @@ export default function SrDevDashboardPage() {
             </div>
 
             {/* Terminal Command 2: Egress Firewall */}
-            <div className="bg-[#08090a] border border-[#232529] rounded p-3 font-mono text-[12px]">
+            <div className="bg-[#08090a] border border-[#232529] hover:border-[#34373c] transition-colors rounded p-3 font-mono text-[12px]">
               <div className="flex items-center justify-between text-[#8a8f98] mb-1">
                 <span>Command 2: Block Outbound C2 Traffic (iptables)</span>
                 <button
                   onClick={() => copyToClipboard("sudo iptables -A OUTPUT -d 185.220.101.5 -j DROP", "cmd2")}
-                  className="text-[11px] text-[#828fff] hover:underline"
+                  className="text-[11px] text-[#828fff] hover:underline active:scale-95 transition-transform"
                 >
                   {copiedCmd === "cmd2" ? "✓ Copied!" : "Copy Command"}
                 </button>
@@ -272,7 +314,7 @@ export default function SrDevDashboardPage() {
           </div>
 
           {/* SOC Shortcuts Panel */}
-          <div className="bg-[#0c0d0e] border border-[#232529] rounded-lg p-4 flex flex-col justify-between">
+          <div className="bg-[#0c0d0e] border border-[#232529] hover:border-[#34373c] transition-all duration-200 rounded-lg p-4 flex flex-col justify-between hover-lift">
             <div>
               <h3 className="text-[14px] font-semibold text-[#f7f8f8] mb-3">
                 SOC Actions & Links
@@ -280,19 +322,19 @@ export default function SrDevDashboardPage() {
               <div className="space-y-2">
                 <Link
                   href="/sr-dev/incidents"
-                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] rounded text-[12.5px] text-[#f7f8f8] transition-colors"
+                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] hover:border-[#34373c] rounded text-[12.5px] text-[#f7f8f8] transition-all active:scale-[0.98]"
                 >
                   🚨 Active Incident Queue (#INC-2026-8891)
                 </Link>
                 <Link
                   href="/sr-dev/approvals"
-                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] rounded text-[12.5px] text-[#f7f8f8] transition-colors"
+                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] hover:border-[#34373c] rounded text-[12.5px] text-[#f7f8f8] transition-all active:scale-[0.98]"
                 >
                   🛡️ Review Patch Approvals (3 Pending)
                 </Link>
                 <Link
                   href="/sr-dev/custom-extensions"
-                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] rounded text-[12.5px] text-[#f7f8f8] transition-colors"
+                  className="block p-2.5 bg-[#121316] hover:bg-[#18191c] border border-[#232529] hover:border-[#34373c] rounded text-[12.5px] text-[#f7f8f8] transition-all active:scale-[0.98]"
                 >
                   🧩 Custom Extensions AI Generator
                 </Link>

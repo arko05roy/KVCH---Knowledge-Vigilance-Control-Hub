@@ -17,14 +17,15 @@ export interface ZkConfig {
 
 type Environment = Record<string, string | undefined>;
 
-function req(env: Environment, key: string): string {
-  const value = env[key]?.trim();
+function req(env: Environment, key: string, fallback?: string): string {
+  const value = env[key]?.trim() || fallback;
   if (!value) throw new Error(`Missing required environment variable: ${key}`);
   return value;
 }
 
 export function readZkConfig(env: Environment = process.env): ZkConfig {
-  const zkWorkspaceDir = path.resolve(req(env, "ZK_WORKSPACE_DIR"));
+  const defaultZkDir = path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../zk");
+  const zkWorkspaceDir = path.resolve(/*turbopackIgnore: true*/ req(env, "ZK_WORKSPACE_DIR", defaultZkDir));
   const deploymentManifest =
     env.ZK_DEPLOYMENT_MANIFEST?.trim() ||
     path.join(zkWorkspaceDir, "contracts/deployments/latest.json");

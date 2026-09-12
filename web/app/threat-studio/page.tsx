@@ -630,7 +630,7 @@ export default function ThreatStudioPage() {
       </div>
     )}
 
-      </main>
-    </div>
+  </main>
+</div>
   );
 }

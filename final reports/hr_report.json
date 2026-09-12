@@ -1,0 +1,119 @@
+{
+  "role": "hr",
+  "title": "Personnel Governance, Access Audit & Regulatory Mandate Brief (120-Min Sandbox Attack)",
+  "summary": "Human resource access audit, insider threat assessment, and regulatory compliance brief for the 120-minute sandbox breach simulation (#INC-2026-8891). Forensic attribution traced the vulnerability introduction to an unreviewed pull request merge (PR #4) by employee Rohit Debnath (EMP-4029) on workstation #WKSTN-0891. Details employee attribution, workstation policy non-compliance, statutory compliance breach mandates under the Digital Personal Data Protection (DPDP) Act 2023 and ISO 27001, and an actionable employee retraining roadmap.",
+  "metrics": {
+    "likelihoodScore": 96,
+    "businessImpactScore": 92,
+    "financialExposure": {
+      "min": "₹15,00,000",
+      "mostLikely": "₹48,00,000",
+      "max": "₹1,20,00,000",
+      "eal": "₹38,40,000"
+    },
+    "riskTrend": "Increasing"
+  },
+  "keyFindings": [
+    "Committer Attribution: Rohit Debnath (Senior Frontend Engineer - Employee ID: EMP-4029) & Workstation MacBook-Pro-Dev03.lan (#WKSTN-0891).",
+    "Unauthorized Merge: PR #4 ('implemented ml model') merged without mandatory 2-person security signoff.",
+    "Workstation Policy Deviations: Personal USB peripheral connected on Tuesday; unapproved cloud sync on Thursday; split-tunnel VPN socket on Friday.",
+    "Regulatory Exposure: Digital Personal Data Protection (DPDP) Act 2023 Sec 8 statutory 72-hour notification protocol required if production data is compromised.",
+    "Standard Breaches: Non-compliance flagged under ISO 27001 Control A.8.28 (Secure Coding) & SEBI CSCRF Section 3.2 (Access Governance)."
+  ],
+  "businessImpact": {
+    "operational": "Engineering deployment paused pending mandatory access scope review and branch protection rule rollout.",
+    "financial": "Exposure to statutory regulatory penalties up to ₹1,20,00,000 under DPDP Act 2023 if unmitigated data breach occurred in production.",
+    "compliance": "Audit observations recorded against ISO 27001 A.8.28 and SEBI CSCRF; corrective action plan required.",
+    "reputational": "Internal trust audit required; zero external press exposure as attack was contained within sandbox boundary."
+  },
+  "aiInsights": [
+    "Forensic investigation reveals developer committed code from unhardened personal workstation without mandatory GPG commit signing.",
+    "Automating GitHub branch protection rules with mandatory 2-person approval eliminates 95% of human-factor supply chain vulnerabilities."
+  ],
+  "recommendedActions": [
+    {
+      "action": "Enforce mandatory GPG signed commits and GitHub branch protection requiring 2 senior security approvals on main branch",
+      "riskReductionPercent": 95,
+      "estimatedCost": "₹0 (Policy Configuration)",
+      "estimatedEffort": "30 minutes",
+      "priority": "HIGH",
+      "timeToImplement": "Immediate",
+      "rosi": "Infinite",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Suspend production deployment keys for EMP-4029 and conduct access scope audit",
+      "riskReductionPercent": 80,
+      "estimatedCost": "₹0",
+      "estimatedEffort": "1 hour",
+      "priority": "HIGH",
+      "timeToImplement": "Within 24 hours",
+      "rosi": "High ROI Action",
+      "type": "Quick Win"
+    },
+    {
+      "action": "Conduct mandatory Secure Supply Chain & Workstation Hygiene workshop for all 14 engineering department personnel",
+      "riskReductionPercent": 75,
+      "estimatedCost": "₹50,000 (Internal Workshop)",
+      "estimatedEffort": "1 day",
+      "priority": "MEDIUM",
+      "timeToImplement": "Next 7 Days",
+      "rosi": "420% ROI",
+      "type": "Long-Term Investment"
+    }
+  ],
+  "investmentOptimization": "Zero-cost immediate HR policy enforcement (branch protection rules & GPG signing) combined with targeted engineering security hygiene training.",
+  "complianceMappings": [
+    {
+      "framework": "ISO/IEC 27001",
+      "controlId": "A.8.28",
+      "status": "Deficient",
+      "impactDescription": "Secure coding rules and peer review mechanisms prior to code integration"
+    },
+    {
+      "framework": "ISO/IEC 27001",
+      "controlId": "A.13.1.1",
+      "status": "Deficient",
+      "impactDescription": "Network boundary controls and restriction of external socket listeners"
+    },
+    {
+      "framework": "SEBI CSCRF",
+      "controlId": "CSCRF-Sec-3.2",
+      "status": "Deficient",
+      "impactDescription": "Access control governance and privilege separation for developer accounts"
+    },
+    {
+      "framework": "RBI Framework",
+      "controlId": "RBI-CS-G2",
+      "status": "Partial",
+      "impactDescription": "Third-party component risk management and vendor package audit"
+    }
+  ],
+  "scenarios": {
+    "scenarioA_NoAction": {
+      "residualRisk": "Critical (Policy violation unaddressed; high recurrence probability)",
+      "financialExposure": "₹1,20,00,000 Maximum Fine Exposure under DPDP Act 2023",
+      "complianceImpact": "Formal regulatory audit observation and potential compliance certification suspension"
+    },
+    "scenarioB_Remediated": {
+      "residualRisk": "Compliant (GPG signing, 2-person review & branch protection active)",
+      "financialExposure": "₹0 Regulatory Penalty Risk",
+      "complianceImpact": "Full regulatory compliance restored and audited",
+      "expectedLossReduction": "95% reduction in compliance risk exposure"
+    }
+  },
+  "finalVerdict": "Update access policies, enforce GPG commit signing and 2-reviewer PR protection immediately; schedule developer security retraining.",
+  "keyInsights": [
+    "Developer EMP-4029 committed malicious dependency without secondary approval",
+    "Workstation deviations (USB, unapproved VPN) paved pathway for security control bypass",
+    "Branch protection policy enforcement prevents unreviewed code merges"
+  ],
+  "actionItems": [
+    "Audit access scopes for Employee EMP-4029 (Rohit Debnath)",
+    "Enable GitHub Branch Protection rule requiring 2 security approvals on main branch",
+    "Enforce mandatory GPG signed commits across repository settings",
+    "Schedule Secure Supply Chain Security training session"
+  ],
+  "roleSpecificDetail": "Detailed attribution matrix, workstation audit logs, and DPDP / ISO statutory mandates available in hr_report.md.",
+  "generatedAt": "2026-09-13T01:45:00.000Z"
+}

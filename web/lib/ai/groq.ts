@@ -19,10 +19,10 @@ export class GroqKeyPoolManager {
     // Fallback: parse .env.local or .env if running outside Next.js process wrapper
     if (!rawKeys) {
       for (const envFile of [".env.local", ".env"]) {
-        const envPath = path.join(process.cwd(), envFile);
-        if (existsSync(envPath)) {
+        const envPath = path.join(/*turbopackIgnore: true*/ process.cwd(), envFile);
+        if (existsSync(/*turbopackIgnore: true*/ envPath)) {
           try {
-            const content = readFileSync(envPath, "utf8");
+            const content = readFileSync(/*turbopackIgnore: true*/ envPath, "utf8");
             const match = content.match(/GROQ_API_KEYS\s*=\s*["']?([^"'\r\n]+)["']?/);
             if (match) {
               rawKeys = match[1];

@@ -136,7 +136,6 @@ model Finding {
   createdAt  DateTime              @default(now())
   run        ScheduledExtensionRun @relation(fields: [runId], references: [id], onDelete: Restrict)
   artifact   Artifact              @relation(fields: [artifactId], references: [id], onDelete: Restrict)
-  aiReport   AIReport?
 
   @@index([artifactId, observedAt])
   @@index([runId])
