@@ -92,6 +92,7 @@ const ROLE_NAVS: Record<string, RoleNavConfig> = {
         items: [
           { label: "Escalations", href: "/management/escalations", icon: <AlertIcon /> },
           { label: "Business Impact", href: "/management/investment", icon: <ChartIcon /> },
+          { label: "ZK Network", href: "/zk", icon: <ShieldIcon /> },
         ]
       }
     ]
@@ -138,12 +139,12 @@ export function DashboardShell({
           {/* Top Nav */}
           <div className="space-y-[2px] mb-6">
             {navConfig.top.map((item, idx) => (
-              <SidebarItem 
-                key={idx} 
-                icon={item.icon} 
-                label={item.label} 
-                href={item.href} 
-                active={pathname === item.href} 
+              <SidebarItem
+                key={idx}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                active={pathname === item.href || pathname.startsWith(item.href + "/")}
               />
             ))}
           </div>
@@ -156,12 +157,12 @@ export function DashboardShell({
               </div>
               <div className="space-y-[2px]">
                 {section.items.map((item, idx) => (
-                  <SidebarItem 
-                    key={idx} 
-                    icon={item.icon} 
-                    label={item.label} 
-                    href={item.href} 
-                    active={pathname === item.href} 
+                  <SidebarItem
+                    key={idx}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    active={pathname === item.href || pathname.startsWith(item.href + "/")}
                   />
                 ))}
               </div>
@@ -229,6 +230,9 @@ function ChartIcon() {
 }
 function PolicyIcon() {
   return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>;
+}
+function ShieldIcon() {
+  return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>;
 }
 function AlertIcon() {
   return <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
