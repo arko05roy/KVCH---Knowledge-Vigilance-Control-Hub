@@ -105,7 +105,7 @@ ${JSON.stringify(vector, null, 2)}`;
     }
 
     parsedResponse = {
-      threat_identified: sev === "CRITICAL" || sev === "HIGH",
+      threat_identified: (sev as SeverityLevel) === "CRITICAL" || (sev as SeverityLevel) === "HIGH",
       threat_classification: cls,
       severity: sev,
       confidence_score: conf,

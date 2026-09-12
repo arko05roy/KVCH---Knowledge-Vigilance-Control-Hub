@@ -30,7 +30,7 @@ async function runCTDETests() {
       console.log(`   Routing Stage:      ${verdict.routing_stage} (Skipped LLM: ${verdict.skipped_llm})`);
       console.log(`   Classification:     ${verdict.threat_classification}`);
       console.log(`   Severity:           ${verdict.severity} (Confidence: ${verdict.confidence_score}%)`);
-      console.log(`   SOAR Action:        ${verdict.soar_action.action_type} (${verdict.soar_action.execution_status})`);
+      console.log(`   SOAR Action:        ${verdict.soar_action.action_type} (${verdict.soar_action.status})`);
       console.log(`   Reasoning:          ${verdict.ai_reasoning_summary.slice(0, 100)}...`);
 
       // Validation logic

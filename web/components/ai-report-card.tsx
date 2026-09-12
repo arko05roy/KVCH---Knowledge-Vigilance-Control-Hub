@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import type { RoleSecurityReport } from "@/lib/ai/report-generator";
 import { SimpleMarkdownRenderer } from "./markdown-renderer";
 

@@ -112,6 +112,7 @@ export interface SoarActionExecution {
   action_type: "AUTO_ISOLATE" | "QUARANTINE_THROTTLE" | "LOG_ONLY";
   action_description: string;
   status: "EXECUTED" | "QUEUED" | "SKIPPED_ASSET_THRESHOLD";
+  execution_status: string;
   executed_at: string;
 }
 

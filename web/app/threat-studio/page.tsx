@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { ScenarioDefinition } from "@/lib/threat-engine/scenarios";
 import { FusedContextVector, DetectionVerdict } from "@/lib/threat-engine/types";
-import ThreatFlowDiagram from "@/components/threat-flow-diagram";
+import ThreatReactFlowDiagram from "@/components/threat-reactflow-diagram";
 
 export default function ThreatStudioPage() {
   const [activeView, setActiveView] = useState<"diagram" | "sandbox">("diagram");
@@ -256,7 +256,7 @@ export default function ThreatStudioPage() {
         
         {activeView === "diagram" ? (
           <div className="space-y-6">
-            <ThreatFlowDiagram />
+            <ThreatReactFlowDiagram />
           </div>
         ) : (
           <div className="space-y-6">
@@ -626,7 +626,9 @@ export default function ThreatStudioPage() {
             )}
 
           </div>
-        )}
+        </div>
+      </div>
+    )}
 
       </main>
     </div>

@@ -54,7 +54,7 @@ async function streamExtensionLogs() {
       console.log(`[${timestamp()}] [ENGINE] Threat Verdict:   ${verdict.threat_classification} [${verdict.severity}]`);
       console.log(`[${timestamp()}] [ENGINE] Confidence Score: ${verdict.confidence_score}%`);
       console.log(`[${timestamp()}] [ENGINE] MITRE ATT&CK:     ${verdict.mitre_attack_technique}`);
-      console.log(`[${timestamp()}] [SOAR]   Action Enforced:  ${verdict.soar_action.action_type} (Status: ${verdict.soar_action.execution_status})`);
+      console.log(`[${timestamp()}] [SOAR]   Action Enforced:  ${verdict.soar_action.action_type} (Status: ${verdict.soar_action.status})`);
 
       if (verdict.primary_differentiators.length > 0) {
         console.log(`[${timestamp()}] [EVIDENCE] Primary Differentiators:`);

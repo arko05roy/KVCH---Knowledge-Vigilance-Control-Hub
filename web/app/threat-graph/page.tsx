@@ -2,8 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { ShieldAlert, ArrowLeft, Layers, ShieldCheck, Zap, Database, Terminal, Cpu, CheckCircle2 } from "lucide-react";
-import ThreatFlowDiagram from "@/components/threat-flow-diagram";
+import { ShieldAlert, ArrowLeft, Layers, Zap } from "lucide-react";
+import ThreatReactFlowDiagram from "@/components/threat-reactflow-diagram";
 
 export default function ThreatGraphPage() {
   return (
@@ -24,10 +24,10 @@ export default function ThreatGraphPage() {
               <div className="flex items-center gap-2">
                 <span className="font-bold tracking-tight text-white">KVCH Threat Architecture &amp; Attack Chain Visualizer</span>
                 <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
-                  Interactive Node Flow
+                  ReactFlow Engine
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">Step-by-Step Multi-Stage Threat Vector &amp; Active Defense Illustration</p>
+              <p className="text-xs text-zinc-400">Node-Based Step-by-Step Multi-Stage Threat Vector &amp; Active Defense Illustration</p>
             </div>
           </div>
 
@@ -60,20 +60,20 @@ export default function ThreatGraphPage() {
             <div className="max-w-3xl space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-mono font-semibold">
                 <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
-                Active Defense &amp; Step-by-Step Threat Visualizer
+                ReactFlow Active Defense &amp; Node Attack Chain Visualizer
               </div>
               <h1 className="text-2xl font-black text-white tracking-tight">
-                Visualizing Multi-Stage Threat Vectors &amp; Mitigations
+                Visualizing Multi-Stage Threat Vectors &amp; Active Mitigations
               </h1>
               <p className="text-sm text-zinc-300 leading-relaxed">
-                Step through complex attack scenarios—including reverse shell process hollowing, AegisDB-ZeroTrust database socket AST interception, and EdgeGuard-Sentinel WAF micro-fuzzing—with full telemetry inspectability at every stage.
+                Interactive Directed Acyclic Graph (DAG) for process hollowing, AegisDB-ZeroTrust database socket AST interception, and EdgeGuard-Sentinel WAF micro-fuzzing—with full telemetry inspectability at every node.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs font-mono shrink-0">
               <div className="bg-[#0b0c10]/80 p-3 rounded-xl border border-zinc-800">
-                <span className="text-zinc-500 block text-[10px]">TOTAL SCENARIOS</span>
-                <span className="text-white font-bold text-base">3 Active Scenarios</span>
+                <span className="text-zinc-500 block text-[10px]">SCENARIOS</span>
+                <span className="text-white font-bold text-base">3 ReactFlow DAGs</span>
               </div>
               <div className="bg-[#0b0c10]/80 p-3 rounded-xl border border-zinc-800">
                 <span className="text-zinc-500 block text-[10px]">PIPELINE STAGES</span>
@@ -84,7 +84,7 @@ export default function ThreatGraphPage() {
         </div>
 
         {/* Embedded Step-by-Step Interactive Component */}
-        <ThreatFlowDiagram />
+        <ThreatReactFlowDiagram />
 
       </main>
     </div>
