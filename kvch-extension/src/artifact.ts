@@ -4,8 +4,9 @@ import path from "node:path";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { parseDocument } from "yaml";
 import { ArtifactFormatError, ExtensionValidationError } from "./errors.js";
+import { getHardwareFingerprint, signHardwareFingerprint } from "./hardware.js";
 import { readValidatedManifest, validateManifestData } from "./manifest.js";
-import type { ArtifactFile, ArtifactInspection, ExtensionManifest } from "./types.js";
+import type { ArtifactFile, ArtifactInspection, CryptographicHardwareBinding, ExtensionManifest } from "./types.js";
 
 const BLOCK_SIZE = 512;
 const ARTIFACT_EXCLUSIONS = new Set([".git", "node_modules", "dist", ".DS_Store"]);
@@ -90,13 +91,43 @@ export async function createArtifact(folder: string): Promise<Buffer> {
   await readValidatedManifest(root);
   const files = await listPackageFiles(root);
   if (files.length > MAX_FILES) throw new ArtifactFormatError(`package has more than ${MAX_FILES} files`);
-  const parts: Buffer[] = [];
-  for (const relativePath of files) {
+
+  const packageFiles = files.filter((f) => f !== ".kvch-hardware-print");
+  const fileDataList: Array<{ relativePath: string; bytes: Buffer; executable: boolean }> = [];
+  const hasher = createHash("sha256");
+
+  for (const relativePath of packageFiles) {
     const absolutePath = path.join(root, relativePath);
     const bytes = await readFile(absolutePath);
     const metadata = await lstat(absolutePath);
-    parts.push(tarHeader(relativePath, bytes.length, (metadata.mode & 0o111) !== 0), bytes);
-    const padding = padded(bytes.length) - bytes.length;
+    const executable = (metadata.mode & 0o111) !== 0;
+    fileDataList.push({ relativePath, bytes, executable });
+    hasher.update(relativePath);
+    hasher.update(bytes);
+  }
+
+  const payloadHash = hasher.digest("hex");
+  const { fingerprint, telemetry } = getHardwareFingerprint();
+  const signature = signHardwareFingerprint(fingerprint, payloadHash);
+
+  const binding: CryptographicHardwareBinding = {
+    hardwareFingerprint: fingerprint,
+    signature,
+    artifactSha256: payloadHash,
+    telemetry,
+  };
+
+  const bindingBytes = Buffer.from(JSON.stringify(binding, null, 2), "utf8");
+
+  const allEntries = [
+    { relativePath: ".kvch-hardware-print", bytes: bindingBytes, executable: false },
+    ...fileDataList,
+  ].sort((a, b) => Buffer.compare(Buffer.from(a.relativePath), Buffer.from(b.relativePath)));
+
+  const parts: Buffer[] = [];
+  for (const entry of allEntries) {
+    parts.push(tarHeader(entry.relativePath, entry.bytes.length, entry.executable), entry.bytes);
+    const padding = padded(entry.bytes.length) - entry.bytes.length;
     if (padding) parts.push(Buffer.alloc(padding));
   }
   parts.push(Buffer.alloc(BLOCK_SIZE * 2));
@@ -175,8 +206,25 @@ export function inspectArtifactBytes(artifact: Buffer): ArtifactInspection {
   if (!files.has("README.md") || ![...files.keys()].some((file) => file.startsWith("src/"))) {
     throw new ArtifactFormatError("artifact is missing the required README.md or src/ directory contents");
   }
+
+  let hardwareBinding: CryptographicHardwareBinding | undefined;
+  const bindingBytes = files.get(".kvch-hardware-print");
+  if (bindingBytes) {
+    try {
+      hardwareBinding = JSON.parse(bindingBytes.toString("utf8")) as CryptographicHardwareBinding;
+    } catch {
+      throw new ArtifactFormatError("artifact contains malformed .kvch-hardware-print metadata");
+    }
+  }
+
   const listedFiles: ArtifactFile[] = [...files.entries()].map(([filePath, content]) => ({ path: filePath, size: content.length, sha256: sha256(content) }));
-  return { format: "kvch-extension-artifact/v1", manifest: validation.manifest, files: listedFiles, artifactSha256: sha256(artifact) };
+  return {
+    format: "kvch-extension-artifact/v1",
+    manifest: validation.manifest,
+    files: listedFiles,
+    artifactSha256: sha256(artifact),
+    hardwareBinding,
+  };
 }
 
 export async function inspectArtifact(artifactFile: string): Promise<ArtifactInspection> {

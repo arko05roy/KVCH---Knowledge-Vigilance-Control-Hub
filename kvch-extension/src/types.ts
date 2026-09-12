@@ -63,11 +63,28 @@ export interface ArtifactFile {
   sha256: string;
 }
 
+export interface HardwareTelemetry {
+  cpuHash: string;
+  systemArch: string;
+  platform: string;
+  hostnameHash: string;
+  macHash: string;
+  salt: string;
+}
+
+export interface CryptographicHardwareBinding {
+  hardwareFingerprint: string;
+  signature: string;
+  artifactSha256: string;
+  telemetry: HardwareTelemetry;
+}
+
 export interface ArtifactInspection {
   format: "kvch-extension-artifact/v1";
   manifest: ExtensionManifest;
   files: ArtifactFile[];
   artifactSha256: string;
+  hardwareBinding?: CryptographicHardwareBinding;
 }
 
 export interface RuntimeAdapter<Input = unknown, Output = unknown> {

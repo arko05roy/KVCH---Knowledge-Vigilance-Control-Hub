@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:judge": "node --conditions=react-server --import tsx --test test/judge-contract.test.ts test/judge-kernel.test.ts",
+    "test:judge": "node --conditions=react-server --import tsx --test test/judge-contract.test.ts test/judge-kernel.test.ts test/judge-security.test.ts",
     "test:foundation": "node --conditions=react-server --import tsx --test test/foundation.test.ts test/artifact-intake.test.ts test/evaluations.test.ts test/deployments.test.ts test/runs.test.ts test/deployment-control.test.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",

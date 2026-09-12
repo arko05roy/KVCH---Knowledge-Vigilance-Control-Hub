@@ -44,7 +44,11 @@ async function run(): Promise<void> {
     if (options.length !== 2 || options[0] !== "--output" || !options[1]) fail(`pack requires --output <artifact-file>.\n${usage()}`);
     const output = resolve(options[1]);
     const packed = await packExtension(target, output);
+    const inspected = await inspectArtifact(output);
     process.stdout.write(`Packed ${output}\nSHA-256: ${packed.sha256}\nSize: ${packed.size} bytes\n`);
+    if (inspected.hardwareBinding) {
+      process.stdout.write(`Hardware Fingerprint: ${inspected.hardwareBinding.hardwareFingerprint}\nSignature: ${inspected.hardwareBinding.signature}\n`);
+    }
     return;
   }
 
