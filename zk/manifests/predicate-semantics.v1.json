@@ -1,0 +1,163 @@
+{
+  "manifest": "kvch.zk.predicate-semantics",
+  "version": "1.0.0",
+  "status": "frozen",
+  "frozen_at": "2026-09-12",
+  "document": "docs/zk/02-predicate-semantics.md",
+  "change_control": "Any change requires a new manifest version and re-run of all dependent golden-vector, circuit, contract, and e2e tests.",
+
+  "scalars": {
+    "monetary": {
+      "unit": "minor_currency_units_integer",
+      "range_semantics": "half_open_lower_inclusive_upper_exclusive",
+      "circuit_type": "u64",
+      "wire": { "type": "uint", "width_bits": 64, "endianness": "big" }
+    },
+    "confidence": {
+      "unit": "basis_points",
+      "min": 0,
+      "max": 10000,
+      "circuit_type": "u16",
+      "band_semantics": "half_open_lower_inclusive_upper_exclusive"
+    },
+    "severity": {
+      "type": "versioned_integer_enum",
+      "circuit_type": "u16",
+      "codebook_v1": { "0": "RESERVED", "1": "LOW", "2": "MEDIUM", "3": "HIGH", "4": "CRITICAL" }
+    },
+    "epoch": {
+      "duration_seconds": 3600,
+      "origin": "1970-01-01T00:00:00Z",
+      "definition": "epoch = floor(unix_seconds / 3600)",
+      "circuit_type": "u32",
+      "wire": { "type": "uint", "width_bits": 64, "endianness": "big" }
+    },
+    "enum_code": { "circuit_type": "u16", "reserved_zero": true },
+    "mask": { "circuit_type": "u64", "bit_i_maps_to_codebook_entry": "i+1" },
+    "optionality": { "convention": "explicit_zero_sentinel", "variable_length_public_inputs": false }
+  },
+
+  "capacities": {
+    "MERKLE_DEPTH": 10,
+    "MAX_EVIDENCE_LEAVES": 1024,
+    "MAX_SOURCE_FAMILIES": 64,
+    "MAX_PROHIBITED_FLAGS": 64,
+    "MAX_APPROVALS": 16,
+    "MAX_COUNCIL_MEMBERS": 16,
+    "MAX_PAYLOAD_FIELDS": 64,
+    "MAX_PAYLOAD_FIELD_BYTES": 256,
+    "MAX_REPORT_FIELDS": 32,
+    "MAX_RISK_METRICS": 4,
+    "NONCE_BYTES": 16,
+    "CLAIM_VERSION_MAX_TYPE": "u32"
+  },
+
+  "domain_tags": {
+    "KVCH_LEAF_V1": "evidence_leaf",
+    "KVCH_SNAPSHOT_V1": "evidence_commitment",
+    "KVCH_REPORT_V1": "report_commitment",
+    "KVCH_PAYLOAD_V1": "payload_commitment",
+    "KVCH_RISK_V1": "risk_result_commitment",
+    "KVCH_APPROVAL_V1": "approval_manifest_commitment",
+    "KVCH_DLP_V1": "dlp_decision_commitment",
+    "KVCH_POLICY_V1": "policy_commitment",
+    "KVCH_CLAIM_ID_V1": "claim_id",
+    "KVCH_DISC_NULL_V1": "disclosure_nullifier",
+    "KVCH_SCOPE_V1": "disclosure_scope_id",
+    "KVCH_ENDORSE_NULL_V1": "endorsement_nullifier",
+    "KVCH_AUDIT_NULL_V1": "audit_nullifier",
+    "KVCH_RECORD_V1": "record_commitment",
+    "KVCH_ASSESS_V1": "local_assessment_commitment",
+    "KVCH_LINEAGE_V1": "lineage_commitment",
+    "KVCH_PI_V1": "public_input_digest"
+  },
+
+  "commitment_preimages": {
+    "evidence_leaf": ["company_code", "source_family_code", "artifact_commitment", "record_id_commitment", "observed_epoch", "ingested_epoch", "payload_commitment", "classification_code", "authenticity_code", "leaf_salt"],
+    "evidence_commitment": ["merkle_root", "leaf_count", "selection_policy_code", "normalization_version_code"],
+    "report_commitment": ["report_schema_code", "period_code", "currency_code", "field_count", "field_vector[MAX_REPORT_FIELDS]", "report_nonce"],
+    "payload_commitment": ["payload_schema_code", "field_count", "field_vector[MAX_PAYLOAD_FIELDS]", "payload_nonce"],
+    "risk_result_commitment": ["company_code", "result_id_commitment", "period_code", "currency_code", "metric_count", "eal_minor", "var_minor", "cvar_minor", "var_percentile_bps", "completeness_mask", "freshness_mask", "evidence_commitment", "model_bundle_commitment", "result_nonce"],
+    "approval_manifest_commitment": ["council_set_id", "council_set_version", "action_code", "claim_draft_commitment", "signer_count", "signer_tuple_vector[MAX_APPROVALS]"],
+    "approval_signer_tuple": ["signer_id_commitment", "role_code", "decision_code", "signer_nonce", "deadline_epoch"],
+    "dlp_decision_commitment": ["claim_draft_commitment", "projection_commitment", "prohibited_data_mask", "scanner_policy_commitment", "decision_code", "evaluated_epoch", "expiry_epoch"],
+    "policy_commitment": ["claim_type_code", "policy_version", "effective_from_epoch", "effective_until_epoch", "threshold_vector", "required_source_mask", "max_ttl_epochs", "codebook_version"],
+    "claim_id": "all public inputs in declared order excluding claim_id and derived nullifier/scope fields",
+    "disclosure_nullifier": ["claim_nonce", "claim_id"],
+    "disclosure_scope_id": ["issuer_company_code", "audience_id", "purpose_code", "metric_code", "period_code"],
+    "endorsement_nullifier": ["endorser_company_code", "target_claim_id", "target_claim_version", "scope_code"],
+    "audit_nullifier": ["company_code", "evidence_commitment", "purpose_code", "audit_request_id"],
+    "record_commitment": ["record_id_commitment", "payload_commitment"],
+    "local_assessment_commitment": ["endorser_company_code", "target_claim_id", "match_score_bps", "match_class_code", "local_evidence_commitment", "assessed_epoch", "assessment_nonce"],
+    "lineage_commitment": ["risk_result_commitment", "evidence_commitment", "model_bundle_commitment", "report_commitment", "approval_manifest_commitment", "dlp_decision_commitment"]
+  },
+
+  "flattening": {
+    "rule": "declared order is the spec; derived identifiers are always terminal",
+    "field_widths": { "u16": 1, "u32": 1, "u64": 1, "mask": 1, "epoch": 1, "code": 1, "commitment": 1, "address_field": 1 },
+    "padded_arrays": "fixed MAX_* field slots; actual length committed separately"
+  },
+
+  "enforcement_layers": ["CIRCUIT", "VERIFIER", "CONTRACT", "ADAPTER", "ORCH"],
+  "proven_wording_rule": "A property may be called 'proven' only if CIRCUIT is an enforcing layer.",
+
+  "circuits": {
+    "ThreatEligibilityV1": {
+      "statement": "The identified issuer's signed evidence snapshot satisfies the active consortium disclosure policy — required source-family coverage and freshness, severity and confidence thresholds, deterministic threat-family and sector mapping, zero prohibited DLP flags, bound approval and DLP manifests — entitling one unique disclosure of the stated bands and epochs, without revealing the evidence contents, exact confidence, exact severity, or exact times.",
+      "public_inputs": [
+        "protocol_version", "circuit_id", "community_id", "chain_id", "claim_registry_address",
+        "claim_series_id", "claim_version", "issuer_company_code", "claim_family_code", "sector_code",
+        "severity_band_code", "confidence_band_code", "observed_epoch", "valid_from_epoch", "expiry_epoch",
+        "policy_commitment", "evidence_commitment", "payload_commitment", "source_artifact_commitment",
+        "approval_manifest_commitment", "dlp_decision_commitment", "disclosure_nullifier", "claim_id",
+        "public_input_digest"
+      ],
+      "private_inputs": [
+        "exact_confidence_bps", "exact_severity_code", "exact_observed_seconds", "required_source_mask",
+        "source_timestamp_vector", "leaf_count", "evidence_leaf_preimage_vector", "family_derivation_vector",
+        "prohibited_data_mask", "policy_witness", "approval_manifest_witness", "dlp_decision_witness",
+        "payload_field_vector", "payload_nonce", "claim_nonce"
+      ]
+    },
+    "StakeholderRiskBandV1": {
+      "statement": "The identified issuer's signed risk result places exact integer-minor-unit risk metrics inside the disclosed half-open bands for the stated reporting period, currency, audience, and purpose under the active policy, without revealing the exact EAL/VaR/CVaR values or underlying evidence.",
+      "public_inputs": [
+        "protocol_version", "circuit_id", "chain_id", "claim_registry_address", "claim_series_id",
+        "claim_version", "issuer_company_code", "audience_id", "purpose_code", "period_code",
+        "currency_code", "metric_flags", "eal_band_lower", "eal_band_upper", "var_band_lower",
+        "var_band_upper", "var_percentile_bps", "appetite_relation_code", "issued_epoch", "valid_until_epoch",
+        "policy_commitment", "lineage_commitment", "disclosure_scope_id", "disclosure_nullifier",
+        "claim_id", "public_input_digest"
+      ],
+      "private_inputs": [
+        "eal_minor_exact", "var_minor_exact", "cvar_minor_exact", "var_percentile_exact_bps",
+        "appetite_threshold_minor_exact", "risk_result_witness", "evidence_opening_refs",
+        "model_bundle_witness", "report_field_vector", "report_nonce", "policy_witness",
+        "approval_manifest_witness", "dlp_decision_witness", "claim_nonce"
+      ]
+    },
+    "PeerEndorsementV1": {
+      "statement": "An identified non-origin company holds a signed local assessment whose exact private match score crosses the endorsement policy threshold and maps to the disclosed match class against the stated target claim version, producing one unique endorsement nullifier, without revealing the exact score or local evidence.",
+      "public_inputs": [
+        "protocol_version", "circuit_id", "chain_id", "endorsement_registry_address",
+        "endorser_company_code", "target_claim_id", "target_claim_version", "target_issuer_company_code",
+        "endorsement_policy_commitment", "local_evidence_commitment", "match_class_code",
+        "endorsed_epoch", "expiry_epoch", "endorsement_nullifier"
+      ],
+      "private_inputs": [
+        "match_score_bps_exact", "local_assessment_witness", "local_evidence_leaf",
+        "merkle_path", "path_index_bits", "policy_witness"
+      ]
+    },
+    "EvidenceInclusionV1": {
+      "statement": "A privately held record commitment is a leaf of the publicly committed evidence snapshot for the stated company, purpose, snapshot version, and audit request, without revealing the record body, salt, leaf index, or sibling path.",
+      "public_inputs": [
+        "protocol_version", "circuit_id", "company_code", "evidence_commitment", "record_commitment",
+        "purpose_code", "snapshot_version", "audit_request_id", "audit_nullifier"
+      ],
+      "private_inputs": [
+        "leaf_preimage", "leaf_index_bits", "merkle_siblings", "leaf_count"
+      ]
+    }
+  }
+}
