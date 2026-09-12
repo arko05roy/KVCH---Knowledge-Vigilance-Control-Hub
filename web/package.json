@@ -15,7 +15,9 @@
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "worker": "node --conditions=react-server --import tsx scripts/kvch-worker.ts",
-    "ws:server": "node --conditions=react-server --import tsx scripts/kvch-ws-server.ts"
+    "ws:server": "node --conditions=react-server --import tsx scripts/kvch-ws-server.ts",
+    "logs:extension": "npx tsx scripts/stream_extension_logs.ts",
+    "test:threat-engine": "npx tsx scripts/test_ctde_v2.ts"
   },
   "dependencies": {
     "@arko05roy/kvch-extension": "^0.1.2",
