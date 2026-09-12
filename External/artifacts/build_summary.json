@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-06T09:40:06Z",
+  "timestamp": "2026-09-12T16:58:13Z",
   "artifacts": [
     {
       "id": "attack-surface-scanner",
       "artifact": "attack-surface-scanner.kvch.tgz",
-      "sha256": "56a02eeff3155824892ecd9713d101d9d63526c2578c57d37fd320de873d95db",
-      "size_bytes": 6443
+      "sha256": "6321141e76c1ce1bae028342062109ac0e948891cffbea86f9c3174f01d49a34",
+      "size_bytes": 7431
     }
 ,
     {
@@ -25,8 +25,8 @@
     {
       "id": "threat-hunter-3000",
       "artifact": "threat-hunter-3000.kvch.tgz",
-      "sha256": "9d89c61c8eaa66e9a54ad5346cb4834b38a823fa0c29e9c28b3c1f6b4f092293",
-      "size_bytes": 5352
+      "sha256": "e47a32af85ad55ad8b47bd100b301d79cf394c0213213e7e6c48f7ea116ae374",
+      "size_bytes": 6215
     }
 ,
     {
@@ -55,6 +55,20 @@
       "artifact": "cookie-xss-auditor.kvch.tgz",
       "sha256": "2bafa699c2c71fa0ac31e76490d3c6a2c7cc96790154c6672722f0c1fdadb3c2",
       "size_bytes": 5539
+    }
+,
+    {
+      "id": "aegisdb-zerotrust",
+      "artifact": "aegisdb-zerotrust.kvch.tgz",
+      "sha256": "e1bc98186418a3be8d98ac0ffe5c143297cd7e9421c4ca79923bc68b17a7aeae",
+      "size_bytes": 5379
+    }
+,
+    {
+      "id": "edgeguard-sentinel",
+      "artifact": "edgeguard-sentinel.kvch.tgz",
+      "sha256": "ca99433836dd4847600e6dd068e9e38e62d2d3cc528aa0c62f28c4b301f5c0bc",
+      "size_bytes": 5487
     }
   ]
 }

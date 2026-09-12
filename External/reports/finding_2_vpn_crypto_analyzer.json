@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-11T20:35:06.335630Z",
+  "observed_at": "2026-09-12T16:56:47.188074Z",
   "severity": "low",
   "category": "vpn_crypto_analyzer",
   "title": "VPN Cryptographic Security Analysis",
@@ -8,7 +8,7 @@
   "resource": {
     "type": "pcap_traffic",
     "id": "/tmp/kvch_laptop_traffic.pcap",
-    "name": "MacBook-Air.lan"
+    "name": "MacBook-Air.local"
   },
   "evidence": [
     "PCAP capture: /tmp/kvch_laptop_traffic.pcap",
@@ -24,12 +24,13 @@
     "Disable deprecated Diffie-Hellman groups below DH Group 14",
     "Ensure secure SHA-256 or SHA-512 PRF functions are used"
   ],
+  "active_response": {},
   "details": {
     "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
-    "target_hostname": "MacBook-Air.lan",
-    "scan_timestamp": "2026-09-12T02:05:03.549405Z",
+    "target_hostname": "MacBook-Air.local",
+    "scan_timestamp": "2026-09-12T22:26:42.187769Z",
     "execution_metrics": {
-      "duration_seconds": 2.787
+      "duration_seconds": 5.001
     },
     "cryptographic_assessment": {
       "security_score": 100,

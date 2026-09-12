@@ -1,0 +1,49 @@
+schema_version: kvch.extension-package/v1
+id: edgeguard-sentinel
+name: EdgeGuard-Sentinel CDN, WAF & Origin IP Firewall Shield
+version: 1.0.0
+description: Active defense edge-proxy shield continuously monitoring response headers (cf-ray, CORS, CSP), running non-destructive micro-fuzzing loops against staging/edge routing endpoints, blocking origin IP leaks, and auto-patching missing WAF rules.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: target_url
+      description: Staging or edge routing endpoint URL to micro-fuzz and audit
+      required: false
+  outputs:
+    - name: findings
+      description: Standardized kvch.finding/v1 JSON envelope with EdgeGuard Sentinel security audit findings and one-click WAF patches
+
+behavior:
+  normal: Edge routing configuration enforces strict WAF policies, hides backend origin IPs, passes path traversal and HTTP smuggling micro-fuzzing loops.
+  concern: Origin IP leaks in DNS/response headers, missing WAF rules (CSP, HSTS), or vulnerability to path traversal/request smuggling payloads.
+  edge_cases:
+    - Staging endpoints missing CDN proxy layers
+    - WebRTC IP leaks
+    - Smuggled Transfer-Encoding headers
+
+deployment:
+  schedule: "*/10 * * * *"
+
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [edge_header_audit, origin_ip_leak_detector, micro_fuzzing_engine, waf_deployment_interceptor]
+  credentials: injected_at_runtime

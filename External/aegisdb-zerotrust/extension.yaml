@@ -1,0 +1,49 @@
+schema_version: kvch.extension-package/v1
+id: aegisdb-zerotrust
+name: AegisDB-ZeroTrust Database AST & Secret Exfiltration Shield
+version: 1.0.0
+description: Active defense runtime gate intercepting database sockets, ORM query builders, and vector-search embedding streams (PostgreSQL, MongoDB, ChromaDB, Pinecone) with AST query normalization and active socket termination.
+
+implementation:
+  language: python
+  runtime: python >=3.11
+  package_manager: pip
+  entrypoint: src/main.py
+
+commands:
+  install: pip install -r requirements.txt
+  run: python src/main.py
+  test: pytest tests/
+  build: python -m build
+  package: python -m build
+
+interface:
+  mode: cli
+  inputs:
+    - name: target_path
+      description: Target database query logs, connection sockets, or ORM configuration files to audit
+      required: false
+  outputs:
+    - name: findings
+      description: Standardized kvch.finding/v1 JSON envelope with AegisDB Zero-Trust audit findings and active socket neutralization logs
+
+behavior:
+  normal: All SQL, NoSQL, and Vector DB queries pass AST normalization with proper pagination, parameterization, and clean embedding dimensions.
+  concern: Detection of unpaginated SELECT * mass dumps, SQL injection AST mutations, vector manipulation signatures, or secret exfiltration queries.
+  edge_cases:
+    - Obfuscated hexadecimal/unicode encoded SQL queries
+    - High-dimensional RAG vector poison payloads
+    - Direct socket-level raw query streams
+
+deployment:
+  schedule: "*/5 * * * *"
+
+dependencies:
+  runtime: []
+  system: []
+  configuration: []
+
+runtime_compatibility:
+  supports_graceful_stop: true
+  operation_boundaries: [ast_normalization, vector_rag_shield, active_socket_termination, structural_fingerprinting]
+  credentials: injected_at_runtime

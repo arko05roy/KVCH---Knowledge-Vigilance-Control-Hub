@@ -1,0 +1,150 @@
+{
+  "schema_version": "kvch.finding/v1",
+  "observed_at": "2026-09-12T16:56:41.486338Z",
+  "severity": "CRITICAL",
+  "category": "edgeguard-sentinel",
+  "title": "EdgeGuard-Sentinel CDN, WAF & Origin IP Firewall Finding",
+  "summary": "Audited CDN edge response headers and executed non-destructive micro-fuzzing loops on MacBook-Air.local. Detected 10 edge vulnerabilities. Intercepted deployment hook and applied WAF patch.",
+  "resource": {
+    "type": "resource",
+    "id": "https://staging-edge.kvch-hub.internal/api/v1",
+    "name": "MacBook-Air.local"
+  },
+  "evidence": [
+    "Missing Content-Security-Policy (CSP) WAF rule header",
+    "Missing Strict-Transport-Security (HSTS) header",
+    "Wildcard Access-Control-Allow-Origin '*' permits arbitrary origin cross-domain requests",
+    "Direct Origin Routing Detected: Missing CDN proxy layer headers (cf-ray / x-amz-cf-id)",
+    "Backend Origin IP Leaked in header 'Server': 172.16.57.163",
+    "Backend Origin IP Leaked in header 'X-Backend-Server': 10.0.4.15",
+    "Backend Origin IP Leaked in response payload/WebRTC candidate: 192.168.1.100",
+    "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with Path Traversal Probe -> Endpoint returned 200 OK for /../../../../etc/passwd without WAF path sanitization",
+    "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with HTTP Request Smuggling Vector -> Edge proxy accepted ambiguous Transfer-Encoding + Content-Length headers",
+    "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with Custom Header Injection (X-Forwarded-Host) -> Host header override permitted without CDN host validation"
+  ],
+  "indicators": [
+    "waf_header_violation",
+    "waf_header_violation",
+    "waf_header_violation",
+    "waf_header_violation",
+    "origin_ip_leak",
+    "origin_ip_leak",
+    "origin_ip_leak",
+    "micro_fuzz_vulnerability",
+    "micro_fuzz_vulnerability",
+    "micro_fuzz_vulnerability"
+  ],
+  "baseline": {
+    "expected_origin_ip_leaks": 0,
+    "expected_waf_header_violations": 0,
+    "deployment_hook_lock": true
+  },
+  "recommended_actions": [
+    "Inject Strict-Transport-Security, CSP, and X-Frame-Options headers on edge proxies",
+    "Obscure backend origin IPv4 addresses behind CDN reverse proxies",
+    "Enable EdgeGuard automated deployment hook locking on staging CI/CD pipelines"
+  ],
+  "active_response": {},
+  "details": {
+    "target_url": "https://staging-edge.kvch-hub.internal/api/v1",
+    "total_threats_detected": 10,
+    "severity": "CRITICAL",
+    "findings": [
+      {
+        "type": "waf_header_violation",
+        "severity": "HIGH",
+        "description": "Missing Content-Security-Policy (CSP) WAF rule header"
+      },
+      {
+        "type": "waf_header_violation",
+        "severity": "HIGH",
+        "description": "Missing Strict-Transport-Security (HSTS) header"
+      },
+      {
+        "type": "waf_header_violation",
+        "severity": "HIGH",
+        "description": "Wildcard Access-Control-Allow-Origin '*' permits arbitrary origin cross-domain requests"
+      },
+      {
+        "type": "waf_header_violation",
+        "severity": "HIGH",
+        "description": "Direct Origin Routing Detected: Missing CDN proxy layer headers (cf-ray / x-amz-cf-id)"
+      },
+      {
+        "type": "origin_ip_leak",
+        "severity": "CRITICAL",
+        "description": "Backend Origin IP Leaked in header 'Server': 172.16.57.163"
+      },
+      {
+        "type": "origin_ip_leak",
+        "severity": "CRITICAL",
+        "description": "Backend Origin IP Leaked in header 'X-Backend-Server': 10.0.4.15"
+      },
+      {
+        "type": "origin_ip_leak",
+        "severity": "CRITICAL",
+        "description": "Backend Origin IP Leaked in response payload/WebRTC candidate: 192.168.1.100"
+      },
+      {
+        "type": "micro_fuzz_vulnerability",
+        "severity": "HIGH",
+        "description": "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with Path Traversal Probe -> Endpoint returned 200 OK for /../../../../etc/passwd without WAF path sanitization"
+      },
+      {
+        "type": "micro_fuzz_vulnerability",
+        "severity": "HIGH",
+        "description": "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with HTTP Request Smuggling Vector -> Edge proxy accepted ambiguous Transfer-Encoding + Content-Length headers"
+      },
+      {
+        "type": "micro_fuzz_vulnerability",
+        "severity": "HIGH",
+        "description": "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with Custom Header Injection (X-Forwarded-Host) -> Host header override permitted without CDN host validation"
+      }
+    ],
+    "micro_fuzz_results": [
+      {
+        "test_name": "Path Traversal Probe",
+        "type": "path_traversal",
+        "vulnerable": true,
+        "severity": "HIGH",
+        "details": "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with Path Traversal Probe -> Endpoint returned 200 OK for /../../../../etc/passwd without WAF path sanitization"
+      },
+      {
+        "test_name": "HTTP Request Smuggling Vector",
+        "type": "request_smuggling",
+        "vulnerable": true,
+        "severity": "HIGH",
+        "details": "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with HTTP Request Smuggling Vector -> Edge proxy accepted ambiguous Transfer-Encoding + Content-Length headers"
+      },
+      {
+        "test_name": "Custom Header Injection (X-Forwarded-Host)",
+        "type": "header_injection",
+        "vulnerable": true,
+        "severity": "HIGH",
+        "details": "Fuzzing endpoint https://staging-edge.kvch-hub.internal/api/v1 with Custom Header Injection (X-Forwarded-Host) -> Host header override permitted without CDN host validation"
+      }
+    ],
+    "active_neutralization": {
+      "deployment_lock": {
+        "deployment_hook_intercepted": true,
+        "synchronization_locked": true,
+        "ipc_warning_hud_triggered": true,
+        "hud_message": "CRITICAL: EdgeGuard-Sentinel blocked deployment hook! 3 Origin IP leaks and 4 WAF rule violations detected."
+      },
+      "one_click_patch": {
+        "patch_id": "patch_edgeguard_waf_v1",
+        "applied": true,
+        "patched_headers": [
+          "Content-Security-Policy",
+          "Strict-Transport-Security",
+          "X-Content-Type-Options",
+          "X-Frame-Options"
+        ],
+        "nginx_cdn_rule_snippet": "# KVCH EdgeGuard Auto-Generated Local WAF Patch\nset $waf_block 0;\nif ($request_uri ~* \"(\\.\\./|\\.\\.\\\\)\") { set $waf_block 1; }\nif ($http_transfer_encoding ~* \"chunked\") { set $waf_block 1; }\nadd_header Content-Security-Policy \"default-src 'self'; script-src 'self'; object-src 'none';\" always;\nadd_header Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\" always;\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header X-Frame-Options \"DENY\" always;\nproxy_hide_header X-Powered-By;\nproxy_hide_header Server;",
+        "applied_at": "2026-09-12T16:56:41.485069+00:00"
+      }
+    },
+    "extension_id": "edgeguard-sentinel",
+    "version": "1.0.0"
+  }
+}
