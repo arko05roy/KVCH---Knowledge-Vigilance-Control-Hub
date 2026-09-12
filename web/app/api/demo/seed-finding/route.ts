@@ -49,8 +49,9 @@ export async function POST(request: Request) {
       message: "AI Role Reports generated successfully via Groq key pool!",
       finding: enrichedEnvelope
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
     console.error("[Demo Trigger Error]:", error);
-    return NextResponse.json({ success: false, error: error?.message || "Generation failed" }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || "Generation failed" }, { status: 500 });
   }
 }

@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export default function InternDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [reportData, setReportData] = useState<any>(DEMO_REPORTS.intern);
+  const [reportData, setReportData] = useState<unknown>(DEMO_REPORTS.intern);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Interactive Checklist State
@@ -43,8 +43,9 @@ export default function InternDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.intern);
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Generation error");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
     }

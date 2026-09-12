@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export default function SrDevDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [reportData, setReportData] = useState<any>(DEMO_REPORTS.srDev);
+  const [reportData, setReportData] = useState<unknown>(DEMO_REPORTS.srDev);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
@@ -39,8 +39,9 @@ export default function SrDevDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.srDev);
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Generation error");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
     }

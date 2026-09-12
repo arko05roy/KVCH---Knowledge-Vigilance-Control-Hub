@@ -2,7 +2,19 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-function getVcdbIncidents() {
+interface VcdbIncident {
+  incident_id: string;
+  scenario_id: string;
+  asset_id: string;
+  occurred_at: string;
+  actual_downtime_hours: number;
+  actual_ir_cost_inr: number;
+  actual_records_exposed: number;
+  actual_sla_penalty_inr: number;
+  root_cause_summary: string;
+}
+
+function getVcdbIncidents(): VcdbIncident[] {
   try {
     const filePath = path.join(process.cwd(), '../data-contracts/fixtures/vcdb_real_incidents.json');
     if (fs.existsSync(filePath)) {
@@ -39,7 +51,7 @@ export async function POST(request: Request) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           asset_profile: assetProfile,
-          incidents: vcdbIncidents.filter((i: any) => i.scenario_id === scenarioId)
+          incidents: vcdbIncidents.filter((i) => i.scenario_id === scenarioId)
         }),
       });
 
@@ -47,18 +59,18 @@ export async function POST(request: Request) {
         const data = await res.json();
         return NextResponse.json(data);
       }
-    } catch (e) {
+    } catch {
       console.warn("Python microservice calibrate unreached, applying fallback Bayesian update...");
     }
 
     // Fallback Bayesian update
-    const matchingIncidents = vcdbIncidents.filter((i: any) => i.scenario_id === scenarioId);
+    const matchingIncidents = vcdbIncidents.filter((i) => i.scenario_id === scenarioId);
     const updatedAsset = { ...assetProfile };
 
     if (matchingIncidents.length > 0) {
-      const avgDowntime = matchingIncidents.reduce((acc: number, i: any) => acc + i.actual_downtime_hours, 0) / matchingIncidents.length;
-      const avgIr = matchingIncidents.reduce((acc: number, i: any) => acc + i.actual_ir_cost_inr, 0) / matchingIncidents.length;
-      const avgRecs = matchingIncidents.reduce((acc: number, i: any) => acc + i.actual_records_exposed, 0) / matchingIncidents.length;
+      const avgDowntime = matchingIncidents.reduce((acc: number, i) => acc + i.actual_downtime_hours, 0) / matchingIncidents.length;
+      const avgIr = matchingIncidents.reduce((acc: number, i) => acc + i.actual_ir_cost_inr, 0) / matchingIncidents.length;
+      const avgRecs = matchingIncidents.reduce((acc: number, i) => acc + i.actual_records_exposed, 0) / matchingIncidents.length;
 
       updatedAsset.rto_hours = Number((0.4 * assetProfile.rto_hours + 0.6 * avgDowntime).toFixed(2));
       updatedAsset.avg_incident_response_cost_inr = Number((0.3 * assetProfile.avg_incident_response_cost_inr + 0.7 * avgIr).toFixed(2));
@@ -71,7 +83,8 @@ export async function POST(request: Request) {
       calibration_status: "BAYESIAN_POSTERIOR_UPDATED"
     });
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -13,160 +13,180 @@ interface Mitigation {
   selected?: boolean;
 }
 
+const initialScenariosList = [
+  {
+    scenario_id: "SCENARIO-PAYMENT-001",
+    title: "Payment Gateway API Vulnerability Exploitation",
+    finding: {
+      finding_id: "FINDING-7742",
+      source_extension: "7_supply_chain_auditor",
+      category: "malicious_dependency",
+      cve_id: "CVE-2026-3891",
+      package_name: "pay-auth-crypto",
+      asset_id: "ASSET-PAY-API-01",
+      observed_at: new Date().toISOString(),
+      internet_reachable: true,
+      authentication_required: false,
+      compensating_controls: ["rate_limiter"],
+      epss_score: 0.72,
+      cisa_kev: true,
+      cvss_score: 9.8
+    },
+    asset_profile: {
+      asset_id: "ASSET-PAY-API-01",
+      asset_name: "Payment Gateway API Cluster",
+      business_service_id: "SVC-DIGITAL-PAYMENTS",
+      business_service_name: "Digital Payments & Merchant Checkout",
+      environment: "production",
+      downtime_cost_per_hour_inr: 1250000.0,
+      avg_incident_response_cost_inr: 2500000.0,
+      data_breach_cost_per_record_inr: 450.0,
+      records_exposed_estimate: 50000,
+      rto_hours: 4.0,
+      active_users: 250000
+    },
+    candidate_mitigations: [
+      {
+        action_id: "ACT-01",
+        name: "Immediate Package Patching & Dependency Upgrade",
+        cost_inr: 150000.0,
+        lead_time_days: 1,
+        risk_reduction_factor: 0.85,
+        technique: "Patch Management"
+      },
+      {
+        action_id: "ACT-02",
+        name: "WAF & API Gateway Virtual Patch Rule Deployment",
+        cost_inr: 50000.0,
+        lead_time_days: 0.5,
+        risk_reduction_factor: 0.60,
+        technique: "Network Shielding"
+      },
+      {
+        action_id: "ACT-03",
+        name: "Enforce Strict mTLS & Certificate Pinning",
+        cost_inr: 400000.0,
+        lead_time_days: 5,
+        risk_reduction_factor: 0.40,
+        technique: "Zero Trust Auth"
+      },
+      {
+        action_id: "ACT-04",
+        name: "Automated Failover & Micro-segmentation Upgrade",
+        cost_inr: 1200000.0,
+        lead_time_days: 14,
+        risk_reduction_factor: 0.75,
+        technique: "Network Segmentation"
+      },
+      {
+        action_id: "ACT-05",
+        name: "24/7 Managed EDR & SOC Threat Hunting Tier",
+        cost_inr: 800000.0,
+        lead_time_days: 3,
+        risk_reduction_factor: 0.50,
+        technique: "Continuous Monitoring"
+      }
+    ]
+  },
+  {
+    scenario_id: "SCENARIO-PAM-002",
+    title: "Privileged PAM Credential Exposure & Database Leak",
+    finding: {
+      finding_id: "FINDING-8812",
+      source_extension: "6_credential_exposure_auditor",
+      category: "credential_leak",
+      cve_id: "CVE-2026-1102",
+      package_name: "vault-pam-adapter",
+      asset_id: "ASSET-CORE-DB-01",
+      observed_at: new Date().toISOString(),
+      internet_reachable: true,
+      authentication_required: true,
+      compensating_controls: ["ip_whitelisting", "mfa_enforced"],
+      epss_score: 0.58,
+      cisa_kev: true,
+      cvss_score: 8.9
+    },
+    asset_profile: {
+      asset_id: "ASSET-CORE-DB-01",
+      asset_name: "Core Financial Ledger Database Cluster",
+      business_service_id: "SVC-CORE-BANKING",
+      business_service_name: "Core Ledger & Settlement System",
+      environment: "production",
+      downtime_cost_per_hour_inr: 2500000.0,
+      avg_incident_response_cost_inr: 4000000.0,
+      data_breach_cost_per_record_inr: 600.0,
+      records_exposed_estimate: 120000,
+      rto_hours: 2.0,
+      active_users: 500000
+    },
+    candidate_mitigations: [
+      {
+        action_id: "ACT-101",
+        name: "Automated PAM Credential Rotation & Secret Elimination",
+        cost_inr: 200000.0,
+        lead_time_days: 1,
+        risk_reduction_factor: 0.90,
+        technique: "Privileged Access Rotation"
+      },
+      {
+        action_id: "ACT-102",
+        name: "Database Column-level Encryption & Dynamic Masking",
+        cost_inr: 600000.0,
+        lead_time_days: 7,
+        risk_reduction_factor: 0.70,
+        technique: "Data Protection"
+      },
+      {
+        action_id: "ACT-103",
+        name: "Zero Trust Bastion & Privileged Session Recording",
+        cost_inr: 500000.0,
+        lead_time_days: 3,
+        risk_reduction_factor: 0.50,
+        technique: "Identity Hardening"
+      },
+      {
+        action_id: "ACT-104",
+        name: "Real-time DLP & Database Activity Monitoring (DAM)",
+        cost_inr: 1000000.0,
+        lead_time_days: 10,
+        risk_reduction_factor: 0.65,
+        technique: "Exfiltration Shielding"
+      }
+    ]
+  }
+];
+
 export default function RiskIntelligencePage() {
   const [loading, setLoading] = useState(false);
   const [selectedScenarioIndex, setSelectedScenarioIndex] = useState(0);
   const [budgetLimit, setBudgetLimit] = useState(10000000); // ₹1 Crore default
+  const [scenarios, setScenarios] = useState(initialScenariosList);
 
-  const [quantifyData, setQuantifyData] = useState<any>(null);
-  const [optimizeData, setOptimizeData] = useState<any>(null);
+  const [quantifyData, setQuantifyData] = useState<Record<string, unknown> | null>(null);
+  const [optimizeData, setOptimizeData] = useState<Record<string, unknown> | null>(null);
 
-  const scenariosList = [
-    {
-      scenario_id: "SCENARIO-PAYMENT-001",
-      title: "Payment Gateway API Vulnerability Exploitation",
-      finding: {
-        finding_id: "FINDING-7742",
-        source_extension: "7_supply_chain_auditor",
-        category: "malicious_dependency",
-        cve_id: "CVE-2026-3891",
-        package_name: "pay-auth-crypto",
-        asset_id: "ASSET-PAY-API-01",
-        observed_at: new Date().toISOString(),
-        internet_reachable: true,
-        authentication_required: false,
-        compensating_controls: ["rate_limiter"],
-        epss_score: 0.72,
-        cisa_kev: true,
-        cvss_score: 9.8
-      },
-      asset_profile: {
-        asset_id: "ASSET-PAY-API-01",
-        asset_name: "Payment Gateway API Cluster",
-        business_service_id: "SVC-DIGITAL-PAYMENTS",
-        business_service_name: "Digital Payments & Merchant Checkout",
-        environment: "production",
-        downtime_cost_per_hour_inr: 1250000.0,
-        avg_incident_response_cost_inr: 2500000.0,
-        data_breach_cost_per_record_inr: 450.0,
-        records_exposed_estimate: 50000,
-        rto_hours: 4.0,
-        active_users: 250000
-      },
-      candidate_mitigations: [
-        {
-          action_id: "ACT-01",
-          name: "Immediate Package Patching & Dependency Upgrade",
-          cost_inr: 150000.0,
-          lead_time_days: 1,
-          risk_reduction_factor: 0.85,
-          technique: "Patch Management"
-        },
-        {
-          action_id: "ACT-02",
-          name: "WAF & API Gateway Virtual Patch Rule Deployment",
-          cost_inr: 50000.0,
-          lead_time_days: 0.5,
-          risk_reduction_factor: 0.60,
-          technique: "Network Shielding"
-        },
-        {
-          action_id: "ACT-03",
-          name: "Enforce Strict mTLS & Certificate Pinning",
-          cost_inr: 400000.0,
-          lead_time_days: 5,
-          risk_reduction_factor: 0.40,
-          technique: "Zero Trust Auth"
-        },
-        {
-          action_id: "ACT-04",
-          name: "Automated Failover & Micro-segmentation Upgrade",
-          cost_inr: 1200000.0,
-          lead_time_days: 14,
-          risk_reduction_factor: 0.75,
-          technique: "Network Segmentation"
-        },
-        {
-          action_id: "ACT-05",
-          name: "24/7 Managed EDR & SOC Threat Hunting Tier",
-          cost_inr: 800000.0,
-          lead_time_days: 3,
-          risk_reduction_factor: 0.50,
-          technique: "Continuous Monitoring"
-        }
-      ]
-    },
-    {
-      scenario_id: "SCENARIO-PAM-002",
-      title: "Privileged PAM Credential Exposure & Database Leak",
-      finding: {
-        finding_id: "FINDING-8812",
-        source_extension: "6_credential_exposure_auditor",
-        category: "credential_leak",
-        cve_id: "CVE-2026-1102",
-        package_name: "vault-pam-adapter",
-        asset_id: "ASSET-CORE-DB-01",
-        observed_at: new Date().toISOString(),
-        internet_reachable: true,
-        authentication_required: true,
-        compensating_controls: ["ip_whitelisting", "mfa_enforced"],
-        epss_score: 0.58,
-        cisa_kev: true,
-        cvss_score: 8.9
-      },
-      asset_profile: {
-        asset_id: "ASSET-CORE-DB-01",
-        asset_name: "Core Financial Ledger Database Cluster",
-        business_service_id: "SVC-CORE-BANKING",
-        business_service_name: "Core Ledger & Settlement System",
-        environment: "production",
-        downtime_cost_per_hour_inr: 2500000.0,
-        avg_incident_response_cost_inr: 4000000.0,
-        data_breach_cost_per_record_inr: 600.0,
-        records_exposed_estimate: 120000,
-        rto_hours: 2.0,
-        active_users: 500000
-      },
-      candidate_mitigations: [
-        {
-          action_id: "ACT-101",
-          name: "Automated PAM Credential Rotation & Secret Elimination",
-          cost_inr: 200000.0,
-          lead_time_days: 1,
-          risk_reduction_factor: 0.90,
-          technique: "Privileged Access Rotation"
-        },
-        {
-          action_id: "ACT-102",
-          name: "Database Column-level Encryption & Dynamic Masking",
-          cost_inr: 600000.0,
-          lead_time_days: 7,
-          risk_reduction_factor: 0.70,
-          technique: "Data Protection"
-        },
-        {
-          action_id: "ACT-103",
-          name: "Zero Trust Bastion & Privileged Session Recording",
-          cost_inr: 500000.0,
-          lead_time_days: 3,
-          risk_reduction_factor: 0.50,
-          technique: "Identity Hardening"
-        },
-        {
-          action_id: "ACT-104",
-          name: "Real-time DLP & Database Activity Monitoring (DAM)",
-          cost_inr: 1000000.0,
-          lead_time_days: 10,
-          risk_reduction_factor: 0.65,
-          technique: "Exfiltration Shielding"
-        }
-      ]
+  const currentScenario = scenarios[selectedScenarioIndex];
+
+  const runOptimization = React.useCallback(async (baselineEal: number, budget: number, scenario = currentScenario) => {
+    try {
+      const oRes = await fetch('/api/risk/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario_id: scenario.scenario_id,
+          baseline_eal_inr: baselineEal,
+          budget_limit_inr: budget,
+          candidate_mitigations: scenario.candidate_mitigations,
+        }),
+      });
+      const oData = await oRes.json();
+      setOptimizeData(oData);
+    } catch (e) {
+      console.error(e);
     }
-  ];
+  }, [currentScenario]);
 
-  const currentScenario = scenariosList[selectedScenarioIndex];
-
-  const fetchQuantification = async () => {
+  const fetchQuantification = React.useCallback(async () => {
     setLoading(true);
     try {
       const qRes = await fetch('/api/risk/quantify', {
@@ -177,13 +197,15 @@ export default function RiskIntelligencePage() {
       const qData = await qRes.json();
       setQuantifyData(qData);
 
-      await runOptimization(qData.baseline_loss.expected_annual_loss_inr, budgetLimit);
+      if (qData?.baseline_loss?.expected_annual_loss_inr != null) {
+        await runOptimization(qData.baseline_loss.expected_annual_loss_inr, budgetLimit, currentScenario);
+      }
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentScenario, budgetLimit, runOptimization]);
 
   const handleCalibrateVCDB = async () => {
     setLoading(true);
@@ -195,9 +217,14 @@ export default function RiskIntelligencePage() {
       });
       const cData = await cRes.json();
       if (cData.calibrated_asset_profile) {
-        currentScenario.asset_profile = cData.calibrated_asset_profile;
+        setScenarios((prev) =>
+          prev.map((s, idx) =>
+            idx === selectedScenarioIndex
+              ? { ...s, asset_profile: cData.calibrated_asset_profile }
+              : s
+          )
+        );
       }
-      await fetchQuantification();
     } catch (e) {
       console.error(e);
     } finally {
@@ -205,33 +232,49 @@ export default function RiskIntelligencePage() {
     }
   };
 
-  const runOptimization = async (baselineEal: number, budget: number) => {
-    try {
-      const oRes = await fetch('/api/risk/optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenario_id: currentScenario.scenario_id,
-          baseline_eal_inr: baselineEal,
-          budget_limit_inr: budget,
-          candidate_mitigations: currentScenario.candidate_mitigations,
-        }),
-      });
-      const oData = await oRes.json();
-      setOptimizeData(oData);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   useEffect(() => {
-    fetchQuantification();
-  }, [selectedScenarioIndex]);
+    let isMounted = true;
+    fetch('/api/risk/quantify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentScenario),
+    })
+      .then((res) => res.json())
+      .then((qData) => {
+        if (!isMounted) return;
+        setQuantifyData(qData);
+        if (qData?.baseline_loss?.expected_annual_loss_inr != null) {
+          fetch('/api/risk/optimize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenario_id: currentScenario.scenario_id,
+              baseline_eal_inr: qData.baseline_loss.expected_annual_loss_inr,
+              budget_limit_inr: budgetLimit,
+              candidate_mitigations: currentScenario.candidate_mitigations,
+            }),
+          })
+            .then((res) => res.json())
+            .then((oData) => {
+              if (isMounted) setOptimizeData(oData);
+            })
+            .catch(console.error);
+        }
+      })
+      .catch(console.error);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentScenario, budgetLimit]);
 
   const handleBudgetChange = (newBudget: number) => {
     setBudgetLimit(newBudget);
-    if (quantifyData) {
-      runOptimization(quantifyData.baseline_loss.expected_annual_loss_inr, newBudget);
+    if (quantifyData && typeof quantifyData === 'object' && 'baseline_loss' in quantifyData) {
+      const baselineLoss = (quantifyData.baseline_loss as { expected_annual_loss_inr?: number })?.expected_annual_loss_inr;
+      if (baselineLoss != null) {
+        runOptimization(baselineLoss, newBudget);
+      }
     }
   };
 

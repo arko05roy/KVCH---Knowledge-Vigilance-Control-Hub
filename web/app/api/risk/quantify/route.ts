@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     try {
       const data = await quantifyRiskScenario(body);
       return NextResponse.json(data);
-    } catch (err) {
+    } catch {
       // Fallback: If python microservice is not running, return mock/calculated response for UI testing
       const epss = body.finding?.epss_score || 0.72;
       const cisaKev = body.finding?.cisa_kev ?? true;
@@ -51,7 +51,8 @@ export async function POST(request: Request) {
       };
       return NextResponse.json(fallback);
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }

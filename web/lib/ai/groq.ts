@@ -88,8 +88,9 @@ export class GroqKeyPoolManager {
   }
 
   /** Extract delay from 429 error message (e.g. "try again in 176ms") or compute exponential backoff */
-  private getRetryDelayMs(error: any, attempt: number): number {
-    const errorMsg = String(error?.message || error?.error?.error?.message || "");
+  private getRetryDelayMs(error: unknown, attempt: number): number {
+    const err = error as { message?: string; error?: { error?: { message?: string } } };
+    const errorMsg = String(err?.message || err?.error?.error?.message || "");
     const match = errorMsg.match(/try again in (\d+)(ms|s)/i);
     if (match) {
       const amount = parseInt(match[1], 10);
@@ -119,9 +120,10 @@ export class GroqKeyPoolManager {
 
       try {
         return (await client.chat.completions.create({ ...requestParams, stream: false })) as Groq.Chat.Completions.ChatCompletion;
-      } catch (error: any) {
+      } catch (error: unknown) {
         lastError = error;
-        const statusCode = error?.status || error?.statusCode;
+        const err = error as { status?: number; statusCode?: number };
+        const statusCode = err?.status || err?.statusCode;
 
         // Handle rate limits (429) or transient server errors (5xx)
         if (statusCode === 429 || (statusCode >= 500 && statusCode < 600)) {

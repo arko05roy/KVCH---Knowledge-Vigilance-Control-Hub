@@ -277,7 +277,8 @@ Required JSON Structure per role:
         };
 
     // Helper to format fallback fields if missing
-    const formatRoleReport = (roleKey: "srDev" | "intern" | "hr" | "management", raw: any): RoleSecurityReport => {
+    const formatRoleReport = (roleKey: "srDev" | "intern" | "hr" | "management", rawObj: Record<string, unknown> | undefined): RoleSecurityReport => {
+      const raw = rawObj as Record<string, unknown> | undefined;
       const roleMap = {
         srDev: "sr-dev",
         intern: "intern",
@@ -331,7 +332,7 @@ Required JSON Structure per role:
         },
         finalVerdict: raw?.finalVerdict || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
         keyInsights: raw?.keyInsights || raw?.keyFindings || [finding.category, `Severity: ${finding.severity}`],
-        actionItems: raw?.actionItems || actions.map((a: any) => typeof a === "string" ? a : a.action) || ["Review finding details"],
+        actionItems: raw?.actionItems || actions.map((a: unknown) => typeof a === "string" ? a : (a as { action?: string }).action || "Remediate finding") || ["Review finding details"],
         roleSpecificDetail: raw?.roleSpecificDetail || JSON.stringify(finding.details, null, 2),
         generatedAt: now
       };

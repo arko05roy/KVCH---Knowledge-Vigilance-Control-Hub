@@ -1,14 +1,14 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-11T20:34:25.310452Z",
+  "observed_at": "2026-09-12T08:42:42.723559Z",
   "severity": "critical",
   "category": "supply_chain_auditor",
   "title": "Extension Supply-Chain & Remote Execution Audit",
-  "summary": "Audited 5 extensions on MacBook-Air.lan. Risk score: 100/100. De-obfuscation and MV3 deep inspection applied.",
+  "summary": "Audited 5 extensions on MacBook-Air.local. Risk score: 100/100. De-obfuscation and MV3 deep inspection applied.",
   "resource": {
     "type": "resource",
     "id": "local_browser_extensions",
-    "name": "MacBook-Air.lan"
+    "name": "MacBook-Air.local"
   },
   "evidence": [],
   "indicators": [],

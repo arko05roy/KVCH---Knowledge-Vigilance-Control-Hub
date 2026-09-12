@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export default function HrDashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [reportData, setReportData] = useState<any>(DEMO_REPORTS.hr);
+  const [reportData, setReportData] = useState<unknown>(DEMO_REPORTS.hr);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleGenerateAiReport = async () => {
@@ -30,8 +30,9 @@ export default function HrDashboardPage() {
         throw new Error(data.error || "Failed to generate AI report");
       }
       setReportData(data.finding.ai_reports.hr);
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Generation error");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setErrorMsg(error?.message || "Generation error");
     } finally {
       setIsGenerating(false);
     }
