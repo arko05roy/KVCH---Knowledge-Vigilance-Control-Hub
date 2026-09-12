@@ -1,0 +1,23 @@
+{
+  "name": "kvch-mcp-server",
+  "version": "1.0.0",
+  "description": "KVCH Model Context Protocol (MCP) Server with 5-Layer Host Fingerprinting for Claude Code & Claude Desktop",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "kvch-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "node --test dist/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
+  }
+}
