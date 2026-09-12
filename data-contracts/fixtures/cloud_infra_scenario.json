@@ -1,0 +1,66 @@
+{
+  "scenario_id": "SCENARIO-CLOUD-INFRA-004",
+  "title": "Kubernetes Ingress RCE & Cloud IAM Metadata Credential Theft",
+  "finding": {
+    "finding_id": "FINDING-9988",
+    "source_extension": "3_cloud_posture_auditor",
+    "category": "infrastructure_rce",
+    "cve_id": "CVE-2026-4410",
+    "package_name": "ingress-nginx-controller",
+    "asset_id": "ASSET-K8S-INGRESS-01",
+    "observed_at": "2026-09-11T10:00:00Z",
+    "internet_reachable": true,
+    "authentication_required": false,
+    "compensating_controls": ["waf_filtering"],
+    "epss_score": 0.81,
+    "cisa_kev": true,
+    "cvss_score": 9.8
+  },
+  "asset_profile": {
+    "asset_id": "ASSET-K8S-INGRESS-01",
+    "asset_name": "Core Production Kubernetes Ingress Cluster",
+    "business_service_id": "SVC-CLOUD-ROUTING",
+    "business_service_name": "Cloud Edge Routing & Traffic Management",
+    "environment": "production",
+    "downtime_cost_per_hour_inr": 3000000.0,
+    "avg_incident_response_cost_inr": 5000000.0,
+    "data_breach_cost_per_record_inr": 700.0,
+    "records_exposed_estimate": 200000,
+    "rto_hours": 2.5,
+    "active_users": 1200000
+  },
+  "candidate_mitigations": [
+    {
+      "action_id": "ACT-401",
+      "name": "Immediate Ingress Controller Patch & WAF Virtual Patching Rule",
+      "cost_inr": 150000.0,
+      "lead_time_days": 1,
+      "risk_reduction_factor": 0.92,
+      "technique": "Virtual Patching"
+    },
+    {
+      "action_id": "ACT-402",
+      "name": "Cloud IMDSv2 Hardening & Workload Identity Least-Privilege Enforcer",
+      "cost_inr": 400000.0,
+      "lead_time_days": 3,
+      "risk_reduction_factor": 0.85,
+      "technique": "IAM Hardening"
+    },
+    {
+      "action_id": "ACT-403",
+      "name": "Kubernetes NetworkPolicy Strict Egress Isolation & Microsegmentation",
+      "cost_inr": 600000.0,
+      "lead_time_days": 5,
+      "risk_reduction_factor": 0.75,
+      "technique": "Network Isolation"
+    },
+    {
+      "action_id": "ACT-404",
+      "name": "24/7 Managed Cloud Threat Detection & Response (MDR)",
+      "cost_inr": 950000.0,
+      "lead_time_days": 6,
+      "risk_reduction_factor": 0.65,
+      "technique": "MDR Threat Shield"
+    }
+  ]
+}

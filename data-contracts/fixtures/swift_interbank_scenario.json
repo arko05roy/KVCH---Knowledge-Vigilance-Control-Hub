@@ -1,0 +1,58 @@
+{
+  "scenario_id": "SCENARIO-SWIFT-005",
+  "title": "SWIFT / Interbank Messaging Gateway Compromise & Wire Exfiltration",
+  "finding": {
+    "finding_id": "FINDING-5510",
+    "source_extension": "7_interbank_security_auditor",
+    "category": "financial_wire_fraud",
+    "cve_id": "CVE-2026-7890",
+    "package_name": "swift-alliance-connector",
+    "asset_id": "ASSET-SWIFT-GATEWAY-01",
+    "observed_at": "2026-09-11T12:00:00Z",
+    "internet_reachable": true,
+    "authentication_required": true,
+    "compensating_controls": ["hsm_signing", "dual_authorization"],
+    "epss_score": 0.86,
+    "cisa_kev": true,
+    "cvss_score": 9.9
+  },
+  "asset_profile": {
+    "asset_id": "ASSET-SWIFT-GATEWAY-01",
+    "asset_name": "Core SWIFT & Real-Time Gross Settlement (RTGS) Gateway",
+    "business_service_id": "SVC-INTERBANK-CLEARING",
+    "business_service_name": "Cross-Border Wire & Interbank Clearing",
+    "environment": "production",
+    "downtime_cost_per_hour_inr": 5000000.0,
+    "avg_incident_response_cost_inr": 7500000.0,
+    "data_breach_cost_per_record_inr": 1200.0,
+    "records_exposed_estimate": 250000,
+    "rto_hours": 2.0,
+    "active_users": 2000000
+  },
+  "candidate_mitigations": [
+    {
+      "action_id": "ACT-501",
+      "name": "Hardware Security Module (HSM) Strict Key Quorum & Air-Gap Enclave",
+      "cost_inr": 800000.0,
+      "lead_time_days": 3,
+      "risk_reduction_factor": 0.94,
+      "technique": "HSM Enclave Hardening"
+    },
+    {
+      "action_id": "ACT-502",
+      "name": "AI-Powered Real-time Outlier Wire Fraud Transaction Interceptor",
+      "cost_inr": 1200000.0,
+      "lead_time_days": 7,
+      "risk_reduction_factor": 0.88,
+      "technique": "Behavioral Fraud Shield"
+    },
+    {
+      "action_id": "ACT-503",
+      "name": "Isolated Network Segment with Ephemeral Bastion & Jump Host Enforcement",
+      "cost_inr": 600000.0,
+      "lead_time_days": 4,
+      "risk_reduction_factor": 0.75,
+      "technique": "Zero Trust Network Isolation"
+    }
+  ]
+}

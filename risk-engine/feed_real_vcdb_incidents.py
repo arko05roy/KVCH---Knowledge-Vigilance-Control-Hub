@@ -15,70 +15,75 @@ def main():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    print("=" * 80)
-    print("  KVCH BAYESIAN CALIBRATION — FEEDING REAL VCDB INCIDENT DATASET  ")
-    print("=" * 80)
+    print("=" * 85)
+    print("      KVCH BAYESIAN CALIBRATION ENGINE — MULTI-SCENARIO VCDB DATASET REPLAY      ")
+    print("=" * 85)
 
-    # 1. Load Payment Scenario & VCDB Real Incidents
     base_dir = Path(__file__).parents[1] / "data-contracts" / "fixtures"
     if not base_dir.exists():
         base_dir = Path(__file__).parent / "data-contracts" / "fixtures"
 
-    with open(base_dir / "payment_service_scenario.json", "r", encoding="utf-8") as f:
-        scenario = json.load(f)
+    vcdb_file = base_dir / "vcdb_real_incidents.json"
+    if not vcdb_file.exists():
+        print("[-] VCDB fixtures not found.")
+        return
 
-    with open(base_dir / "vcdb_real_incidents.json", "r", encoding="utf-8") as f:
+    with open(vcdb_file, "r", encoding="utf-8") as f:
         incidents_raw = json.load(f)
 
-    finding = FindingIntake(**scenario["finding"])
-    asset = AssetServiceProfile(**scenario["asset_profile"])
-    incidents = [IncidentRecord(**inc) for inc in incidents_raw if inc["scenario_id"] == scenario["scenario_id"]]
+    scenario_files = list(base_dir.glob("*scenario*.json"))
 
-    print(f"\n[+] Baseline Asset Profile: {asset.asset_name} ({asset.asset_id})")
-    print(f"    Prior RTO Target: {asset.rto_hours} Hours")
-    print(f"    Prior Avg Response Cost: ₹{asset.avg_incident_response_cost_inr:,.2f}")
-    print(f"    Prior Records Exposure Estimate: {asset.records_exposed_estimate:,} records")
+    print(f"\n[+] Loaded {len(incidents_raw)} Real VCDB Incident Records across {len(scenario_files)} Enterprise Scenarios.\n")
 
-    # 2. Run Baseline Monte Carlo Before Calibration
-    lh = calculate_likelihood(finding)
-    baseline_loss = run_fair_monte_carlo(lh, asset, draws=10000, seed=42)
+    for s_file in scenario_files:
+        with open(s_file, "r", encoding="utf-8") as f:
+            scenario = json.load(f)
 
-    print("\n" + "-" * 80)
-    print("  1. BEFORE CALIBRATION (THEORETICAL PRIOR DISTRIBUTIONS)  ")
-    print("-" * 80)
-    print(f"  • Expected Annual Loss (EAL): ₹{baseline_loss.expected_annual_loss_inr:,.2f}")
-    print(f"  • Value at Risk (VaR 95%):    ₹{baseline_loss.var95_inr:,.2f}")
+        s_id = scenario.get("scenario_id", "UNKNOWN")
+        s_title = scenario.get("title", s_file.stem)
+        finding = FindingIntake(**scenario["finding"])
+        asset = AssetServiceProfile(**scenario["asset_profile"])
 
-    # 3. Feed Real VCDB Incidents & Update Bayesian Posteriors
-    print("\n" + "-" * 80)
-    print(f"  2. INGESTING {len(incidents)} REAL VCDB INCIDENT LOGS  ")
-    print("-" * 80)
-    for idx, inc in enumerate(incidents, 1):
-        print(f"  [Incident #{idx}] {inc.incident_id} — {inc.root_cause_summary}")
-        print(f"               Actual Downtime: {inc.actual_downtime_hours} hrs | Response Cost: ₹{inc.actual_ir_cost_inr:,.2f} | Exposed Recs: {inc.actual_records_exposed:,}")
+        matching_incidents = [
+            IncidentRecord(**inc) for inc in incidents_raw if inc.get("scenario_id") == s_id
+        ]
 
-    calibrated_asset = update_asset_posterior(asset, incidents)
+        print("=" * 85)
+        print(f"  SCENARIO: {s_title} ({s_id})")
+        print(f"  Asset: {asset.asset_name} | Prior RTO: {asset.rto_hours}h | Prior IR: ₹{asset.avg_incident_response_cost_inr:,.0f}")
+        print("-" * 85)
 
-    print("\n  [✓] BAYESIAN POSTERIOR UPDATED:")
-    print(f"      • Calibrated RTO:             {calibrated_asset.rto_hours} Hours (up from {scenario['asset_profile']['rto_hours']} hrs)")
-    print(f"      • Calibrated IR Cost:         ₹{calibrated_asset.avg_incident_response_cost_inr:,.2f}")
-    print(f"      • Calibrated Records Est:     {calibrated_asset.records_exposed_estimate:,} records")
+        # Baseline Monte Carlo
+        lh = calculate_likelihood(finding)
+        base_loss = run_fair_monte_carlo(lh, asset, draws=10000, seed=42)
+        print(f"  [1] PRE-CALIBRATION BASELINE:")
+        print(f"      • Annual Exploitation Prob: {lh.exploitation_probability * 100:.1f}%")
+        print(f"      • Expected Annual Loss (EAL): ₹{base_loss.expected_annual_loss_inr:,.2f}")
+        print(f"      • Value at Risk (VaR 95%):    ₹{base_loss.var95_inr:,.2f}")
 
-    # 4. Run Post-Calibration Monte Carlo
-    calibrated_loss = run_fair_monte_carlo(lh, calibrated_asset, draws=10000, seed=42)
+        if matching_incidents:
+            print(f"\n  [2] INGESTING {len(matching_incidents)} REAL VCDB INCIDENT LOGS:")
+            for inc in matching_incidents:
+                print(f"      - [{inc.incident_id}] Downtime: {inc.actual_downtime_hours}h | IR Cost: ₹{inc.actual_ir_cost_inr:,.0f} | Recs: {inc.actual_records_exposed:,}")
+                print(f"        Summary: {inc.root_cause_summary}")
 
-    print("\n" + "-" * 80)
-    print("  3. AFTER BAYESIAN CALIBRATION (CALIBRATED POSTERIOR DISTRIBUTIONS)  ")
-    print("-" * 80)
-    print(f"  • Calibrated EAL:             ₹{calibrated_loss.expected_annual_loss_inr:,.2f}")
-    print(f"  • Calibrated VaR 95%:         ₹{calibrated_loss.var95_inr:,.2f}")
-    print(f"  • Downtime Loss Share:        ₹{calibrated_loss.expected_downtime_loss_inr:,.2f}")
-    print(f"  • Forensics & Response Share: ₹{calibrated_loss.expected_incident_response_loss_inr:,.2f}")
-    print(f"  • Data Breach Loss Share:     ₹{calibrated_loss.expected_breach_loss_inr:,.2f}")
+            calibrated_asset = update_asset_posterior(asset.model_copy(), matching_incidents)
+            calib_loss = run_fair_monte_carlo(lh, calibrated_asset, draws=10000, seed=42)
 
-    diff_eal = calibrated_loss.expected_annual_loss_inr - baseline_loss.expected_annual_loss_inr
-    print(f"\n  [+] Calibration Delta: EAL shifted by +₹{diff_eal:,.2f} based on real empirical VCDB incident severity.")
-    print("=" * 80 + "\n")
+            diff_eal = calib_loss.expected_annual_loss_inr - base_loss.expected_annual_loss_inr
+            print(f"\n  [3] POST-BAYESIAN CALIBRATION POSTERIOR:")
+            print(f"      • Calibrated RTO:             {calibrated_asset.rto_hours} hrs (Prior: {scenario['asset_profile']['rto_hours']} hrs)")
+            print(f"      • Calibrated Avg IR Cost:     ₹{calibrated_asset.avg_incident_response_cost_inr:,.2f}")
+            print(f"      • Calibrated EAL:             ₹{calib_loss.expected_annual_loss_inr:,.2f} ({'+' if diff_eal >= 0 else ''}₹{diff_eal:,.2f})")
+            print(f"      • Calibrated VaR 95%:         ₹{calib_loss.var95_inr:,.2f}")
+        else:
+            print("  [!] No empirical VCDB logs mapped for this scenario yet. Retaining prior.")
+
+        print("\n")
+
+    print("=" * 85)
+    print("  [✓] Multi-Scenario Bayesian Calibration Replay Completed Successfully.")
+    print("=" * 85 + "\n")
 
 
 if __name__ == "__main__":

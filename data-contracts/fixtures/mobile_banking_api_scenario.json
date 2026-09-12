@@ -1,0 +1,58 @@
+{
+  "scenario_id": "SCENARIO-MOBILE-API-006",
+  "title": "Mobile App BFF API JWT Algorithm Confusion & Account Takeover",
+  "finding": {
+    "finding_id": "FINDING-6612",
+    "source_extension": "5_mobile_api_auditor",
+    "category": "api_security_jwt",
+    "cve_id": "CVE-2026-6199",
+    "package_name": "mobile-bff-jwt-verifier",
+    "asset_id": "ASSET-MOBILE-BFF-01",
+    "observed_at": "2026-09-11T16:00:00Z",
+    "internet_reachable": true,
+    "authentication_required": false,
+    "compensating_controls": ["rate_limiting"],
+    "epss_score": 0.79,
+    "cisa_kev": true,
+    "cvss_score": 9.4
+  },
+  "asset_profile": {
+    "asset_id": "ASSET-MOBILE-BFF-01",
+    "asset_name": "Retail Mobile Banking Backend-for-Frontend (BFF)",
+    "business_service_id": "SVC-MOBILE-RETAIL",
+    "business_service_name": "Retail Customer Mobile Banking Services",
+    "environment": "production",
+    "downtime_cost_per_hour_inr": 1800000.0,
+    "avg_incident_response_cost_inr": 3800000.0,
+    "data_breach_cost_per_record_inr": 450.0,
+    "records_exposed_estimate": 180000,
+    "rto_hours": 3.0,
+    "active_users": 3500000
+  },
+  "candidate_mitigations": [
+    {
+      "action_id": "ACT-601",
+      "name": "Strict Asymmetric RS256/ES256 Signature Enforcer & Key Whitelist",
+      "cost_inr": 100000.0,
+      "lead_time_days": 1,
+      "risk_reduction_factor": 0.95,
+      "technique": "Cryptographic Token Hardening"
+    },
+    {
+      "action_id": "ACT-602",
+      "name": "Device Fingerprint & Behavioral Biometrics Risk Engine",
+      "cost_inr": 450000.0,
+      "lead_time_days": 3,
+      "risk_reduction_factor": 0.80,
+      "technique": "Behavioral Anti-Fraud"
+    },
+    {
+      "action_id": "ACT-603",
+      "name": "Web Application & API Protection (WAAP) Token Abuse Rule",
+      "cost_inr": 250000.0,
+      "lead_time_days": 2,
+      "risk_reduction_factor": 0.65,
+      "technique": "API Shield"
+    }
+  ]
+}

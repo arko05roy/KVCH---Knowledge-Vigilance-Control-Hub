@@ -1,0 +1,66 @@
+{
+  "scenario_id": "SCENARIO-SUPPLY-CHAIN-003",
+  "title": "Software Supply Chain Dependency Poisoning & Malicious Package Injection",
+  "finding": {
+    "finding_id": "FINDING-9941",
+    "source_extension": "4_supply_chain_auditor",
+    "category": "supply_chain",
+    "cve_id": "CVE-2026-3829",
+    "package_name": "express-auth-core",
+    "asset_id": "ASSET-APP-ENGINE-01",
+    "observed_at": "2026-09-10T14:20:00Z",
+    "internet_reachable": true,
+    "authentication_required": false,
+    "compensating_controls": ["lockfile_pinning"],
+    "epss_score": 0.74,
+    "cisa_kev": true,
+    "cvss_score": 9.6
+  },
+  "asset_profile": {
+    "asset_id": "ASSET-APP-ENGINE-01",
+    "asset_name": "Customer Microservices & Application Engine",
+    "business_service_id": "SVC-APP-GATEWAY",
+    "business_service_name": "Retail & Corporate Banking Microservices",
+    "environment": "production",
+    "downtime_cost_per_hour_inr": 2000000.0,
+    "avg_incident_response_cost_inr": 4500000.0,
+    "data_breach_cost_per_record_inr": 550.0,
+    "records_exposed_estimate": 150000,
+    "rto_hours": 3.0,
+    "active_users": 750000
+  },
+  "candidate_mitigations": [
+    {
+      "action_id": "ACT-301",
+      "name": "Automated Software Bill of Materials (SBOM) & VEX Attestation Engine",
+      "cost_inr": 350000.0,
+      "lead_time_days": 2,
+      "risk_reduction_factor": 0.85,
+      "technique": "Supply Chain Attestation"
+    },
+    {
+      "action_id": "ACT-302",
+      "name": "Private Internal Package Proxy & Dependency Quarantine Firewall",
+      "cost_inr": 500000.0,
+      "lead_time_days": 4,
+      "risk_reduction_factor": 0.80,
+      "technique": "Artifact Isolation"
+    },
+    {
+      "action_id": "ACT-303",
+      "name": "Cryptographic Code-Signing & In-Toto Build Pipeline Verification",
+      "cost_inr": 450000.0,
+      "lead_time_days": 3,
+      "risk_reduction_factor": 0.70,
+      "technique": "Integrity Verification"
+    },
+    {
+      "action_id": "ACT-304",
+      "name": "Runtime eBPF Package Behavior Anomaly Detection",
+      "cost_inr": 800000.0,
+      "lead_time_days": 7,
+      "risk_reduction_factor": 0.60,
+      "technique": "Runtime Protection"
+    }
+  ]
+}

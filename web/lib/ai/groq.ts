@@ -103,7 +103,7 @@ export class GroqKeyPoolManager {
   }
 
   /** Generate chat completion with failover retry across the key pool and smart rate-limit backoff */
-  async createCompletion(params: Parameters<Groq["chat"]["completions"]["create"]>[0]): Promise<Groq.Chat.Completions.ChatCompletion> {
+  async createCompletion(params: any): Promise<any> {
     let lastError: unknown;
     // Allow up to 6 retry attempts to handle rate limit resets
     const maxAttempts = Math.max(this.keys.length * 2, 6);
