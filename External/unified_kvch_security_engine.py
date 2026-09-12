@@ -239,14 +239,80 @@ class UnifiedSecurityEngine:
         return [r for r in results if r is not None]
 
     def generate_master_report(self, extension_results: List[Dict[str, Any]], trigger_reason: str = "scheduled_interval") -> Dict[str, Any]:
-        """Consolidates all extension findings into ONE SINGLE master report file at External/reports/report.json."""
+        """Consolidates extension findings:
+        - Combines extensions 1-8 into finding_1_8_combined.json
+        - Keeps extension 9 as finding_9_aegisdb_zerotrust.json
+        - Keeps extension 10 as finding_10_edgeguard_sentinel.json
+        - Generates the master consolidated report file at External/reports/report.json.
+        """
+        core_1_8_results = [r for r in extension_results if r.get("category") not in ["aegisdb-zerotrust", "edgeguard-sentinel", "aegisdb_zerotrust", "edgeguard_sentinel"]]
+
+        # 1. Generate finding_1_8_combined.json for extensions 1-8
+        combined_1_8_file = self.reports_dir / "finding_1_8_combined.json"
+        all_evidence_1_8 = []
+        all_indicators_1_8 = []
+        all_actions_1_8 = set()
+        all_baseline_1_8 = {}
+        all_details_1_8 = {}
+        severities = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+        max_sev_idx_1_8 = 0
+        total_threats_1_8 = 0
+
+        for item in core_1_8_results:
+            bev = item.get("evidence", [])
+            bind = item.get("indicators", [])
+            bact = item.get("recommended_actions", [])
+            base = item.get("baseline", {})
+            cat = item.get("category", "unknown")
+            sev = str(item.get("severity", "LOW")).upper()
+
+            if bev: all_evidence_1_8.extend(bev if isinstance(bev, list) else [bev])
+            if bind: all_indicators_1_8.extend(bind if isinstance(bind, list) else [bind])
+            if bact:
+                for act in (bact if isinstance(bact, list) else [bact]):
+                    all_actions_1_8.add(str(act))
+            if base and isinstance(base, dict): all_baseline_1_8.update(base)
+            all_details_1_8[cat] = item.get("details", {})
+            total_threats_1_8 += len(bind if isinstance(bind, list) else [])
+
+            if sev in severities:
+                idx = severities.index(sev)
+                if idx > max_sev_idx_1_8: max_sev_idx_1_8 = idx
+
+        overall_sev_1_8 = severities[max_sev_idx_1_8]
+
+        envelope_1_8 = FindingEnvelope()
+        envelope_1_8.set_extension_info("core-security-suite-1-8", "1.0.0")
+        envelope_1_8.set_finding(
+            finding_type="core_security_suite_1_8_combined",
+            affected_actor=self.hostname,
+            affected_resource=f"{self.hostname} ({self.ip})",
+            result={
+                "trigger_reason": trigger_reason,
+                "total_extensions_audited": len(core_1_8_results),
+                "total_threats_detected": total_threats_1_8,
+                "extension_breakdown": all_details_1_8
+            },
+            severity=overall_sev_1_8.lower(),
+            title="KVCH Core Security Suite (Extensions 1-8) Combined Finding Report",
+            category="core_security_suite_1_8"
+        )
+        envelope_1_8.set_summary(
+            f"Combined security findings across Extensions 1-8 (Attack Surface, VPN/Crypto, Phishing, Threat Hunter, Malware, Credential Exposure, Supply Chain, Cookie/XSS). "
+            f"Detected {total_threats_1_8} threat indicators across host {self.hostname}."
+        )
+        for ev in all_evidence_1_8[:50]: envelope_1_8.add_evidence(ev)
+        for ind in all_indicators_1_8[:50]: envelope_1_8.add_indicator(ind)
+        for act in all_actions_1_8: envelope_1_8.add_recommended_action(act)
+        envelope_1_8.set_baseline(all_baseline_1_8)
+        envelope_1_8.save(str(combined_1_8_file))
+
+        # 2. Master report (report.json) consolidates finding_1_8_combined, finding_9, and finding_10
         all_evidence = []
         all_indicators = []
         all_actions = set()
         all_baseline = {}
         all_details = {}
-        
-        severities = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
         max_severity_idx = 0
         total_threats_count = 0
 
@@ -258,23 +324,18 @@ class UnifiedSecurityEngine:
             cat = item.get("category", "unknown")
             sev = str(item.get("severity", "LOW")).upper()
 
-            if bev:
-                all_evidence.extend(bev if isinstance(bev, list) else [bev])
-            if bind:
-                all_indicators.extend(bind if isinstance(bind, list) else [bind])
+            if bev: all_evidence.extend(bev if isinstance(bev, list) else [bev])
+            if bind: all_indicators.extend(bind if isinstance(bind, list) else [bind])
             if bact:
                 for act in (bact if isinstance(bact, list) else [bact]):
                     all_actions.add(str(act))
-            if base and isinstance(base, dict):
-                all_baseline.update(base)
-
+            if base and isinstance(base, dict): all_baseline.update(base)
             all_details[cat] = item.get("details", {})
             total_threats_count += len(bind if isinstance(bind, list) else [])
 
             if sev in severities:
                 idx = severities.index(sev)
-                if idx > max_severity_idx:
-                    max_severity_idx = idx
+                if idx > max_severity_idx: max_severity_idx = idx
 
         overall_severity = severities[max_severity_idx]
 
@@ -288,29 +349,29 @@ class UnifiedSecurityEngine:
                 "trigger_reason": trigger_reason,
                 "total_extensions_audited": len(extension_results),
                 "total_threats_detected": total_threats_count,
+                "reports_structure": {
+                    "core_suite_extensions_1_to_8": str(combined_1_8_file),
+                    "independent_extension_9": str(self.reports_dir / "finding_9_aegisdb_zerotrust.json"),
+                    "independent_extension_10": str(self.reports_dir / "finding_10_edgeguard_sentinel.json"),
+                    "master_consolidated_report": str(self.master_report_file)
+                },
                 "extension_breakdown": all_details
             },
             severity=overall_severity.lower(),
             title="Unified KVCH Enterprise Active Security Master Report",
             category="unified_security_engine"
         )
-
         envelope.set_summary(
             f"Consolidated 24/7 background security scan on {self.hostname} triggered via '{trigger_reason}'. "
-            f"Audited {len(extension_results)} active defense extensions. Detected {total_threats_count} total threat indicators. Overall Severity: {overall_severity}."
+            f"Audited 10 active defense extensions (Core Suite 1-8 combined, AegisDB-ZeroTrust #9, EdgeGuard-Sentinel #10). "
+            f"Detected {total_threats_count} total threat indicators. Overall Severity: {overall_severity}."
         )
 
-        for ev in all_evidence[:50]:
-            envelope.add_evidence(ev)
-
-        for ind in all_indicators[:50]:
-            envelope.add_indicator(ind)
-
-        for act in all_actions:
-            envelope.add_recommended_action(act)
-
+        for ev in all_evidence[:50]: envelope.add_evidence(ev)
+        for ind in all_indicators[:50]: envelope.add_indicator(ind)
+        for act in all_actions: envelope.add_recommended_action(act)
         envelope.set_baseline(all_baseline)
-        
+
         envelope.set_active_response(
             incident_type="unified_enterprise_active_defense",
             target_layer="full_stack_security_mesh",
@@ -325,7 +386,6 @@ class UnifiedSecurityEngine:
 
         master_dict = envelope.to_dict()
 
-        # Write to EXACTLY ONE SINGLE CONSOLIDATED MASTER REPORT file at External/reports/report.json
         with open(self.master_report_file, "w", encoding="utf-8") as f:
             json.dump(master_dict, f, indent=2)
 
@@ -336,8 +396,23 @@ class UnifiedSecurityEngine:
             "trigger_reason": trigger_reason,
             "overall_severity": overall_severity,
             "total_threats": total_threats_count,
-            "report_path": str(self.master_report_file)
+            "reports": [
+                str(combined_1_8_file),
+                str(self.reports_dir / "finding_9_aegisdb_zerotrust.json"),
+                str(self.reports_dir / "finding_10_edgeguard_sentinel.json"),
+                str(self.master_report_file)
+            ]
         })
+
+        # Clean up individual finding_1_ through finding_8_ files to leave strictly combined 1-8, 9, 10, and report.json
+        for i in range(1, 9):
+            pattern_files = list(self.reports_dir.glob(f"finding_{i}_*.json"))
+            for pf in pattern_files:
+                if pf.name != "finding_1_8_combined.json":
+                    try:
+                        pf.unlink()
+                    except Exception:
+                        pass
 
         return master_dict
 
