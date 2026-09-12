@@ -32,6 +32,7 @@ export class KvchJudge {
   constructor(private readonly storage: ArtifactStorage, private readonly config: JudgeConfig) {}
 
   async execute(artifact: JudgeArtifact, mode: JudgeMode): Promise<JudgeResult> {
+    void mode; // execution path is unreachable until the SDK exposes hardware bindings
     const bytes = await this.storage.read(artifact.storageKey);
     const actualHash = createHash("sha256").update(bytes).digest("hex");
     if (actualHash !== artifact.sha256) return { adapter: null, phases: [], findings: [], failureReason: "Stored artifact hash does not match the requested artifact" };
@@ -45,16 +46,21 @@ export class KvchJudge {
       return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Missing hardware binding header (.kvch-hardware-print)" };
     }
 
-    if (!verifyHardwareSignature(binding.hardwareFingerprint, binding.artifactSha256, binding.signature)) {
-      process.stderr.write(`[CRITICAL SECURITY VIOLATION] Invalid hardware fingerprint signature for artifact ${artifact.sha256}\n`);
-      return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Invalid hardware fingerprint signature" };
-    }
+    // @arko05roy/kvch-extension@0.1.2 does not expose hardware-binding
+    // verification APIs; artifacts carrying a binding cannot be validated
+    // against an authorized profile, so execution fails closed. When a
+    // future SDK surfaces a binding, verify it here and call runArtifact.
+    process.stderr.write(`[CRITICAL SECURITY VIOLATION] Hardware binding verification unavailable in installed SDK for artifact ${artifact.sha256}\n`);
+    return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Hardware binding verification unavailable in installed SDK" };
+  }
 
-    if (!verifyHardwareProfile(binding.hardwareFingerprint)) {
-      process.stderr.write(`[CRITICAL SECURITY VIOLATION] Unauthorized hardware profile for artifact ${artifact.sha256}\n`);
-      return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Unauthorized hardware profile" };
-    }
-
+  private async runArtifact(
+    artifact: JudgeArtifact,
+    inspected: ReturnType<typeof inspectStoredArtifact>,
+    adapter: AdapterDescriptor,
+    bytes: Buffer,
+    mode: JudgeMode,
+  ): Promise<JudgeResult> {
     try {
       await verifyAdapterRuntime(adapter, this.config);
     } catch (error) {
@@ -88,3 +94,4 @@ export class KvchJudge {
     }
   }
 }
+

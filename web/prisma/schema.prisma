@@ -384,3 +384,35 @@ model ZkIndexerCursor {
   lastBlock     BigInt  @default(0)
   updatedAt     DateTime @updatedAt
 }
+
+enum ZkJoinKind {
+  verifier
+  company
+}
+
+enum ZkJoinStatus {
+  pending
+  approved
+  rejected
+}
+
+/// Self-service onboarding requests — a verifier's seat request lands here
+/// until governance includes their key in a newly registered council set;
+/// a company's registration records its identity and first-use intent.
+model ZkJoinRequest {
+  id            String       @id @default(cuid())
+  kind          ZkJoinKind
+  status        ZkJoinStatus @default(pending)
+  walletAddress String?
+  companyCode   String?
+  label         String?
+  note          String?
+  chainId       Int?
+  councilSetId  BigInt?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  resolvedAt    DateTime?
+
+  @@index([kind, status])
+  @@index([walletAddress])
+}

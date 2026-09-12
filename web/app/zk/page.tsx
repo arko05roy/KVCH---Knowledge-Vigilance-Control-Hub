@@ -25,7 +25,13 @@ export default async function ZkDashboard() {
 
   return (
     <main className="mx-auto max-w-6xl p-8 font-mono text-sm">
-      <h1 className="mb-2 text-xl font-bold">KVCH Zero-Knowledge Subsystem</h1>
+      <div className="flex items-baseline justify-between">
+        <h1 className="mb-2 text-xl font-bold">KVCH Zero-Knowledge Subsystem</h1>
+        <span className="space-x-4">
+          <Link href="/zk/join" className="text-sky-400">join the network →</Link>
+          <Link href="/zk/council" className="text-sky-400">council dashboard →</Link>
+        </span>
+      </div>
       <p className="mb-8 text-neutral-500">
         Off-chain proving → verifier-council quorum → minimized claims anchored on Celo Sepolia.
         Proofs attest consistency with signed inputs — not real-world truth.
