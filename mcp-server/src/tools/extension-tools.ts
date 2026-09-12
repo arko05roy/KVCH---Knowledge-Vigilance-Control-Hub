@@ -191,14 +191,38 @@ export function handleListExtensions() {
     const entries = fs.readdirSync(externalDir, { withFileTypes: true });
     for (const ent of entries) {
       if (ent.isDirectory() && !["venv", "artifacts", "fixtures", "reports", "utils", "extensions", "edr_daemon"].includes(ent.name)) {
-        const manifestPath = path.join(externalDir, ent.name, "kvch-manifest.json");
-        if (fs.existsSync(manifestPath)) {
+        const manifestJsonPath = path.join(externalDir, ent.name, "kvch-manifest.json");
+        const manifestYamlPath = path.join(externalDir, ent.name, "extension.yaml");
+        const manifestPath = fs.existsSync(manifestYamlPath) ? manifestYamlPath : fs.existsSync(manifestJsonPath) ? manifestJsonPath : null;
+
+        if (manifestPath) {
           try {
-            const man = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+            const rawContent = fs.readFileSync(manifestPath, "utf-8");
+            const isYaml = manifestPath.endsWith(".yaml") || manifestPath.endsWith(".yml");
+            
+            // Simple regex parser for basic yaml properties if yaml
+            let id = ent.name;
+            let name = ent.name;
+            let cron = "*/5 * * * *";
+
+            if (isYaml) {
+              const idMatch = rawContent.match(/^id:\s*(.+)$/m);
+              const nameMatch = rawContent.match(/^name:\s*(.+)$/m);
+              const cronMatch = rawContent.match(/schedule:\s*["']?([^"'\n]+)["']?/m);
+              if (idMatch) id = idMatch[1].trim();
+              if (nameMatch) name = nameMatch[1].trim();
+              if (cronMatch) cron = cronMatch[1].trim();
+            } else {
+              const man = JSON.parse(rawContent);
+              id = man.id || ent.name;
+              name = man.name || ent.name;
+              cron = man.schedule?.cron || "*/5 * * * *";
+            }
+
             extensions.push({
-              id: man.id || ent.name,
-              name: man.name || ent.name,
-              cron: man.schedule?.cron || "*/5 * * * *",
+              id,
+              name,
+              cron,
               path: `External/${ent.name}`,
             });
           } catch {
