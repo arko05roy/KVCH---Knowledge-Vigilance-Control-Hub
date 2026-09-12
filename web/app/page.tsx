@@ -812,9 +812,9 @@ export default function Home() {
 
               <nav className="nav-pill">
                 <a href="#" className="nav-link active">Home</a>
-                <a href="#" className="nav-link">Product</a>
-                <a href="#" className="nav-link">Case Studies</a>
-                <a href="#" className="nav-link">Contact</a>
+                <a href="/threat-graph" className="nav-link">Threat Diagram</a>
+                <a href="/threat-studio" className="nav-link">Threat Studio</a>
+                <a href="/risk-intelligence" className="nav-link">Risk Intelligence</a>
               </nav>
 
               <button className="sign-in-pill" onClick={() => setIsModalOpen(true)}>

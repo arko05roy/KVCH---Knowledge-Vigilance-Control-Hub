@@ -35,8 +35,10 @@ import {
 } from "lucide-react";
 import { ScenarioDefinition } from "@/lib/threat-engine/scenarios";
 import { FusedContextVector, DetectionVerdict } from "@/lib/threat-engine/types";
+import ThreatFlowDiagram from "@/components/threat-flow-diagram";
 
 export default function ThreatStudioPage() {
+  const [activeView, setActiveView] = useState<"diagram" | "sandbox">("diagram");
   const [scenarios, setScenarios] = useState<ScenarioDefinition[]>([]);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>("SCENARIO-1-C2");
   const [selectedOptionKey, setSelectedOptionKey] = useState<string>("rev_shell");
@@ -214,17 +216,36 @@ export default function ThreatStudioPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/risk-intelligence"
-              className="text-xs font-mono px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60 transition"
-            >
-              Risk Intelligence
-            </Link>
+            <div className="flex items-center gap-1 bg-[#090a0d] p-1 rounded-lg border border-zinc-800 text-xs font-mono">
+              <button
+                onClick={() => setActiveView("diagram")}
+                className={`px-3 py-1.5 rounded-md font-semibold transition flex items-center gap-1.5 ${
+                  activeView === "diagram"
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-950"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                Step-by-Step Threat Diagram
+              </button>
+              <button
+                onClick={() => setActiveView("sandbox")}
+                className={`px-3 py-1.5 rounded-md font-semibold transition flex items-center gap-1.5 ${
+                  activeView === "sandbox"
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-950"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                <Terminal className="w-3.5 h-3.5" />
+                Telemetry Matrix Sandbox
+              </button>
+            </div>
+
             <Link
               href="/threat-graph"
               className="text-xs font-mono px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60 transition"
             >
-              Threat Graph
+              Full Graph Page
             </Link>
           </div>
         </div>
@@ -233,6 +254,12 @@ export default function ThreatStudioPage() {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         
+        {activeView === "diagram" ? (
+          <div className="space-y-6">
+            <ThreatFlowDiagram />
+          </div>
+        ) : (
+          <div className="space-y-6">
         {/* Scenario Selection Header Banner */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           {scenarios.map((scen) => {
@@ -599,8 +626,7 @@ export default function ThreatStudioPage() {
             )}
 
           </div>
-
-        </div>
+        )}
 
       </main>
     </div>
