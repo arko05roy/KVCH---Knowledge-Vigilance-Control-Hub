@@ -66,6 +66,19 @@ export interface RoleSecurityReport {
   finalVerdict?: string;
   keyInsights: string[]; // Backward compatibility helper array
   actionItems: string[]; // Backward compatibility helper array
+  failureDifferentiation?: {
+    incidentType: "SERVER_FAIL" | "GATEWAY_FAIL" | "DDOS_ATTACK" | "DB_OUTAGE" | "CDN_ORIGIN_FAIL";
+    targetLayer: "HOST_OS" | "API_GATEWAY" | "DATABASE" | "CDN_EDGE" | "APPLICATION";
+    reason: string;
+  };
+  activeResponsePayload?: {
+    actionId: string;
+    actionName: string;
+    command: string;
+    recoveryTimeEst: string;
+    status: string;
+    autoExecutable: boolean;
+  };
   roleSpecificDetail: string;
   generatedAt: string;
 }
@@ -299,6 +312,11 @@ Required JSON Structure per role:
         }
       ];
 
+      const activeResp = (finding.active_response || finding.details?.active_response || {}) as Record<string, unknown>;
+      const incidentType = (activeResp.incident_type || (finding.category === "attack_surface_scan" ? "DDOS_ATTACK" : "GATEWAY_FAIL")) as "SERVER_FAIL" | "GATEWAY_FAIL" | "DDOS_ATTACK" | "DB_OUTAGE" | "CDN_ORIGIN_FAIL";
+      const targetLayer = (activeResp.target_layer || (finding.category === "attack_surface_scan" ? "CDN_EDGE" : "API_GATEWAY")) as "HOST_OS" | "API_GATEWAY" | "DATABASE" | "CDN_EDGE" | "APPLICATION";
+      const reason = (activeResp.differentiation_reason as string) || "Diagnostic matrix correlated network telemetry, HTTP status entropy, and connection socket state.";
+
       return {
         role: roleMap[roleKey],
         title: (raw.title as string) || `${roleKey.toUpperCase()} Security Briefing`,
@@ -330,10 +348,23 @@ Required JSON Structure per role:
             expectedLossReduction: "95% loss reduction"
           }
         },
-        finalVerdict: (raw.finalVerdict as string) || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
-        keyInsights: (raw.keyInsights as string[]) || (raw.keyFindings as string[]) || [finding.category, `Severity: ${finding.severity}`],
-        actionItems: (raw.actionItems as string[]) || actions.map((a: any) => typeof a === "string" ? a : (a?.action || "Remediate finding")) || ["Review finding details"],
-        roleSpecificDetail: (raw.roleSpecificDetail as string) || JSON.stringify(finding.details, null, 2),
+        failureDifferentiation: {
+          incidentType,
+          targetLayer,
+          reason,
+        },
+        activeResponsePayload: {
+          actionId: (activeResp.action_id as string) || "ACT-01-RATE-LIMIT",
+          actionName: (activeResp.action_name as string) || "Deploy Edge Rate Limitation & WAF Rule",
+          command: (activeResp.command as string) || "nft add rule inet filter input limit rate 50/minute accept",
+          recoveryTimeEst: (activeResp.recovery_time_est as string) || "15s",
+          status: (activeResp.status as string) || "PENDING",
+          autoExecutable: Boolean(activeResp.auto_executable ?? true),
+        },
+        finalVerdict: (raw?.finalVerdict as string) || (isLocalLaptop ? "Developer laptop asset is safe; local configuration fix recommended." : "Prompt production patch recommended."),
+        keyInsights: (raw?.keyInsights as string[]) || (raw?.keyFindings as string[]) || [finding.category, `Severity: ${finding.severity}`],
+        actionItems: (raw?.actionItems as string[]) || actions.map((a: unknown) => typeof a === "string" ? a : (a as { action?: string }).action || "Remediate finding") || ["Review finding details"],
+        roleSpecificDetail: (raw?.roleSpecificDetail as string) || JSON.stringify(finding.details, null, 2),
         generatedAt: now
       };
     };

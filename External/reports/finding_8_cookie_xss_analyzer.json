@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-12T08:42:43.087763Z",
+  "observed_at": "2026-09-12T09:28:11.179296Z",
   "severity": "CRITICAL",
   "category": "cookie-xss-auditor",
   "title": "Cookie Security Posture, DOM XSS & Session Theft Finding",
@@ -277,6 +277,7 @@
     "Replace innerHTML and eval() sinks with safe textContent and DOM APIs",
     "Store JWT session tokens in HttpOnly cookies instead of localStorage"
   ],
+  "active_response": {},
   "details": {
     "auditor_name": "Cookie Security, XSS & Session Hijacking Auditor",
     "version": "1.0.0",

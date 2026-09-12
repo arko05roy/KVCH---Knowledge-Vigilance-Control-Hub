@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-12T08:42:42.723559Z",
+  "observed_at": "2026-09-12T09:28:11.016059Z",
   "severity": "critical",
   "category": "supply_chain_auditor",
   "title": "Extension Supply-Chain & Remote Execution Audit",
@@ -14,6 +14,7 @@
   "indicators": [],
   "baseline": {},
   "recommended_actions": [],
+  "active_response": {},
   "details": {
     "evidence": [
       "manifest.mv3_permission:offscreen",

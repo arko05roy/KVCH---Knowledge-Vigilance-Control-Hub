@@ -1,5 +1,19 @@
 import "server-only";
 
+export interface ActiveResponsePayload {
+  incident_type: "SERVER_FAIL" | "GATEWAY_FAIL" | "DDOS_ATTACK" | "DB_OUTAGE" | "CDN_ORIGIN_FAIL";
+  target_layer: "HOST_OS" | "API_GATEWAY" | "DATABASE" | "CDN_EDGE" | "APPLICATION";
+  action_id: string;
+  action_name: string;
+  command: string;
+  differentiation_reason: string;
+  recovery_time_est: string;
+  status: "PENDING" | "EXECUTING" | "EXECUTED" | "FAILED";
+  auto_executable: boolean;
+  executed_at?: string;
+  output?: string;
+}
+
 export interface FindingEnvelope {
   schema_version: "kvch.finding/v1";
   observed_at: string;
@@ -12,6 +26,7 @@ export interface FindingEnvelope {
   indicators: unknown[];
   baseline: Record<string, unknown>;
   recommended_actions: unknown[];
+  active_response?: ActiveResponsePayload;
   details: Record<string, unknown>;
 }
 
