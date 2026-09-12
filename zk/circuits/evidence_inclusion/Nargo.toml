@@ -1,0 +1,8 @@
+[package]
+name = "evidence_inclusion"
+type = "bin"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+inclusion_lib = { path = "../../libraries/inclusion_lib" }
+kvch_fixtures = { path = "../../libraries/kvch_fixtures" }

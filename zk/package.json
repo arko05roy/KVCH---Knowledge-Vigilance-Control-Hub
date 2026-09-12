@@ -1,0 +1,19 @@
+{
+  "name": "kvch-zk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KVCH zero-knowledge subsystem: Noir circuits, NoirJS witness execution, Barretenberg UltraHonk proving, circom interop",
+  "dependencies": {
+    "@aztec/bb.js": "5.0.1",
+    "@noir-lang/noir_js": "1.0.0-beta.26",
+    "@noir-lang/noir_wasm": "1.0.0-beta.26",
+    "@noir-lang/types": "1.0.0-beta.26",
+    "circom_tester": "^0.0.21",
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.5"
+  },
+  "devDependencies": {
+    "circomlib": "^2.0.5"
+  }
+}

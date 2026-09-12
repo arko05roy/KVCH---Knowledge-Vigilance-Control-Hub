@@ -1,0 +1,15 @@
+[package]
+name = "fixture_gen"
+type = "bin"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+kvch_encoding = { path = "../../libraries/kvch_encoding" }
+kvch_commitments = { path = "../../libraries/kvch_commitments" }
+kvch_merkle = { path = "../../libraries/kvch_merkle" }
+kvch_fixtures = { path = "../../libraries/kvch_fixtures" }
+kvch_policy = { path = "../../libraries/kvch_policy" }
+threat_lib = { path = "../../libraries/threat_lib" }
+risk_lib = { path = "../../libraries/risk_lib" }
+endorsement_lib = { path = "../../libraries/endorsement_lib" }
+inclusion_lib = { path = "../../libraries/inclusion_lib" }

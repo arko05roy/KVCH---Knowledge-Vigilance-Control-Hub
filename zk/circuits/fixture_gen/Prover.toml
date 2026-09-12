@@ -1,0 +1,287 @@
+# Synthetic fixture inputs for fixture_gen (mirrors libraries/kvch_fixtures).
+# Commitment/draft slots left as 0 are patched in-circuit.
+
+[threat_public]
+protocol_version = 1
+circuit_id = 1
+community_id = 7
+chain_id = 11142220
+claim_registry_address = "797161134358056856230896843146392277790002887282"
+claim_series_id = 424242
+claim_version = 1
+issuer_company_code = 11
+claim_family_code = 0
+sector_code = 4
+severity_band_code = 0
+confidence_band_code = 0
+observed_epoch = 0
+valid_from_epoch = 493000
+expiry_epoch = 493720
+policy_commitment = 0
+evidence_commitment = 0
+payload_commitment = 0
+source_artifact_commitment = 705431
+approval_manifest_commitment = 0
+dlp_decision_commitment = 0
+disclosure_nullifier = 0
+claim_id = 0
+public_input_digest = 0
+
+[threat_private]
+exact_confidence_bps = 8750
+exact_severity_code = 3
+exact_observed_seconds = 1774801234
+required_source_mask = 5
+source_timestamp_vector = [492990, 0, 492950, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+leaf_count = 3
+family_derivation_vector = [7, 3, 0, 0]
+prohibited_data_mask = 0
+payload_schema_code = 1
+payload_field_count = 2
+payload_field_vector = [273, 546, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+payload_nonce = 1044177
+claim_nonce = 793114
+
+[threat_private.evidence_opening]
+index_bits = [true, false, true, false, false, false, false, false, false, false]
+siblings = [119, 618, 1117, 1616, 2115, 2614, 3113, 3612, 4111, 4610]
+selection_policy_code = 1
+normalization_version_code = 1
+
+[threat_private.evidence_opening.leaf]
+company_code = 11
+source_family_code = 1
+artifact_commitment = 698881
+record_id_commitment = 12533589
+observed_epoch = 492990
+ingested_epoch = 492995
+payload_commitment = 1911
+classification_code = 2
+authenticity_code = 2
+leaf_salt = 23063
+
+[threat_private.policy]
+claim_type_code = 1
+policy_version = 1
+effective_from_epoch = 490000
+effective_until_epoch = 499000
+threshold_vector = [2, 5000, 168, 2]
+required_source_mask = 5
+max_ttl_epochs = 2000
+codebook_version = 1
+
+[threat_private.approval]
+council_set_id = 12489473
+council_set_version = 1
+action_code = 1
+claim_draft_commitment = 0
+signer_count = 3
+tuples = [
+  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 494000 },
+  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 494000 },
+  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 494000 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+]
+
+[threat_private.dlp]
+claim_draft_commitment = 0
+projection_commitment = 3358
+prohibited_data_mask = 0
+scanner_policy_commitment = 23649
+decision_code = 1
+evaluated_epoch = 493000
+expiry_epoch = 494000
+
+[risk_public]
+protocol_version = 1
+circuit_id = 2
+chain_id = 11142220
+claim_registry_address = "797161134358056856230896843146392277790002887282"
+claim_series_id = 5150
+claim_version = 1
+issuer_company_code = 11
+audience_id = 9001
+purpose_code = 2
+period_code = 202608
+currency_code = 1
+metric_flags = 3
+eal_band_lower = 10000000000
+eal_band_upper = 25000000000
+var_band_lower = 10000000000
+var_band_upper = 30000000000
+var_percentile_bps = 9500
+appetite_relation_code = 1
+issued_epoch = 493010
+valid_until_epoch = 493730
+policy_commitment = 0
+lineage_commitment = 0
+disclosure_scope_id = 0
+disclosure_nullifier = 0
+claim_id = 0
+public_input_digest = 0
+
+[risk_private]
+eal_minor_exact = 15000000000
+var_minor_exact = 20000000000
+cvar_minor_exact = 28000000000
+var_percentile_exact_bps = 9500
+appetite_threshold_minor_exact = 20000000000
+report_schema_code = 1
+report_field_count = 2
+report_field_vector = [49, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+report_nonce = 3793
+claim_nonce = 333248
+
+[risk_private.risk_result]
+company_code = 11
+result_id_commitment = 2846
+period_code = 202608
+currency_code = 1
+metric_count = 3
+eal_minor = 15000000000
+var_minor = 20000000000
+cvar_minor = 28000000000
+var_percentile_bps = 9500
+completeness_mask = 7
+freshness_mask = 7
+evidence_commitment = 3776
+model_bundle_commitment = 3553
+result_nonce = 2313
+
+[risk_private.policy]
+claim_type_code = 2
+policy_version = 1
+effective_from_epoch = 490000
+effective_until_epoch = 499000
+threshold_vector = [3, 3, 72, 2]
+required_source_mask = 0
+max_ttl_epochs = 2000
+codebook_version = 1
+
+[risk_private.approval]
+council_set_id = 12489473
+council_set_version = 1
+action_code = 1
+claim_draft_commitment = 0
+signer_count = 3
+tuples = [
+  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 494000 },
+  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 494000 },
+  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 494000 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+  { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
+]
+
+[risk_private.dlp]
+claim_draft_commitment = 0
+projection_commitment = 3358
+prohibited_data_mask = 0
+scanner_policy_commitment = 23649
+decision_code = 1
+evaluated_epoch = 493000
+expiry_epoch = 494000
+
+[endorsement_public]
+protocol_version = 1
+circuit_id = 3
+chain_id = 11142220
+endorsement_registry_address = "797161134358056856230896843146392277790002887282"
+endorser_company_code = 22
+target_claim_id = 793117
+target_claim_version = 1
+target_issuer_company_code = 11
+endorsement_policy_commitment = 0
+local_evidence_commitment = 0
+match_class_code = 0
+endorsed_epoch = 493000
+expiry_epoch = 493720
+endorsement_nullifier = 0
+
+[endorsement_private]
+match_score_bps_exact = 7200
+assessed_epoch = 492950
+assessment_nonce = 708181
+leaf_count = 4
+
+[endorsement_private.local_evidence_opening]
+index_bits = [true, false, true, false, false, false, false, false, false, false]
+siblings = [119, 618, 1117, 1616, 2115, 2614, 3113, 3612, 4111, 4610]
+selection_policy_code = 1
+normalization_version_code = 1
+
+[endorsement_private.local_evidence_opening.leaf]
+company_code = 22
+source_family_code = 1
+artifact_commitment = 698881
+record_id_commitment = 3601
+observed_epoch = 492990
+ingested_epoch = 492995
+payload_commitment = 0
+classification_code = 2
+authenticity_code = 2
+leaf_salt = 23063
+
+[endorsement_private.policy]
+claim_type_code = 3
+policy_version = 1
+effective_from_epoch = 490000
+effective_until_epoch = 499000
+threshold_vector = [5000, 336, 7, 0]
+required_source_mask = 0
+max_ttl_epochs = 2000
+codebook_version = 1
+
+[inclusion_public]
+protocol_version = 1
+circuit_id = 4
+company_code = 11
+evidence_commitment = 0
+record_commitment = 0
+purpose_code = 2
+snapshot_version = 3
+audit_request_id = 44311
+audit_nullifier = 0
+
+[inclusion_private]
+leaf_count = 3
+
+[inclusion_private.opening]
+index_bits = [true, false, true, false, false, false, false, false, false, false]
+siblings = [119, 618, 1117, 1616, 2115, 2614, 3113, 3612, 4111, 4610]
+selection_policy_code = 1
+normalization_version_code = 1
+
+[inclusion_private.opening.leaf]
+company_code = 11
+source_family_code = 1
+artifact_commitment = 698881
+record_id_commitment = 12533589
+observed_epoch = 492990
+ingested_epoch = 492995
+payload_commitment = 1911
+classification_code = 2
+authenticity_code = 2
+leaf_salt = 23063

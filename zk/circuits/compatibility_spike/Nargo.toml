@@ -1,0 +1,6 @@
+[package]
+name = "compatibility_spike"
+type = "bin"
+compiler_version = ">=0.31.0"
+
+[dependencies]

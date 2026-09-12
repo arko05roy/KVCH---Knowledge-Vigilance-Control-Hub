@@ -1,0 +1,8 @@
+[package]
+name = "kvch_merkle"
+type = "lib"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+kvch_encoding = { path = "../kvch_encoding" }
+kvch_commitments = { path = "../kvch_commitments" }

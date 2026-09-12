@@ -1,0 +1,8 @@
+[package]
+name = "peer_endorsement"
+type = "bin"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+endorsement_lib = { path = "../../libraries/endorsement_lib" }
+kvch_fixtures = { path = "../../libraries/kvch_fixtures" }

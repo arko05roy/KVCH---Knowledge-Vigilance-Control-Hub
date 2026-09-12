@@ -1,0 +1,49 @@
+[public]
+protocol_version = 1
+circuit_id = 3
+chain_id = 11142220
+endorsement_registry_address = "0x8ba1f109551bd432803012645ac136ddd64dba72"
+endorser_company_code = 22
+target_claim_id = "0x0c1a1d"
+target_claim_version = 1
+target_issuer_company_code = 11
+endorsement_policy_commitment = "0x2055083851850aaeeb678a40fc4abda485e299ec062f3d5f9d9d6ff7b0a2f915"
+local_evidence_commitment = "0x07dfc490fb59b6d85d6e361cbc9260c79b365b24afd67614e88c2a2d64b4d317"
+match_class_code = 3
+endorsed_epoch = 493000
+expiry_epoch = 493720
+endorsement_nullifier = "0x17c1f5fc44203e0efdadfd300183b6a14ad93caffd6c9ad1fd8a23822b3d094b"
+
+[private]
+match_score_bps_exact = 7200
+assessed_epoch = 492950
+assessment_nonce = 708181
+leaf_count = 4
+
+[private.local_evidence_opening]
+index_bits = [true, false, true, false, false, false, false, false, false, false]
+siblings = [119, 618, 1117, 1616, 2115, 2614, 3113, 3612, 4111, 4610]
+selection_policy_code = 1
+normalization_version_code = 1
+
+[private.local_evidence_opening.leaf]
+company_code = 22
+source_family_code = 1
+artifact_commitment = 698881
+record_id_commitment = 3601
+observed_epoch = 492990
+ingested_epoch = 492995
+payload_commitment = "0x095952d5ba42e823f4990d0c140c3f289b7526b900e1bd6e5074320bde2f1b85"
+classification_code = 2
+authenticity_code = 2
+leaf_salt = 23063
+
+[private.policy]
+claim_type_code = 3
+policy_version = 1
+effective_from_epoch = 490000
+effective_until_epoch = 499000
+threshold_vector = [5000, 336, 7, 0]
+required_source_mask = 0
+max_ttl_epochs = 2000
+codebook_version = 1

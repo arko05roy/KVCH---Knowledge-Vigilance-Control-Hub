@@ -1,0 +1,8 @@
+[package]
+name = "stakeholder_risk_band"
+type = "bin"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+risk_lib = { path = "../../libraries/risk_lib" }
+kvch_fixtures = { path = "../../libraries/kvch_fixtures" }

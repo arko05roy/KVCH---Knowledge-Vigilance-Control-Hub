@@ -1,0 +1,13 @@
+[package]
+name = "kvch_fixtures"
+type = "lib"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+kvch_encoding = { path = "../kvch_encoding" }
+kvch_commitments = { path = "../kvch_commitments" }
+kvch_merkle = { path = "../kvch_merkle" }
+threat_lib = { path = "../threat_lib" }
+risk_lib = { path = "../risk_lib" }
+endorsement_lib = { path = "../endorsement_lib" }
+inclusion_lib = { path = "../inclusion_lib" }

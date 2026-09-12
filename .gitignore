@@ -3,3 +3,5 @@ __pycache__/
 .DS_Store
 *.log
 *.pid
+node_modules/
+zk/circuits/**/target/

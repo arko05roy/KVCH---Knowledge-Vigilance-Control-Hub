@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "libraries/kvch_encoding",
+    "libraries/kvch_commitments",
+    "libraries/kvch_merkle",
+    "libraries/kvch_policy",
+    "libraries/kvch_approval",
+    "libraries/kvch_fixtures",
+    "circuits/compatibility_spike",
+    "circuits/threat_eligibility",
+    "circuits/stakeholder_risk_band",
+    "circuits/peer_endorsement",
+    "circuits/evidence_inclusion",
+    "circuits/fixture_gen",
+]
+default-member = "circuits/compatibility_spike"

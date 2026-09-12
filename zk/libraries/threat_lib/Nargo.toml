@@ -1,0 +1,11 @@
+[package]
+name = "threat_lib"
+type = "lib"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+kvch_encoding = { path = "../kvch_encoding" }
+kvch_commitments = { path = "../kvch_commitments" }
+kvch_merkle = { path = "../kvch_merkle" }
+kvch_policy = { path = "../kvch_policy" }
+kvch_approval = { path = "../kvch_approval" }

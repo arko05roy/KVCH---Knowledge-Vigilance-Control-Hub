@@ -1,0 +1,8 @@
+[package]
+name = "threat_eligibility"
+type = "bin"
+compiler_version = ">=0.31.0"
+
+[dependencies]
+threat_lib = { path = "../../libraries/threat_lib" }
+kvch_fixtures = { path = "../../libraries/kvch_fixtures" }

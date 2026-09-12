@@ -1,0 +1,236 @@
+{
+  "public": {
+    "protocol_version": "1",
+    "circuit_id": "2",
+    "chain_id": "11142220",
+    "claim_registry_address": "0x8ba1f109551bd432803012645ac136ddd64dba72",
+    "claim_series_id": "0x141e",
+    "claim_version": "1",
+    "issuer_company_code": "11",
+    "audience_id": "9001",
+    "purpose_code": "2",
+    "period_code": "202608",
+    "currency_code": "1",
+    "metric_flags": "3",
+    "eal_band_lower": "10000000000",
+    "eal_band_upper": "25000000000",
+    "var_band_lower": "10000000000",
+    "var_band_upper": "30000000000",
+    "var_percentile_bps": "9500",
+    "appetite_relation_code": "1",
+    "issued_epoch": "493010",
+    "valid_until_epoch": "493730",
+    "policy_commitment": "0x2c74ffb2d877578ca6d17763c782651879d275ea6d69906dda00ed6ac09ab8c9",
+    "lineage_commitment": "0x1f65afdf9b724c72f8e3fb1fc7636cc4c91cd95d060962ca063339318da7e757",
+    "disclosure_scope_id": "0x2c26b7e6932e73e6d65af5e38479f3b4bab20da21d62c09b1bc21929e419d5c3",
+    "disclosure_nullifier": "0x08004ccfb377235dffd049cfcb42595e150f051e16cc2e84987609756c17daa9",
+    "claim_id": "0x16f9a545b2e322f955a8d507b10d6f6d942cc0c65a9b9d8cf80cf7e0521e5097",
+    "public_input_digest": "0x17a223663d690f50a17bbdee2b481080e37888f30a4fdf5e6af6f1bf5d450af9"
+  },
+  "private": {
+    "eal_minor_exact": "15000000000",
+    "var_minor_exact": "20000000000",
+    "cvar_minor_exact": "28000000000",
+    "var_percentile_exact_bps": "9500",
+    "appetite_threshold_minor_exact": "20000000000",
+    "report_schema_code": "1",
+    "report_field_count": "2",
+    "report_field_vector": [
+      "49",
+      "50",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "report_nonce": "3793",
+    "claim_nonce": "333248",
+    "risk_result": {
+      "company_code": "11",
+      "result_id_commitment": "2846",
+      "period_code": "202608",
+      "currency_code": "1",
+      "metric_count": "3",
+      "eal_minor": "15000000000",
+      "var_minor": "20000000000",
+      "cvar_minor": "28000000000",
+      "var_percentile_bps": "9500",
+      "completeness_mask": "7",
+      "freshness_mask": "7",
+      "evidence_commitment": "3776",
+      "model_bundle_commitment": "3553",
+      "result_nonce": "2313"
+    },
+    "policy": {
+      "claim_type_code": "2",
+      "policy_version": "1",
+      "effective_from_epoch": "490000",
+      "effective_until_epoch": "499000",
+      "threshold_vector": [
+        "3",
+        "3",
+        "72",
+        "2"
+      ],
+      "required_source_mask": "0",
+      "max_ttl_epochs": "2000",
+      "codebook_version": "1"
+    },
+    "approval": {
+      "council_set_id": "12489473",
+      "council_set_version": "1",
+      "action_code": "1",
+      "claim_draft_commitment": "0x106626345e26d1d04ee8920acfde6bc3dab40960164003a6b10d7d0553f8da42",
+      "signer_count": "3",
+      "tuples": [
+        {
+          "signer_id_commitment": "20830",
+          "role_code": "1",
+          "decision_code": "1",
+          "signer_nonce": "57005",
+          "deadline_epoch": "494000"
+        },
+        {
+          "signer_id_commitment": "23361",
+          "role_code": "1",
+          "decision_code": "1",
+          "signer_nonce": "57006",
+          "deadline_epoch": "494000"
+        },
+        {
+          "signer_id_commitment": "25892",
+          "role_code": "1",
+          "decision_code": "1",
+          "signer_nonce": "57007",
+          "deadline_epoch": "494000"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        },
+        {
+          "signer_id_commitment": "0",
+          "role_code": "0",
+          "decision_code": "0",
+          "signer_nonce": "0",
+          "deadline_epoch": "0"
+        }
+      ]
+    },
+    "dlp": {
+      "claim_draft_commitment": "0x106626345e26d1d04ee8920acfde6bc3dab40960164003a6b10d7d0553f8da42",
+      "projection_commitment": "3358",
+      "prohibited_data_mask": "0",
+      "scanner_policy_commitment": "23649",
+      "decision_code": "1",
+      "evaluated_epoch": "493000",
+      "expiry_epoch": "494000"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "toolchain": "kvch.zk.toolchain",
+  "version": "1.0.0",
+  "frozen_at": "2026-09-12",
+  "platform": "darwin-arm64",
+  "cli": {
+    "nargo": {
+      "version": "1.0.0-beta.26",
+      "noirc": "1.0.0-beta.26+40d6574f851d926f93e0c3a271bac3e6e82ac905",
+      "path": "~/.nargo/bin/nargo",
+      "sha256": "f6813368af0a901261cf0cc785d8f3c75a038756b2c9927fbd990e64239d3781",
+      "installed_via": "noirup"
+    },
+    "bb": {
+      "version": "5.0.0",
+      "path": "~/.bb/bb",
+      "sha256": "a109b1dc96189516224d4d5fc03d2ebd39555deb4a5b29c5952323c185edd73d",
+      "installed_via": "bbup",
+      "note": "bb-versions.json maps only up to noir 1.0.0-beta.22; 5.0.0 verified compatible via compatibility_spike prove/verify"
+    },
+    "circom": {
+      "version": "2.2.3",
+      "path": "~/.local/bin/circom",
+      "sha256": "e006332b3fe225f11c3b87bd2debbf5d7f568d6efbde25e5a6a12cd6988c8ecb",
+      "installed_via": "github release circom-macos-amd64 (runs under Rosetta 2)"
+    }
+  },
+  "npm": {
+    "@noir-lang/noir_js": "1.0.0-beta.26",
+    "@noir-lang/noir_wasm": "1.0.0-beta.26",
+    "@noir-lang/types": "1.0.0-beta.26",
+    "@aztec/bb.js": "5.0.1",
+    "snarkjs": "0.7.6",
+    "circomlibjs": "0.1.7",
+    "circom_tester": "0.0.21",
+    "circomlib": "installed (devDependency)"
+  },
+  "compatibility_spike": {
+    "circuit": "circuits/compatibility_spike",
+    "cli_flow": "nargo compile && nargo execute && bb prove -t noir-recursive-no-zk --write_vk && bb verify -t noir-recursive-no-zk -> PASS",
+    "node_flow": "noir_js Noir.execute + bb.js UltraHonkBackend generateProof/verifyProof (verifierTarget noir-recursive-no-zk) -> PASS, proof 410 fields / 13120 bytes",
+    "circom_flow": "circom --r1cs --wasm + snarkjs groth16 setup/prove/verify -> PASS"
+  }
+}
