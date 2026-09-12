@@ -3,12 +3,12 @@
     "protocol_version": "1",
     "circuit_id": "4",
     "company_code": "11",
-    "evidence_commitment": "0x079cefc793e554bc8590f93755771226be602f810b344c3b0bc39662a1e8b94f",
+    "evidence_commitment": "0x26a2ca0650128ec012be3284a984e9b0b2a2522846cd4eab98c22548d6f8d154",
     "record_commitment": "0x119295d20e6fa79b99dd14c769cd9a385f6b799739b7c848e4279ce3dec3216b",
     "purpose_code": "2",
     "snapshot_version": "3",
     "audit_request_id": "0xad17",
-    "audit_nullifier": "0x23cc02bbde3f8571d0d0da51d08dc99e839e8702b98868b1716d9726a439ba8f"
+    "audit_nullifier": "0x2a9293cb86bab3fa897359ab07ed0c686e3156ce46f3d51eb8fb1a2a21131d4a"
   },
   "private": {
     "leaf_count": "3",
@@ -44,8 +44,8 @@
         "source_family_code": "1",
         "artifact_commitment": "698881",
         "record_id_commitment": "12533589",
-        "observed_epoch": "492990",
-        "ingested_epoch": "492995",
+        "observed_epoch": "497001",
+        "ingested_epoch": "497006",
         "payload_commitment": "1911",
         "classification_code": "2",
         "authenticity_code": "2",

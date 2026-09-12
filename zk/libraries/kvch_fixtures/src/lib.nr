@@ -21,19 +21,19 @@ pub global CLAIM_SERIES: Field = 424242;
 pub global ISSUER: u32 = 11;
 pub global PEER_COMPANY: u32 = 22;
 pub global AUDIENCE_STAKEHOLDER: u32 = 9001;
-pub global OBSERVED_SECONDS: u64 = 493000 * 3600 + 1234; // inside epoch 493000
-pub global OBSERVED_EPOCH: u32 = 493000;
-pub global VALID_FROM: u32 = 493000;
-pub global EXPIRY: u32 = 493720; // +720 epochs (~30 days)
-pub global ISSUED: u32 = 493010;
-pub global VALID_UNTIL: u32 = 493730;
+pub global OBSERVED_SECONDS: u64 = 497011 * 3600 + 1234; // inside epoch 497011
+pub global OBSERVED_EPOCH: u32 = 497011;
+pub global VALID_FROM: u32 = 497011;
+pub global EXPIRY: u32 = 497731; // +720 epochs (~30 days)
+pub global ISSUED: u32 = 497021;
+pub global VALID_UNTIL: u32 = 497741;
 
 fn policy(claim_type: u16) -> PolicyWitness {
     PolicyWitness {
         claim_type_code: claim_type,
         policy_version: 1,
-        effective_from_epoch: 490000,
-        effective_until_epoch: 499000,
+        effective_from_epoch: 494011,
+        effective_until_epoch: 503011,
         threshold_vector: [0; 4],
         required_source_mask: 0,
         max_ttl_epochs: 2000,
@@ -82,8 +82,8 @@ pub fn evidence_opening(company: u32, payload_commitment: Field, record_id: Fiel
         source_family_code: 1,
         artifact_commitment: 0xaaa01,
         record_id_commitment: record_id,
-        observed_epoch: 492990,
-        ingested_epoch: 492995,
+        observed_epoch: 497001,
+        ingested_epoch: 497006,
         payload_commitment,
         classification_code: 2,
         authenticity_code: 2,
@@ -120,7 +120,7 @@ fn approval() -> ApprovalManifestWitness {
             role_code: 1,
             decision_code: APPROVAL_DECISION_APPROVE,
             signer_nonce: 0xdead + i as Field,
-            deadline_epoch: 494000,
+            deadline_epoch: 498011,
         };
     }
     ApprovalManifestWitness {
@@ -140,15 +140,15 @@ fn dlp() -> DlpDecisionWitness {
         prohibited_data_mask: 0,
         scanner_policy_commitment: 0x5ca1,
         decision_code: DLP_DECISION_PASS,
-        evaluated_epoch: 493000,
-        expiry_epoch: 494000,
+        evaluated_epoch: 497011,
+        expiry_epoch: 498011,
     }
 }
 
 fn source_timestamps() -> [u32; MAX_SOURCE_FAMILIES] {
     let mut v: [u32; MAX_SOURCE_FAMILIES] = [0; MAX_SOURCE_FAMILIES];
-    v[0] = 492990; // family bit0 (family code 1)
-    v[2] = 492950; // family bit2 (family code 3)
+    v[0] = 497001; // family bit0 (family code 1)
+    v[2] = 496961; // family bit2 (family code 3)
     v
 }
 
@@ -315,12 +315,12 @@ pub fn endorsement() -> (EndorsementPublic, EndorsementPrivate) {
         7200,
         3,
         0,
-        492950,
+        496961,
         0xace55,
     );
     let w = EndorsementPrivate {
         match_score_bps_exact: 7200, // >= 5000 threshold, class 3 STRONG
-        assessed_epoch: 492950,
+        assessed_epoch: 496961,
         assessment_nonce: 0xace55,
         leaf_count: 4,
         local_evidence_opening: evidence_opening(PEER_COMPANY, assess_payload, 0xe11),

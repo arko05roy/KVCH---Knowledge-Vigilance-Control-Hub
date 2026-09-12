@@ -15,8 +15,8 @@ sector_code = 4
 severity_band_code = 0
 confidence_band_code = 0
 observed_epoch = 0
-valid_from_epoch = 493000
-expiry_epoch = 493720
+valid_from_epoch = 497011
+expiry_epoch = 497731
 policy_commitment = 0
 evidence_commitment = 0
 payload_commitment = 0
@@ -30,9 +30,9 @@ public_input_digest = 0
 [threat_private]
 exact_confidence_bps = 8750
 exact_severity_code = 3
-exact_observed_seconds = 1774801234
+exact_observed_seconds = 1789240834
 required_source_mask = 5
-source_timestamp_vector = [492990, 0, 492950, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+source_timestamp_vector = [497001, 0, 496961, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 leaf_count = 3
 family_derivation_vector = [7, 3, 0, 0]
 prohibited_data_mask = 0
@@ -53,8 +53,8 @@ company_code = 11
 source_family_code = 1
 artifact_commitment = 698881
 record_id_commitment = 12533589
-observed_epoch = 492990
-ingested_epoch = 492995
+observed_epoch = 497001
+ingested_epoch = 497006
 payload_commitment = 1911
 classification_code = 2
 authenticity_code = 2
@@ -63,8 +63,8 @@ leaf_salt = 23063
 [threat_private.policy]
 claim_type_code = 1
 policy_version = 1
-effective_from_epoch = 490000
-effective_until_epoch = 499000
+effective_from_epoch = 494011
+effective_until_epoch = 503011
 threshold_vector = [2, 5000, 168, 2]
 required_source_mask = 5
 max_ttl_epochs = 2000
@@ -77,9 +77,9 @@ action_code = 1
 claim_draft_commitment = 0
 signer_count = 3
 tuples = [
-  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 494000 },
-  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 494000 },
-  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 494000 },
+  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 498011 },
+  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 498011 },
+  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 498011 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
@@ -101,8 +101,8 @@ projection_commitment = 3358
 prohibited_data_mask = 0
 scanner_policy_commitment = 23649
 decision_code = 1
-evaluated_epoch = 493000
-expiry_epoch = 494000
+evaluated_epoch = 497011
+expiry_epoch = 498011
 
 [risk_public]
 protocol_version = 1
@@ -123,8 +123,8 @@ var_band_lower = 10000000000
 var_band_upper = 30000000000
 var_percentile_bps = 9500
 appetite_relation_code = 1
-issued_epoch = 493010
-valid_until_epoch = 493730
+issued_epoch = 497021
+valid_until_epoch = 497741
 policy_commitment = 0
 lineage_commitment = 0
 disclosure_scope_id = 0
@@ -163,8 +163,8 @@ result_nonce = 2313
 [risk_private.policy]
 claim_type_code = 2
 policy_version = 1
-effective_from_epoch = 490000
-effective_until_epoch = 499000
+effective_from_epoch = 494011
+effective_until_epoch = 503011
 threshold_vector = [3, 3, 72, 2]
 required_source_mask = 0
 max_ttl_epochs = 2000
@@ -177,9 +177,9 @@ action_code = 1
 claim_draft_commitment = 0
 signer_count = 3
 tuples = [
-  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 494000 },
-  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 494000 },
-  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 494000 },
+  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 498011 },
+  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 498011 },
+  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 498011 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
@@ -201,8 +201,8 @@ projection_commitment = 3358
 prohibited_data_mask = 0
 scanner_policy_commitment = 23649
 decision_code = 1
-evaluated_epoch = 493000
-expiry_epoch = 494000
+evaluated_epoch = 497011
+expiry_epoch = 498011
 
 [endorsement_public]
 protocol_version = 1
@@ -210,19 +210,19 @@ circuit_id = 3
 chain_id = 11142220
 endorsement_registry_address = "797161134358056856230896843146392277790002887282"
 endorser_company_code = 22
-target_claim_id = 793117
+target_claim_id = "0x204a225b4fff6743a6e87e9388ddf24b65cc40207d3195709477658076063334"
 target_claim_version = 1
 target_issuer_company_code = 11
 endorsement_policy_commitment = 0
 local_evidence_commitment = 0
 match_class_code = 0
-endorsed_epoch = 493000
-expiry_epoch = 493720
+endorsed_epoch = 497011
+expiry_epoch = 497731
 endorsement_nullifier = 0
 
 [endorsement_private]
 match_score_bps_exact = 7200
-assessed_epoch = 492950
+assessed_epoch = 496961
 assessment_nonce = 708181
 leaf_count = 4
 
@@ -237,8 +237,8 @@ company_code = 22
 source_family_code = 1
 artifact_commitment = 698881
 record_id_commitment = 3601
-observed_epoch = 492990
-ingested_epoch = 492995
+observed_epoch = 497001
+ingested_epoch = 497006
 payload_commitment = 0
 classification_code = 2
 authenticity_code = 2
@@ -247,8 +247,8 @@ leaf_salt = 23063
 [endorsement_private.policy]
 claim_type_code = 3
 policy_version = 1
-effective_from_epoch = 490000
-effective_until_epoch = 499000
+effective_from_epoch = 494011
+effective_until_epoch = 503011
 threshold_vector = [5000, 336, 7, 0]
 required_source_mask = 0
 max_ttl_epochs = 2000
@@ -279,8 +279,8 @@ company_code = 11
 source_family_code = 1
 artifact_commitment = 698881
 record_id_commitment = 12533589
-observed_epoch = 492990
-ingested_epoch = 492995
+observed_epoch = 497001
+ingested_epoch = 497006
 payload_commitment = 1911
 classification_code = 2
 authenticity_code = 2

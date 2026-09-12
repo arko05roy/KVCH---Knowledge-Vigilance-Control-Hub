@@ -5,3 +5,8 @@ __pycache__/
 *.pid
 node_modules/
 zk/circuits/**/target/
+
+# zk deploy env (contains generated keys)
+zk/.env.deploy
+zk/bundles/
+zk/deployments/

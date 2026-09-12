@@ -140,3 +140,247 @@ model Finding {
   @@index([artifactId, observedAt])
   @@index([runId])
 }
+
+// ---------------------------------------------------------------------------
+// ZK subsystem — ZK-owned state only; never references upstream tables.
+// ---------------------------------------------------------------------------
+
+enum ZkJobStatus {
+  queued
+  proving
+  verifying
+  attestating
+  publishing
+  submitted
+  anchored
+  failed
+  cancelled
+}
+
+enum ZkClaimStatus {
+  pending
+  anchored
+  revoked
+  superseded
+  invalidated
+  expired
+}
+
+enum ZkArtifactStatus {
+  active
+  paused
+  deprecated
+  invalidated
+}
+
+enum ZkDisputeStatus {
+  open
+  resolved
+  appealed
+}
+
+model ZkInputBundle {
+  id             String   @id @default(cuid())
+  companyId      String
+  adapterKey     String
+  adapterVersion String
+  envelopeDigest String
+  envelopeRef    String
+  schemaVersion  String
+  createdAt      DateTime @default(now())
+  proofJobs      ZkProofJob[]
+
+  @@unique([companyId, envelopeDigest])
+  @@index([companyId, createdAt])
+}
+
+model ZkEvidenceSnapshot {
+  id                   String   @id @default(cuid())
+  companyId            String
+  snapshotDigest       String
+  merkleRoot           String
+  leafCount            Int
+  selectionPolicyCode  Int
+  normalizationCode    Int
+  createdAt            DateTime @default(now())
+
+  @@unique([companyId, snapshotDigest])
+}
+
+model ZkCircuitVersion {
+  id             String           @id @default(cuid())
+  circuitId      String           @unique
+  name           String
+  artifactDigest String
+  vkDigest       String
+  proofFlavor    String
+  status         ZkArtifactStatus @default(active)
+  registeredAt   DateTime?
+  createdAt      DateTime         @default(now())
+  proofJobs      ZkProofJob[]
+
+  @@index([status])
+}
+
+model ZkPolicyVersion {
+  id              String           @id @default(cuid())
+  policyId        String           @unique
+  policyDigest    String
+  codebookDigest  String
+  sourceDigest    String?
+  auditDigest     String?
+  containerDigest String?
+  status          ZkArtifactStatus @default(active)
+  createdAt       DateTime         @default(now())
+  proofJobs       ZkProofJob[]
+}
+
+model ZkProofJob {
+  id                 String       @id @default(cuid())
+  companyId          String
+  claimKind          String // threat | risk | endorsement | inclusion
+  idempotencyKey     String       @unique
+  status             ZkJobStatus  @default(queued)
+  inputBundleId      String
+  circuitVersionId   String
+  policyVersionId    String
+  expectedDigest     String?
+  bundleDigest       String?
+  errorCode          String?
+  errorDetail        String?
+  attemptCount       Int          @default(0)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  finishedAt         DateTime?
+  inputBundle        ZkInputBundle   @relation(fields: [inputBundleId], references: [id], onDelete: Restrict)
+  circuitVersion     ZkCircuitVersion @relation(fields: [circuitVersionId], references: [id], onDelete: Restrict)
+  policyVersion      ZkPolicyVersion  @relation(fields: [policyVersionId], references: [id], onDelete: Restrict)
+  bundle             ZkProofBundle?
+  attestations       ZkVerifierAttestation[]
+  claim              ZkClaim?
+  endorsement        ZkEndorsement?
+
+  @@index([companyId, status, createdAt])
+}
+
+model ZkProofBundle {
+  id          String   @id @default(cuid())
+  jobId       String   @unique
+  bundleDigest String  @unique
+  refDigest   String
+  body        Json
+  byteSize    Int
+  createdAt   DateTime @default(now())
+  job         ZkProofJob @relation(fields: [jobId], references: [id], onDelete: Restrict)
+}
+
+model ZkVerifierAttestation {
+  id        String   @id @default(cuid())
+  jobId     String
+  claimId   String
+  verifier  String
+  decision  Int
+  reasonCode Int
+  nonce     String
+  issuedAt  BigInt
+  deadline  BigInt
+  signature String
+  digest    String
+  createdAt DateTime @default(now())
+  job       ZkProofJob @relation(fields: [jobId], references: [id], onDelete: Restrict)
+
+  @@unique([jobId, verifier])
+  @@index([claimId])
+}
+
+enum ZkChainStatus {
+  pending
+  confirmed
+}
+
+model ZkClaim {
+  id                  String        @id @default(cuid())
+  claimId             String        @unique
+  jobId               String        @unique
+  companyId           String
+  claimSeriesId       String
+  claimVersion        Int
+  issuerCompanyCode   BigInt
+  status              ZkClaimStatus @default(pending)
+  chainStatus         ZkChainStatus @default(pending)
+  bundleDigest        String
+  publicInputDigest   String
+  disclosureNullifier String
+  councilSetId        BigInt
+  expiryEpoch         BigInt
+  txHash              String?
+  blockNumber         BigInt?
+  anchoredAt          DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  job                 ZkProofJob    @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  endorsements        ZkEndorsement[]
+  disputes            ZkDispute[]
+
+  @@index([companyId, status])
+  @@index([status])
+}
+
+model ZkEndorsement {
+  id                   String   @id @default(cuid())
+  endorsementId        String   @unique
+  jobId                String   @unique
+  targetClaimId        String
+  endorserCompanyCode  BigInt
+  endorsementNullifier String
+  matchBandCode        Int
+  bundleDigest         String
+  txHash               String?
+  chainStatus          ZkChainStatus @default(pending)
+  createdAt            DateTime @default(now())
+  job                  ZkProofJob @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  targetClaim          ZkClaim    @relation(fields: [targetClaimId], references: [claimId], onDelete: Restrict)
+
+  @@unique([targetClaimId, endorserCompanyCode])
+  @@index([targetClaimId])
+}
+
+model ZkDispute {
+  id               String          @id @default(cuid())
+  claimId          String
+  status           ZkDisputeStatus @default(open)
+  reasonCode       Int
+  evidenceDigest   String
+  resolutionDigest String?
+  resolutionCode   Int?
+  appealRef        String?
+  txHash           String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  claim            ZkClaim         @relation(fields: [claimId], references: [claimId], onDelete: Restrict)
+
+  @@index([claimId, status])
+}
+
+model ZkChainEvent {
+  id              String   @id @default(cuid())
+  chainId         Int
+  contractAddress String
+  eventName       String
+  txHash          String
+  logIndex        Int
+  blockNumber     BigInt
+  blockHash       String
+  payload         Json
+  processedAt     DateTime @default(now())
+
+  @@unique([chainId, txHash, logIndex])
+  @@index([chainId, blockNumber])
+}
+
+model ZkIndexerCursor {
+  id            String  @id @default("celo")
+  chainId       Int
+  lastBlock     BigInt  @default(0)
+  updatedAt     DateTime @updatedAt
+}

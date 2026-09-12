@@ -40,5 +40,13 @@
     "cli_flow": "nargo compile && nargo execute && bb prove -t noir-recursive-no-zk --write_vk && bb verify -t noir-recursive-no-zk -> PASS",
     "node_flow": "noir_js Noir.execute + bb.js UltraHonkBackend generateProof/verifyProof (verifierTarget noir-recursive-no-zk) -> PASS, proof 410 fields / 13120 bytes",
     "circom_flow": "circom --r1cs --wasm + snarkjs groth16 setup/prove/verify -> PASS"
+  },
+  "tools": {
+    "forge": "1.8.1",
+    "anvil": "1.8.1",
+    "cast": "1.8.1",
+    "openzeppelin-contracts": "v5.4.0",
+    "solc": "0.8.28",
+    "viem": "2.38.3"
   }
 }

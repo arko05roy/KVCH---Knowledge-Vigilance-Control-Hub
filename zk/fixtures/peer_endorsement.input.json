@@ -5,19 +5,19 @@
     "chain_id": "11142220",
     "endorsement_registry_address": "0x8ba1f109551bd432803012645ac136ddd64dba72",
     "endorser_company_code": "22",
-    "target_claim_id": "0x0c1a1d",
+    "target_claim_id": "0x204a225b4fff6743a6e87e9388ddf24b65cc40207d3195709477658076063334",
     "target_claim_version": "1",
     "target_issuer_company_code": "11",
-    "endorsement_policy_commitment": "0x2055083851850aaeeb678a40fc4abda485e299ec062f3d5f9d9d6ff7b0a2f915",
-    "local_evidence_commitment": "0x07dfc490fb59b6d85d6e361cbc9260c79b365b24afd67614e88c2a2d64b4d317",
+    "endorsement_policy_commitment": "0x2636d6214972c99070737ee8bd0e8dc22ab69b91c9cc3e818764a2026ec9a9c9",
+    "local_evidence_commitment": "0x29cce13fec1eafab3467877f3fa0326f43b59e40bd029df608a0d410e11dd9e8",
     "match_class_code": "3",
-    "endorsed_epoch": "493000",
-    "expiry_epoch": "493720",
-    "endorsement_nullifier": "0x17c1f5fc44203e0efdadfd300183b6a14ad93caffd6c9ad1fd8a23822b3d094b"
+    "endorsed_epoch": "497011",
+    "expiry_epoch": "497731",
+    "endorsement_nullifier": "0x2d4e5256aaa07d63d394d8916f7128e39bb19c854b3a7935f86aff9d84b6c86a"
   },
   "private": {
     "match_score_bps_exact": "7200",
-    "assessed_epoch": "492950",
+    "assessed_epoch": "496961",
     "assessment_nonce": "708181",
     "leaf_count": "4",
     "local_evidence_opening": {
@@ -52,9 +52,9 @@
         "source_family_code": "1",
         "artifact_commitment": "698881",
         "record_id_commitment": "3601",
-        "observed_epoch": "492990",
-        "ingested_epoch": "492995",
-        "payload_commitment": "0x095952d5ba42e823f4990d0c140c3f289b7526b900e1bd6e5074320bde2f1b85",
+        "observed_epoch": "497001",
+        "ingested_epoch": "497006",
+        "payload_commitment": "0x17dc6f875ac01f98fdc2d48cd579aeca8c3e77be2c1133f43fc3d35e68b2174c",
         "classification_code": "2",
         "authenticity_code": "2",
         "leaf_salt": "23063"
@@ -63,8 +63,8 @@
     "policy": {
       "claim_type_code": "3",
       "policy_version": "1",
-      "effective_from_epoch": "490000",
-      "effective_until_epoch": "499000",
+      "effective_from_epoch": "494011",
+      "effective_until_epoch": "503011",
       "threshold_vector": [
         "5000",
         "336",

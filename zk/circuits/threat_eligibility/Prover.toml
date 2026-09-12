@@ -11,25 +11,25 @@ claim_family_code = 3
 sector_code = 4
 severity_band_code = 3
 confidence_band_code = 4
-observed_epoch = 493000
-valid_from_epoch = 493000
-expiry_epoch = 493720
-policy_commitment = "0x0b2b97f735bc1efa616eca5bf5d940fe798c35b16b973eeb2d88f0d96c3a322e"
-evidence_commitment = "0x079cefc793e554bc8590f93755771226be602f810b344c3b0bc39662a1e8b94f"
+observed_epoch = 497011
+valid_from_epoch = 497011
+expiry_epoch = 497731
+policy_commitment = "0x2e2ed43a05bc2dec60682433e48cf43d46566cd4f73c9d312f499fd04f4a25d5"
+evidence_commitment = "0x26a2ca0650128ec012be3284a984e9b0b2a2522846cd4eab98c22548d6f8d154"
 payload_commitment = "0x02608338e8afd4549eb7f93a8c0380c14772ad36632cc7f5eaa24e7e87cfff72"
 source_artifact_commitment = "0x0ac397"
-approval_manifest_commitment = "0x08f1a0e15c7568f92dd496962105a4b8433e0a9e1b79fba771a3f18e6438e001"
-dlp_decision_commitment = "0x2143e094ac00e50def0dfc02a52dc23cf448d8b17353dba042595a8678cd8fb3"
-disclosure_nullifier = "0x2c025a2cda8e99c162705cc0d9fd9d3773283ab90dc9f07d63c49b8b0d1cec3d"
-claim_id = "0x19a2e85fa18f8d669a2372e2106c91cd3885dab569da563143888112b1bd759f"
-public_input_digest = "0x1480287dfe4f5d5569dc2d3920475996c9e7fd5fdf974d30abbcad6067a8feba"
+approval_manifest_commitment = "0x2bb34c67dc365af9c7d5690733fef42d41c4a99380ad9ffb72f647840cddfc89"
+dlp_decision_commitment = "0x0e218208f25c4b994f3f1374c39ec1847c0cf23ed3841717ae1b9f12577162d4"
+disclosure_nullifier = "0x0f9e0bff42b1b0187e98ca8ec8c1ba76c3f75bd48329099d911bfc3d207a9118"
+claim_id = "0x204a225b4fff6743a6e87e9388ddf24b65cc40207d3195709477658076063334"
+public_input_digest = "0x0c18b623eda1cda94b47bfdf80103ca854d7f2e9a5ad4d9f1c0138991f0c8d62"
 
 [private]
 exact_confidence_bps = 8750
 exact_severity_code = 3
-exact_observed_seconds = 1774801234
+exact_observed_seconds = 1789240834
 required_source_mask = 5
-source_timestamp_vector = [492990, 0, 492950, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+source_timestamp_vector = [497001, 0, 496961, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 leaf_count = 3
 family_derivation_vector = [7, 3, 0, 0]
 prohibited_data_mask = 0
@@ -50,8 +50,8 @@ company_code = 11
 source_family_code = 1
 artifact_commitment = 698881
 record_id_commitment = 12533589
-observed_epoch = 492990
-ingested_epoch = 492995
+observed_epoch = 497001
+ingested_epoch = 497006
 payload_commitment = 1911
 classification_code = 2
 authenticity_code = 2
@@ -60,8 +60,8 @@ leaf_salt = 23063
 [private.policy]
 claim_type_code = 1
 policy_version = 1
-effective_from_epoch = 490000
-effective_until_epoch = 499000
+effective_from_epoch = 494011
+effective_until_epoch = 503011
 threshold_vector = [2, 5000, 168, 2]
 required_source_mask = 5
 max_ttl_epochs = 2000
@@ -71,12 +71,12 @@ codebook_version = 1
 council_set_id = 12489473
 council_set_version = 1
 action_code = 1
-claim_draft_commitment = "0x2b26313196c15c69de88f69217a526d7e5bed081772d603592e16df9b0c520f8"
+claim_draft_commitment = "0x2235c133bd905eda474801439e293ef8e9f527395ff5512579fc6cc45cd115fb"
 signer_count = 3
 tuples = [
-  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 494000 },
-  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 494000 },
-  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 494000 },
+  { signer_id_commitment = 20830, role_code = 1, decision_code = 1, signer_nonce = 57005, deadline_epoch = 498011 },
+  { signer_id_commitment = 23361, role_code = 1, decision_code = 1, signer_nonce = 57006, deadline_epoch = 498011 },
+  { signer_id_commitment = 25892, role_code = 1, decision_code = 1, signer_nonce = 57007, deadline_epoch = 498011 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
   { signer_id_commitment = 0, role_code = 0, decision_code = 0, signer_nonce = 0, deadline_epoch = 0 },
@@ -93,10 +93,10 @@ tuples = [
 ]
 
 [private.dlp]
-claim_draft_commitment = "0x2b26313196c15c69de88f69217a526d7e5bed081772d603592e16df9b0c520f8"
+claim_draft_commitment = "0x2235c133bd905eda474801439e293ef8e9f527395ff5512579fc6cc45cd115fb"
 projection_commitment = 3358
 prohibited_data_mask = 0
 scanner_policy_commitment = 23649
 decision_code = 1
-evaluated_epoch = 493000
-expiry_epoch = 494000
+evaluated_epoch = 497011
+expiry_epoch = 498011
