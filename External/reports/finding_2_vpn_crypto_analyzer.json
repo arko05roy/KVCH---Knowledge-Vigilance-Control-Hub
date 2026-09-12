@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-12T16:56:47.188074Z",
+  "observed_at": "2026-09-12T17:07:54.039919Z",
   "severity": "low",
   "category": "vpn_crypto_analyzer",
   "title": "VPN Cryptographic Security Analysis",
@@ -28,9 +28,9 @@
   "details": {
     "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
     "target_hostname": "MacBook-Air.local",
-    "scan_timestamp": "2026-09-12T22:26:42.187769Z",
+    "scan_timestamp": "2026-09-12T22:37:49.321464Z",
     "execution_metrics": {
-      "duration_seconds": 5.001
+      "duration_seconds": 4.719
     },
     "cryptographic_assessment": {
       "security_score": 100,
