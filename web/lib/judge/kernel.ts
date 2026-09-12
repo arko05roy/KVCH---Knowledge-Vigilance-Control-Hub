@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import * as tar from "tar";
-import type { ExtensionManifest } from "@arko05roy/kvch-extension";
+import { verifyHardwareSignature, verifyHardwareProfile, type ExtensionManifest } from "@arko05roy/kvch-extension";
 import { selectAdapter, verifyAdapterRuntime, type AdapterDescriptor } from "./adapters";
 import { parseFindingsJsonl, type FindingEnvelope } from "./findings";
 import { runShellCommand, type ProcessResult } from "./process";
@@ -45,11 +45,15 @@ export class KvchJudge {
       return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Missing hardware binding header (.kvch-hardware-print)" };
     }
 
-    // @arko05roy/kvch-extension@0.1.2 does not expose hardware-binding
-    // verification APIs; artifacts carrying a binding cannot be validated
-    // against an authorized profile, so execution fails closed.
-    process.stderr.write(`[CRITICAL SECURITY VIOLATION] Hardware binding verification unavailable in installed SDK for artifact ${artifact.sha256}\n`);
-    return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Hardware binding verification unavailable in installed SDK" };
+    if (!verifyHardwareSignature(binding.hardwareFingerprint, binding.artifactSha256, binding.signature)) {
+      process.stderr.write(`[CRITICAL SECURITY VIOLATION] Invalid hardware fingerprint signature for artifact ${artifact.sha256}\n`);
+      return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Invalid hardware fingerprint signature" };
+    }
+
+    if (!verifyHardwareProfile(binding.hardwareFingerprint)) {
+      process.stderr.write(`[CRITICAL SECURITY VIOLATION] Unauthorized hardware profile for artifact ${artifact.sha256}\n`);
+      return { adapter, manifest: inspected.manifest, phases: [], findings: [], failureReason: "CRITICAL: Security Violation - Unauthorized hardware profile" };
+    }
 
     try {
       await verifyAdapterRuntime(adapter, this.config);

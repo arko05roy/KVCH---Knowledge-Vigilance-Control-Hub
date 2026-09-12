@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-12T17:14:11.269952Z",
+  "observed_at": "2026-09-12T17:38:22.818518Z",
   "severity": "critical",
   "category": "core_security_suite_1_8",
   "title": "KVCH Core Security Suite (Extensions 1-8) Combined Finding Report",
@@ -128,14 +128,14 @@
   },
   "recommended_actions": [
     "Perform sandbox execution analysis if high entropy indicates obfuscation",
+    "Enforce strong AES-GCM encryption ciphers for IPsec proposals",
     "Replace innerHTML and eval() sinks with safe textContent and DOM APIs",
     "Store JWT session tokens in HttpOnly cookies instead of localStorage",
+    "Ensure secure SHA-256 or SHA-512 PRF functions are used",
     "Enforce HttpOnly and Secure flags on all session cookies",
-    "Enforce strong AES-GCM encryption ciphers for IPsec proposals",
     "Disable deprecated Diffie-Hellman groups below DH Group 14",
-    "Verify file SHA-256 against threat intelligence hash databases",
     "Quarantine files matching known YARA signatures immediately",
-    "Ensure secure SHA-256 or SHA-512 PRF functions are used"
+    "Verify file SHA-256 against threat intelligence hash databases"
   ],
   "active_response": {},
   "details": {
@@ -147,9 +147,9 @@
       "vpn_crypto_analyzer": {
         "pcap_file": "/tmp/kvch_laptop_traffic.pcap",
         "target_hostname": "MacBook-Air.local",
-        "scan_timestamp": "2026-09-12T22:44:02.593249Z",
+        "scan_timestamp": "2026-09-12T23:08:14.259458Z",
         "execution_metrics": {
-          "duration_seconds": 4.19
+          "duration_seconds": 4.097
         },
         "cryptographic_assessment": {
           "security_score": 100,
@@ -203,9 +203,9 @@
       "malware_analyzer": {
         "target_file": "/Users/it4/.zshrc",
         "file_basename": ".zshrc",
-        "scan_timestamp": "2026-09-12T22:44:01.865016Z",
+        "scan_timestamp": "2026-09-12T23:08:13.525419Z",
         "execution_metrics": {
-          "duration_seconds": 0.451
+          "duration_seconds": 0.41
         },
         "hash_analysis": {
           "md5": "cff8f5ec4524833a54e53016ef210333",

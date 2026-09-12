@@ -13,7 +13,7 @@ export function inspectStoredArtifact(bytes: Buffer) {
     sha256: inspection.artifactSha256,
     size: bytes.byteLength,
     manifest: inspection.manifest,
-    hardwareBinding: null,
+    hardwareBinding: inspection.hardwareBinding ?? null,
     adapter,
     state: adapter ? "uploaded" as const : "runtime_unsupported" as const,
   };

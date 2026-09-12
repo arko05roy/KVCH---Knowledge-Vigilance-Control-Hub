@@ -1,6 +1,6 @@
 {
   "schema_version": "kvch.finding/v1",
-  "observed_at": "2026-09-12T17:14:01.733971Z",
+  "observed_at": "2026-09-12T17:38:13.320149Z",
   "severity": "CRITICAL",
   "category": "edgeguard-sentinel",
   "title": "EdgeGuard-Sentinel CDN, WAF & Origin IP Firewall Finding",
@@ -141,7 +141,7 @@
           "X-Frame-Options"
         ],
         "nginx_cdn_rule_snippet": "# KVCH EdgeGuard Auto-Generated Local WAF Patch\nset $waf_block 0;\nif ($request_uri ~* \"(\\.\\./|\\.\\.\\\\)\") { set $waf_block 1; }\nif ($http_transfer_encoding ~* \"chunked\") { set $waf_block 1; }\nadd_header Content-Security-Policy \"default-src 'self'; script-src 'self'; object-src 'none';\" always;\nadd_header Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\" always;\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header X-Frame-Options \"DENY\" always;\nproxy_hide_header X-Powered-By;\nproxy_hide_header Server;",
-        "applied_at": "2026-09-12T17:14:01.730732+00:00"
+        "applied_at": "2026-09-12T17:38:13.318630+00:00"
       }
     },
     "extension_id": "edgeguard-sentinel",
