@@ -195,6 +195,22 @@ export default function ThreatStudioPage() {
     }
   };
 
+  const getLayerBadge = (layer?: string) => {
+    switch (layer) {
+      case "MEMORY":
+        return "bg-purple-500/20 text-purple-300 border border-purple-500/40";
+      case "NETWORK":
+        return "bg-rose-500/20 text-rose-300 border border-rose-500/40";
+      case "TRANSPORT":
+        return "bg-amber-500/20 text-amber-300 border border-amber-500/40";
+      case "PRESENTATION":
+        return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+      case "OS":
+      default:
+        return "bg-blue-500/20 text-blue-300 border border-blue-500/40";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0b0d] text-zinc-100 selection:bg-indigo-500 selection:text-white pb-20">
       {/* Top Header */}
@@ -527,6 +543,42 @@ export default function ThreatStudioPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Mandatory Device Signature & Telemetry Source Layer Card */}
+                {verdict.device_signature && (
+                  <div className="bg-[#111215] border border-zinc-800 rounded-xl p-4 shadow-sm space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-4 h-4 text-emerald-400" />
+                        <span className="text-xs font-mono uppercase font-bold text-zinc-200">
+                          Mandatory Device Hardware Signature &amp; Layer Attribution
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-zinc-400">Attestation Layer:</span>
+                        <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded uppercase ${getLayerBadge(verdict.telemetry_source_layer)}`}>
+                          {verdict.telemetry_source_layer} LAYER
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
+                      <div className="p-2.5 bg-[#0a0b0e] border border-zinc-800/80 rounded-lg">
+                        <div className="text-[10px] text-zinc-400 uppercase">Device Identity</div>
+                        <div className="font-semibold text-zinc-100 truncate">{verdict.device_signature.device_id}</div>
+                        <div className="text-[10px] text-zinc-400 truncate mt-0.5">UUID: {verdict.device_signature.hardware_uuid}</div>
+                      </div>
+                      <div className="p-2.5 bg-[#0a0b0e] border border-zinc-800/80 rounded-lg">
+                        <div className="text-[10px] text-zinc-400 uppercase flex items-center justify-between">
+                          <span>Cryptographic Signature Hash</span>
+                          <span className="text-emerald-400 font-bold">{verdict.device_signature.attestation_status}</span>
+                        </div>
+                        <div className="font-semibold text-indigo-300 truncate">{verdict.device_signature.signature_hash}</div>
+                        <div className="text-[10px] text-zinc-400 truncate mt-0.5">{verdict.device_signature.layer_indicator_summary}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Primary Differentiators & Grounding Evidence Card */}
                 <div className="bg-[#111215] border border-zinc-800 rounded-xl p-4 shadow-sm space-y-4">

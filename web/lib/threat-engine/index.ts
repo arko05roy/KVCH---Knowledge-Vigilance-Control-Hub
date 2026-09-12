@@ -3,6 +3,7 @@ import { routeTelemetry } from "./confidence-router";
 import { runStage2Reasoning } from "./reasoning-engine";
 import { executeTieredSoarPolicy } from "./tiered-soar";
 import { analystFeedbackStore } from "./feedback-store";
+import { detectTelemetrySourceLayer, generateMandatoryDeviceSignature } from "./attestation";
 
 export * from "./types";
 export * from "./sanitizer";
@@ -71,11 +72,17 @@ export async function analyzeThreatContext(vector: FusedContextVector): Promise<
     pid: vector.process.pid,
   });
 
+  // Step 4: Detect Telemetry Source Layer (OS | NETWORK | TRANSPORT | PRESENTATION | MEMORY) & Hardware Signature
+  const layerInfo = detectTelemetrySourceLayer(vector);
+  const deviceSignature = generateMandatoryDeviceSignature(vector, layerInfo);
+
   return {
     threat_identified: verdictSeverity === "CRITICAL" || verdictSeverity === "HIGH",
     threat_classification: verdictClassification,
     severity: verdictSeverity,
     confidence_score: verdictConfidence,
+    telemetry_source_layer: layerInfo.layer,
+    device_signature: deviceSignature,
     primary_differentiators: primaryDiffs,
     evidence_refs: evidenceRefs,
     ai_reasoning_summary: reasoningSummary,

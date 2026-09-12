@@ -61,6 +61,8 @@ async function runContinuousExtensionDaemon() {
     console.log(`[${timestamp()}] [ENGINE] Route Stage:      ${verdict.routing_stage} (Skipped LLM: ${verdict.skipped_llm})`);
     console.log(`[${timestamp()}] [ENGINE] Threat Verdict:   ${verdict.threat_classification} [${verdict.severity}]`);
     console.log(`[${timestamp()}] [ENGINE] Confidence Score: ${verdict.confidence_score}%`);
+    console.log(`[${timestamp()}] [ENGINE] Layer Attribution: [${verdict.telemetry_source_layer} LAYER]`);
+    console.log(`[${timestamp()}] [SIGN]   Device Signature:  ${verdict.device_signature.device_id} (${verdict.device_signature.signature_hash.substring(0, 24)}...) [${verdict.device_signature.attestation_status}]`);
     console.log(`[${timestamp()}] [ENGINE] MITRE ATT&CK:     ${verdict.mitre_attack_technique}`);
     console.log(`[${timestamp()}] [SOAR]   Action Enforced:  ${verdict.soar_action.action_type} (Status: ${verdict.soar_action.execution_status})`);
 

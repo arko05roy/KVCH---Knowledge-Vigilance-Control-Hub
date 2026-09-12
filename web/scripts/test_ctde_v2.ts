@@ -41,11 +41,17 @@ async function runCTDETests() {
         passes = (verdict.severity === "LOW" || verdict.severity === "INFORMATIONAL" || verdict.severity === "MEDIUM") && !verdict.threat_identified;
       }
 
-      if (passes) {
-        console.log(`   [PASS] Correctly evaluated without hallucination!`);
+      const validLayers = ["OS", "NETWORK", "TRANSPORT", "PRESENTATION", "MEMORY"];
+      const hasLayer = validLayers.includes(verdict.telemetry_source_layer);
+      const hasSignature =
+        Boolean(verdict.device_signature?.signature_hash) &&
+        verdict.device_signature?.attestation_status === "VERIFIED_HARDWARE_ATTESTED";
+
+      if (passes && hasLayer && hasSignature) {
+        console.log(`   [PASS] Classified accurately! Layer: [${verdict.telemetry_source_layer}], Signature: ${verdict.device_signature.device_id}`);
         passedTests++;
       } else {
-        console.error(`   [FAIL] Classification mismatch for ${opt.key}: got ${verdict.threat_classification} (${verdict.severity})`);
+        console.error(`   [FAIL] Validation mismatch for ${opt.key}: got ${verdict.threat_classification} (${verdict.severity}), layer=${verdict.telemetry_source_layer}`);
       }
 
       // Test feedback store recording on malicious options

@@ -116,11 +116,25 @@ export interface SoarActionExecution {
   executed_at: string;
 }
 
+export type TelemetrySourceLayer = "OS" | "NETWORK" | "TRANSPORT" | "PRESENTATION" | "MEMORY";
+
+export interface DeviceSignature {
+  device_id: string;
+  hostname: string;
+  hardware_uuid: string;
+  telemetry_source_layer: TelemetrySourceLayer;
+  signature_hash: string;
+  attestation_status: "VERIFIED_HARDWARE_ATTESTED" | "HARDWARE_TAMPER_ALERT";
+  layer_indicator_summary: string;
+}
+
 export interface DetectionVerdict {
   threat_identified: boolean;
   threat_classification: ThreatClassification;
   severity: SeverityLevel;
   confidence_score: number; // 0 to 100
+  telemetry_source_layer: TelemetrySourceLayer;
+  device_signature: DeviceSignature; // Mandatory device hardware attestation signature
   primary_differentiators: string[];
   evidence_refs: EvidenceRef[];
   ai_reasoning_summary: string;
