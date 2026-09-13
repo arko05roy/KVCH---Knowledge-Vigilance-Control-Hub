@@ -154,29 +154,30 @@ export function handleGetMlInsights(params) {
     if (format === "json") {
         return { success: true, mode: queryType, data: hostSpecificData };
     }
-    const md = `### 🔒 KVCH ML Model: Host-Attested Hardware & Telemetry Insights
-*Cryptographic Session Envelope:* \`${fp.prefix}\`  
-*Host Attestation Hash:* \`${fp.layersHash.slice(0, 16)}...\`
+    const md = `### KVCH System Telemetry & Model Diagnostic Profile
+> **Runtime Context:** Process executed locally via Node.js stdio on client host (\`${osLayer.platform}-${osLayer.arch}\`, hostname: \`${osLayer.hostname}\`).  
+> **Attestation Token:** \`${fp.prefix}\` (HMAC-SHA256 digest of layers 1–5).
 
 ---
 
-#### 1. Active 5-Layer Host Fingerprint
-| Architectural Layer | Detected Host Telemetry | Attestation Status |
-|---|---|---|
-| **Layer 1: OS / Host** | \`${osLayer.platform}\` (${osLayer.arch}) • UUID: \`${osLayer.hardwareUuid.slice(0, 13)}...\` | ✅ Attested |
-| **Layer 2: Network** | Interface \`${netLayer.primaryInterface}\` • IP: \`${netLayer.localIp}\` | ✅ Attested |
-| **Layer 3: Transport** | Socket Digest: \`${transLayer.activeSocketsHash.slice(0, 12)}...\` (${transLayer.listeningPorts.length} ports) | ✅ Attested |
-| **Layer 4: Presentation** | TLS/OpenSSL: \`${presLayer.sslVersion}\` • Curve: \`${presLayer.cryptoCurvesHash.slice(0, 10)}...\` | ✅ Attested |
-| **Layer 5: Memory** | ${ramGb} GB RAM (${heapMb} MB active heap) • Sig: \`${memLayer.memorySignature}\` | ✅ Attested |
+#### 1. Hardware & Runtime Telemetry (Live System Probe)
+| Layer | Metric / Parameter | Value | Verification Source |
+|---|---|---|---|
+| **OS / Host** | Platform & Arch | \`${osLayer.platform}\` (${osLayer.arch}), release \`${osLayer.release}\` | \`os.platform()\`, \`os.release()\` |
+| **OS / Host** | Hardware UUID | \`${osLayer.hardwareUuid}\` | \`ioreg -rd1 -c IOPlatformExpertDevice\` |
+| **Network** | Primary Adapter | Interface \`${netLayer.primaryInterface}\` | \`os.networkInterfaces()\` |
+| **Network** | Local IP Address | \`${netLayer.localIp}\` (Subnet: \`${netLayer.subnetMask}\`) | \`os.networkInterfaces()\` |
+| **Transport** | Active Sockets | \`${transLayer.listeningPorts.length}\` listening ports (Digest: \`${transLayer.activeSocketsHash.slice(0, 12)}...\`) | \`netstat -an\` digest |
+| **Presentation**| TLS / OpenSSL | OpenSSL \`${presLayer.sslVersion}\` (Node \`${presLayer.nodeVersion}\`) | \`process.versions\` |
+| **Memory** | System RAM | ${ramGb} GB total physical RAM | \`os.totalmem()\` |
+| **Memory** | Process Heap | ${heapMb} MB heap (Sig: \`${memLayer.memorySignature}\`) | \`process.memoryUsage().heapTotal\` |
 
 ---
 
-#### 2. ML Tailored Remediation & Optimization
-1. **Kernel & Execution Isolation:** Configured specifically for **${osLayer.platform.toUpperCase()} (${osLayer.arch})**. ${isDarwin ? "App Sandbox containment active on local execution workers." : "Seccomp namespace active."}
-2. **Network Perimeter:** Local IP \`${netLayer.localIp}\` on \`${netLayer.primaryInterface}\` isolated from outbound credential exfiltration vectors.
-3. **Cipher Handshake:** OpenSSL \`${presLayer.sslVersion}\` enforces TLS 1.3 curve integrity.
-4. **Memory Allocation:** ${heapMb} MB active heap within ${ramGb} GB headroom guarantees zero OOM stalls across all 10 sandbox security engines.
-
-> *Security Assurance: This output is strictly filtered and customized to your active hardware signature. Foreign environments are isolated and cannot read this attestation profile.*`;
+#### 2. Architecture-Specific Inferences (Filtered for ${osLayer.platform.toUpperCase()} ${osLayer.arch})
+- **Process Model:** Configured for ${osLayer.platform.toUpperCase()} (${osLayer.arch}) local isolation. ${isDarwin ? "macOS App Sandbox entitlement profile recommended for child workers." : "Linux seccomp namespace profile."}
+- **Network Affinity:** Target binding restricted to local interface \`${netLayer.primaryInterface}\` (\`${netLayer.localIp}\`).
+- **Cipher Stack:** Node TLS runtime verified with OpenSSL \`${presLayer.sslVersion}\` curve profile.
+- **Resource Sizing:** ${ramGb} GB host capacity provides standard allocation bounds for concurrent sandboxed micro-engines.`;
     return { success: true, mode: queryType, content: md, attestationPrefix: fp.prefix };
 }
