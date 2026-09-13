@@ -1258,57 +1258,81 @@ export function PolicyViolationHeatmapChart() {
 /** 4. MANAGEMENT DASHBOARD: Monte Carlo Loss Exceedance & Budget Simulator using Recharts */
 export function MonteCarloVaRCurveChart() {
   const [mounted, setMounted] = useState(false);
-  const [budgetSlider, setBudgetSlider] = useState<number>(150000); // Default ₹1.5L
+  const [budgetSlider, setBudgetSlider] = useState<number>(250000); // Default ₹2.5L (Optimal)
   const [scenarioView, setScenarioView] = useState<"current" | "remediated" | "both">("both");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Monte Carlo Calculation:
-  // Base Expected Annual Loss (EAL): ₹38,40,000
+  // Base Expected Annual Loss (EAL): ₹38,40,000 (~$46k USD)
   const baseEAL = 3840000;
-  const reductionRate = Math.min(0.968, (budgetSlider / 150000) * 0.968);
+
+  // FAIR Model Logarithmic Diminishing Returns:
+  // Ranges smoothly from 22.0% at ₹50,000 to 96.0% at ₹5,00,000
+  const minBudget = 50000;
+  const maxBudget = 500000;
+  const normalizedBudget = Math.max(0, Math.min(1, (budgetSlider - minBudget) / (maxBudget - minBudget)));
+  const reductionRate = 0.22 + Math.pow(normalizedBudget, 0.72) * 0.74; // Smooth continuous curve
   const netEAL = Math.round(baseEAL * (1 - reductionRate));
   const lossAvoided = baseEAL - netEAL;
   const rosiPercent = budgetSlider > 0 ? Math.round((lossAvoided / budgetSlider) * 100) : 0;
 
-  // Dynamic Recharts dataset representing loss exceedance probability
-  const varPoints = [
-    { loss: "₹5L", lossVal: 5, unmitigated: 96, remediated: Math.round(92 * (1 - reductionRate * 0.3)) },
-    { loss: "₹15L", lossVal: 15, unmitigated: 86, remediated: Math.round(62 * (1 - reductionRate * 0.5)) },
-    { loss: "₹25L", lossVal: 25, unmitigated: 72, remediated: Math.round(38 * (1 - reductionRate * 0.7)) },
-    { loss: "₹38L", lossVal: 38, unmitigated: 58, remediated: Math.round(18 * (1 - reductionRate * 0.85)) },
-    { loss: "₹50L", lossVal: 50, unmitigated: 44, remediated: Math.round(8 * (1 - reductionRate * 0.9)) },
-    { loss: "₹75L", lossVal: 75, unmitigated: 28, remediated: Math.round(3 * (1 - reductionRate * 0.95)) },
-    { loss: "₹1.0Cr", lossVal: 100, unmitigated: 16, remediated: Math.round(1 * (1 - reductionRate * 0.98)) },
-    { loss: "₹1.5Cr", lossVal: 150, unmitigated: 8, remediated: 0 },
-    { loss: "₹2.0Cr", lossVal: 200, unmitigated: 3, remediated: 0 },
+  // Dynamic Recharts dataset representing loss exceedance probability curve
+  const baseExceedanceCurve = [
+    { loss: "₹5L", lossVal: 5, unmitigated: 96, sensitivity: 0.38 },
+    { loss: "₹15L", lossVal: 15, unmitigated: 86, sensitivity: 0.58 },
+    { loss: "₹25L", lossVal: 25, unmitigated: 74, sensitivity: 0.75 },
+    { loss: "₹38L", lossVal: 38, unmitigated: 58, sensitivity: 0.88 }, // Base EAL point
+    { loss: "₹50L", lossVal: 50, unmitigated: 44, sensitivity: 0.94 },
+    { loss: "₹75L", lossVal: 75, unmitigated: 28, sensitivity: 0.97 },
+    { loss: "₹1.0Cr", lossVal: 100, unmitigated: 16, sensitivity: 0.98 },
+    { loss: "₹1.5Cr", lossVal: 150, unmitigated: 8, sensitivity: 0.99 },
+    { loss: "₹2.0Cr", lossVal: 200, unmitigated: 3, sensitivity: 1.0 },
   ];
+
+  // Recalculate remediated curve dynamically on EVERY slider change
+  const varPoints = baseExceedanceCurve.map((p) => {
+    const remediatedProb = Math.max(
+      0,
+      Math.round(p.unmitigated * (1 - reductionRate * p.sensitivity))
+    );
+    return {
+      loss: p.loss,
+      lossVal: p.lossVal,
+      unmitigated: p.unmitigated,
+      remediated: remediatedProb,
+    };
+  });
 
   const CustomVaRTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const probDiff = Math.max(0, data.unmitigated - data.remediated);
       return (
-        <div className="bg-[#0c0d0e] border border-[#23252a] rounded-lg p-3 shadow-2xl text-[11px] font-mono z-50">
-          <div className="text-[#f7f8f8] font-bold border-b border-[#1f2125] pb-1 mb-1">
-            Loss Exceedance: {data.loss}
+        <div className="bg-[#0b0c0e]/95 backdrop-blur-md border border-[#23252a] rounded-xl p-3.5 shadow-2xl text-[11px] font-mono z-50 min-w-[210px] ring-1 ring-white/5">
+          <div className="text-[#f7f8f8] font-bold border-b border-[#1f2125] pb-1.5 mb-2 flex items-center justify-between">
+            <span>Threshold: {data.loss}</span>
+            <span className="text-[10px] text-[#828fff] bg-[#828fff]/10 px-1.5 py-0.5 rounded border border-[#828fff]/20">
+              FAIR VaR Point
+            </span>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {(scenarioView === "current" || scenarioView === "both") && (
               <div className="flex items-center justify-between gap-3 text-[#ff5555]">
-                <span>Unmitigated Prob:</span>
-                <span className="font-bold">{data.unmitigated}%</span>
+                <span>Unmitigated Risk:</span>
+                <span className="font-bold text-[12px]">{data.unmitigated}%</span>
               </div>
             )}
             {(scenarioView === "remediated" || scenarioView === "both") && (
               <div className="flex items-center justify-between gap-3 text-[#2ea043]">
-                <span>Remediated Prob:</span>
-                <span className="font-bold">{data.remediated}%</span>
+                <span>Remediated Posture:</span>
+                <span className="font-bold text-[12px]">{data.remediated}%</span>
               </div>
             )}
-            <div className="text-[10px] text-[#8a8f98] pt-1">
-              Delta: -{Math.max(0, data.unmitigated - data.remediated)}% Risk Compression
+            <div className="text-[10px] text-[#8a8f98] pt-1.5 border-t border-[#1f2125] flex items-center justify-between">
+              <span>Risk Compression:</span>
+              <strong className="text-[#f2c94c]">-{probDiff}% Prob</strong>
             </div>
           </div>
         </div>
@@ -1317,8 +1341,17 @@ export function MonteCarloVaRCurveChart() {
     return null;
   };
 
+  const PRESET_BUDGETS = [
+    { label: "₹0.75L", val: 75000, tag: "Minimum" },
+    { label: "₹1.5L", val: 150000, tag: "Baseline" },
+    { label: "₹2.5L", val: 250000, tag: "Optimal" },
+    { label: "₹3.5L", val: 350000, tag: "Hardened" },
+    { label: "₹5.0L", val: 500000, tag: "Max Cap" },
+  ];
+
   return (
     <div className="w-full rounded-2xl border border-[#23252a] bg-[#0c0d0e] p-6 shadow-2xl hover:border-[#34373c] transition-all hover-lift">
+      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1f2125] pb-4 mb-5">
         <div>
           <div className="flex items-center gap-2">
@@ -1332,6 +1365,7 @@ export function MonteCarloVaRCurveChart() {
           </p>
         </div>
 
+        {/* Scenario View Toggles */}
         <div className="flex items-center gap-1 rounded-lg border border-[#23252a] bg-[#141516] p-0.5 text-[11px] font-mono">
           <button
             onClick={() => setScenarioView("both")}
@@ -1367,18 +1401,18 @@ export function MonteCarloVaRCurveChart() {
       </div>
 
       {/* Area Curve Graphic */}
-      <div className="h-56 w-full my-2 bg-[#090a0c] border border-[#1e2025] rounded-xl p-3 shadow-inner">
+      <div className="h-60 w-full my-2 bg-[#090a0c] border border-[#1e2025] rounded-xl p-3 shadow-inner relative">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={varPoints} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+            <AreaChart data={varPoints} margin={{ top: 15, right: 20, left: -15, bottom: 0 }}>
               <defs>
                 <linearGradient id="linearVarUnmitigated" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ff5555" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#ff5555" stopOpacity={0.0} />
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="linearVarRemediated" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#2ea043" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#2ea043" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.42} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
 
@@ -1390,6 +1424,7 @@ export function MonteCarloVaRCurveChart() {
                 fontSize={10}
                 tickLine={false}
                 axisLine={{ stroke: "#1f2125" }}
+                tick={{ fill: "#8a8f98" }}
               />
               <YAxis
                 stroke="#62666d"
@@ -1398,6 +1433,7 @@ export function MonteCarloVaRCurveChart() {
                 axisLine={{ stroke: "#1f2125" }}
                 domain={[0, 100]}
                 unit="%"
+                tick={{ fill: "#62666d", fontFamily: "monospace" }}
               />
 
               <Tooltip content={<CustomVaRTooltip />} />
@@ -1406,10 +1442,11 @@ export function MonteCarloVaRCurveChart() {
                 <Area
                   type="monotone"
                   dataKey="unmitigated"
-                  stroke="#ff5555"
+                  stroke="#ef4444"
                   strokeWidth={2}
                   fill="url(#linearVarUnmitigated)"
                   name="Unmitigated Risk"
+                  isAnimationActive={false}
                 />
               )}
 
@@ -1417,10 +1454,11 @@ export function MonteCarloVaRCurveChart() {
                 <Area
                   type="monotone"
                   dataKey="remediated"
-                  stroke="#2ea043"
+                  stroke="#10b981"
                   strokeWidth={2.5}
                   fill="url(#linearVarRemediated)"
                   name="Remediated Profile"
+                  isAnimationActive={false}
                 />
               )}
 
@@ -1433,6 +1471,7 @@ export function MonteCarloVaRCurveChart() {
                   fill: "#828fff",
                   fontSize: 10,
                   position: "top",
+                  className: "font-mono font-semibold",
                 }}
               />
             </AreaChart>
@@ -1444,43 +1483,95 @@ export function MonteCarloVaRCurveChart() {
         )}
       </div>
 
-      {/* Interactive Investment Slider with Recharts Real-Time Feedback */}
-      <div className="rounded-xl border border-[#23252a] bg-[#121316] p-4 space-y-3 text-[12px] font-mono mt-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[#8a8f98]">
-            Remediation Budget Allocation (Slide to simulate live ROSI curve):
-          </span>
-          <span className="text-[#f7f8f8] font-bold bg-[#1e2025] px-2.5 py-1 rounded border border-[#2b2d32]">
-            ₹{(budgetSlider / 100000).toFixed(1)} Lakhs
-          </span>
+      {/* Interactive Investment Slider with Real-Time Instant Feedback */}
+      <div className="rounded-xl border border-[#23252a] bg-[#121316] p-4 space-y-3.5 text-[12px] font-mono mt-4 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[#f7f8f8] font-bold">
+              Remediation Budget Allocation:
+            </span>
+            <span className="text-[11px] text-[#8a8f98]">
+              (Slide or tap preset to simulate live ROSI curve)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[#f7f8f8] font-bold bg-[#1e2025] px-3 py-1 rounded-lg border border-[#2b2d32] text-[13px] text-right min-w-[100px]">
+              ₹{(budgetSlider / 100000).toFixed(2)} Lakhs
+            </span>
+          </div>
         </div>
 
-        <input
-          type="range"
-          min="50000"
-          max="500000"
-          step="25000"
-          value={budgetSlider}
-          onChange={(e) => setBudgetSlider(Number(e.target.value))}
-          className="w-full accent-[#5e6ad2] cursor-pointer"
-        />
+        {/* Live Slider Input with Real-Time Response */}
+        <div className="space-y-2">
+          <input
+            type="range"
+            min={minBudget}
+            max={maxBudget}
+            step="10000"
+            value={budgetSlider}
+            onChange={(e) => setBudgetSlider(Number(e.target.value))}
+            onInput={(e: any) => setBudgetSlider(Number(e.target.value))}
+            style={{
+              background: `linear-gradient(to right, #6366f1 0%, #8b5cf6 ${normalizedBudget * 100}%, #23252a ${normalizedBudget * 100}%, #23252a 100%)`,
+            }}
+            className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#6366f1] transition-all"
+          />
 
-        <div className="grid grid-cols-4 gap-3 pt-2.5 border-t border-[#1f2125] text-center text-[11.5px]">
-          <div className="bg-[#0c0d0e] p-2.5 rounded-lg border border-[#1f2125]">
-            <span className="text-[#8a8f98] block text-[10.5px]">Net EAL:</span>
-            <span className="text-[#2ea043] font-bold text-[14px]">₹{(netEAL / 100000).toFixed(1)}L</span>
+          {/* Quick Preset Buttons */}
+          <div className="flex items-center justify-between gap-1 pt-1">
+            {PRESET_BUDGETS.map((preset) => {
+              const isActive = Math.abs(budgetSlider - preset.val) < 15000;
+              return (
+                <button
+                  key={preset.val}
+                  onClick={() => setBudgetSlider(preset.val)}
+                  className={`px-2 py-1 rounded-md text-[10.5px] transition-all active:scale-95 flex items-center gap-1 ${
+                    isActive
+                      ? "bg-[#6366f1] text-white font-bold shadow-sm shadow-[#6366f1]/30"
+                      : "bg-[#181a1f] text-[#8a8f98] hover:text-[#f7f8f8] border border-[#23252a] hover:border-[#353842]"
+                  }`}
+                >
+                  <span>{preset.label}</span>
+                  <span className="text-[9px] opacity-70 hidden md:inline">({preset.tag})</span>
+                </button>
+              );
+            })}
           </div>
-          <div className="bg-[#0c0d0e] p-2.5 rounded-lg border border-[#1f2125]">
+        </div>
+
+        {/* Live Metrics Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#1f2125] text-center text-[11.5px]">
+          <div className="bg-[#0c0d0e] p-3 rounded-xl border border-[#1f2125] hover:border-[#2f3238] transition-colors">
+            <span className="text-[#8a8f98] block text-[10.5px]">Net EAL (Remaining):</span>
+            <span className="text-[#10b981] font-bold font-mono text-[16px] block mt-0.5">
+              ₹{(netEAL / 100000).toFixed(2)}L
+            </span>
+            <span className="text-[9.5px] text-[#8a8f98]">Annual Risk Exposure</span>
+          </div>
+
+          <div className="bg-[#0c0d0e] p-3 rounded-xl border border-[#1f2125] hover:border-[#2f3238] transition-colors">
             <span className="text-[#8a8f98] block text-[10.5px]">Gross Loss Avoided:</span>
-            <span className="text-[#828fff] font-bold text-[14px]">₹{(lossAvoided / 100000).toFixed(1)}L</span>
+            <span className="text-[#828fff] font-bold font-mono text-[16px] block mt-0.5">
+              ₹{(lossAvoided / 100000).toFixed(2)}L
+            </span>
+            <span className="text-[9.5px] text-[#8a8f98]">Total Catastrophe Savings</span>
           </div>
-          <div className="bg-[#0c0d0e] p-2.5 rounded-lg border border-[#1f2125]">
-            <span className="text-[#8a8f98] block text-[10.5px]">Risk Reduction:</span>
-            <span className="text-[#f2c94c] font-bold text-[14px]">{(reductionRate * 100).toFixed(1)}%</span>
+
+          <div className="bg-[#0c0d0e] p-3 rounded-xl border border-[#1f2125] hover:border-[#2f3238] transition-colors">
+            <span className="text-[#8a8f98] block text-[10.5px]">Risk Compression:</span>
+            <span className="text-[#f59e0b] font-bold font-mono text-[16px] block mt-0.5">
+              {(reductionRate * 100).toFixed(1)}%
+            </span>
+            <span className="text-[9.5px] text-[#8a8f98]">Across Confidence Intervals</span>
           </div>
-          <div className="bg-[#0c0d0e] p-2.5 rounded-lg border border-[#1f2125]">
+
+          <div className="bg-[#0c0d0e] p-3 rounded-xl border border-[#1f2125] hover:border-[#2f3238] transition-colors">
             <span className="text-[#8a8f98] block text-[10.5px]">ROSI Multiplier:</span>
-            <span className="text-[#2ea043] font-bold text-[14px]">{rosiPercent}% ROI</span>
+            <span className="text-[#10b981] font-bold font-mono text-[16px] block mt-0.5">
+              {rosiPercent}% ROI
+            </span>
+            <span className="text-[9.5px] text-[#8a8f98]">Return on Security Spend</span>
           </div>
         </div>
       </div>
