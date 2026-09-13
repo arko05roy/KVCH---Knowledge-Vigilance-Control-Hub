@@ -20,6 +20,7 @@ import {
 } from "./tools/extension-tools.js";
 import { handleGetSecurityReports } from "./tools/report-tools.js";
 import { handleRunSandboxScan, handleExecuteSoar } from "./tools/scan-tools.js";
+import { handleGetMlInsights } from "./tools/ml-tools.js";
 
 const server = new Server(
   {
@@ -155,6 +156,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: "kvch_get_ml_insights",
+        description:
+          "Retrieves machine learning model predictive insights. Supports 'general_info' (global architecture benchmarks independent of host) and 'host_tailored' (filtered and customized strictly to the host's 5-layer hardware/network/memory attestation profile).",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query_type: {
+              type: "string",
+              enum: ["general_info", "host_tailored"],
+              default: "general_info",
+              description: "Mode of ML intelligence: 'general_info' for global benchmarks, 'host_tailored' for hardware/telemetry personalized insights.",
+            },
+            format: {
+              type: "string",
+              enum: ["markdown", "json"],
+              default: "markdown",
+              description: "Output presentation format.",
+            },
+          },
+        },
+      },
     ],
   };
 });
@@ -243,6 +266,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const res = handleExecuteSoar(args as any);
         return {
           content: [{ type: "text", text: JSON.stringify(res, null, 2) }],
+        };
+      }
+
+      case "kvch_get_ml_insights": {
+        const res = handleGetMlInsights(args as any);
+        return {
+          content: [{ type: "text", text: typeof res.content === "string" ? res.content : JSON.stringify(res, null, 2) }],
         };
       }
 
