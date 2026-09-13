@@ -15,6 +15,7 @@ import {
   Tooltip,
   Cell,
   ReferenceLine,
+  ReferenceArea,
 } from "recharts";
 import {
   ShieldAlert,
@@ -658,76 +659,198 @@ export function PolicyViolationHeatmapChart() {
   const [mounted, setMounted] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>("Fri");
   const [activeFilter, setActiveFilter] = useState<"all" | "usb" | "vpn">("all");
+  const [isRemediating, setIsRemediating] = useState(false);
+  const [remediated, setRemediated] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const heatmapDays = [
-    {
-      day: "Mon",
-      status: "Compliant",
-      count: 0,
-      trackSlot: 5,
-      color: "#2ea043",
-      topViolation: "None recorded",
-      affectedUsers: 0,
-      vector: "Clean Baseline",
-    },
-    {
-      day: "Tue",
-      status: "Notice",
-      count: 1,
-      trackSlot: 5,
-      color: "#f2c94c",
-      topViolation: "Personal USB peripheral detected",
-      affectedUsers: 1,
-      vector: "USB / Removable Media",
-    },
-    {
-      day: "Wed",
-      status: "Compliant",
-      count: 0,
-      trackSlot: 5,
-      color: "#2ea043",
-      topViolation: "None recorded",
-      affectedUsers: 0,
-      vector: "Clean Baseline",
-    },
-    {
-      day: "Thu",
-      status: "Warning",
-      count: 2,
-      trackSlot: 5,
-      color: "#f2c94c",
-      topViolation: "Unapproved file sync to cloud storage",
-      affectedUsers: 2,
-      vector: "Cloud Storage Sync",
-    },
-    {
-      day: "Fri",
-      status: "Breach Detected",
-      count: 4,
-      trackSlot: 5,
-      color: "#ff5555",
-      topViolation: "External VPN file exfiltration & unencrypted socket",
-      affectedUsers: 3,
-      vector: "VPN & Socket Exfil",
-    },
-  ];
+  const filterDatasets: Record<"all" | "usb" | "vpn", Array<{
+    day: string;
+    status: string;
+    count: number;
+    color: string;
+    topViolation: string;
+    affectedUsers: number;
+    vector: string;
+    mitreTechnique?: string;
+  }>> = {
+    all: [
+      {
+        day: "Mon",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "Normal baseline traffic, all DLP agents connected",
+        affectedUsers: 0,
+        vector: "Clean Baseline",
+        mitreTechnique: "N/A - Compliant",
+      },
+      {
+        day: "Tue",
+        status: "Notice",
+        count: 1,
+        color: "#f59e0b",
+        topViolation: "Unregistered USB mass storage peripheral mounted",
+        affectedUsers: 1,
+        vector: "USB / Removable Media",
+        mitreTechnique: "T1052.001 (USB Exfiltration)",
+      },
+      {
+        day: "Wed",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "All endpoints enforcing signed policy hashes",
+        affectedUsers: 0,
+        vector: "Clean Baseline",
+        mitreTechnique: "N/A - Compliant",
+      },
+      {
+        day: "Thu",
+        status: "Warning",
+        count: 2,
+        color: "#f59e0b",
+        topViolation: "Unapproved outbound file sync to personal cloud repository",
+        affectedUsers: 2,
+        vector: "Cloud Storage Sync",
+        mitreTechnique: "T1567.002 (Cloud Storage Exfil)",
+      },
+      {
+        day: "Fri",
+        status: "Breach Detected",
+        count: 4,
+        color: "#ef4444",
+        topViolation: "Direct raw socket pipe via external VPN tunnel & encrypted tarball",
+        affectedUsers: 3,
+        vector: "VPN & Raw Socket Exfil",
+        mitreTechnique: "T1048.003 (Exfil Over Alternative Protocol)",
+      },
+    ],
+    usb: [
+      {
+        day: "Mon",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "No removable media detected",
+        affectedUsers: 0,
+        vector: "USB Storage",
+        mitreTechnique: "N/A",
+      },
+      {
+        day: "Tue",
+        status: "Notice",
+        count: 1,
+        color: "#f59e0b",
+        topViolation: "Unregistered USB mass storage peripheral mounted",
+        affectedUsers: 1,
+        vector: "USB / Removable Media",
+        mitreTechnique: "T1052.001 (USB Exfiltration)",
+      },
+      {
+        day: "Wed",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "No USB activity logged",
+        affectedUsers: 0,
+        vector: "USB Storage",
+        mitreTechnique: "N/A",
+      },
+      {
+        day: "Thu",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "USB bus controller enforcing lockdown policy",
+        affectedUsers: 0,
+        vector: "USB Storage",
+        mitreTechnique: "N/A",
+      },
+      {
+        day: "Fri",
+        status: "Notice",
+        count: 1,
+        color: "#f59e0b",
+        topViolation: "Hardware keylogger insertion probe blocked by kernel driver",
+        affectedUsers: 1,
+        vector: "USB Hardware Probe",
+        mitreTechnique: "T1200 (Hardware Additions)",
+      },
+    ],
+    vpn: [
+      {
+        day: "Mon",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "Corporate VPN tunnel active, split-tunneling disabled",
+        affectedUsers: 0,
+        vector: "VPN / Network",
+        mitreTechnique: "N/A",
+      },
+      {
+        day: "Tue",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "Standard TLS egress traffic",
+        affectedUsers: 0,
+        vector: "VPN / Network",
+        mitreTechnique: "N/A",
+      },
+      {
+        day: "Wed",
+        status: "Compliant",
+        count: 0,
+        color: "#2ea043",
+        topViolation: "WireGuard daemon passing integrity attestations",
+        affectedUsers: 0,
+        vector: "VPN / Network",
+        mitreTechnique: "N/A",
+      },
+      {
+        day: "Thu",
+        status: "Warning",
+        count: 1,
+        color: "#f59e0b",
+        topViolation: "Non-standard UDP port binding on workstation interface",
+        affectedUsers: 1,
+        vector: "Socket Anomaly",
+        mitreTechnique: "T1571 (Non-Standard Port)",
+      },
+      {
+        day: "Fri",
+        status: "Breach Detected",
+        count: 3,
+        color: "#ef4444",
+        topViolation: "Shadow WireGuard tunnel exfiltrating archive to foreign IP",
+        affectedUsers: 2,
+        vector: "VPN & Raw Socket Exfil",
+        mitreTechnique: "T1048.003 (Exfil Over Alternative Protocol)",
+      },
+    ],
+  };
 
+  const heatmapDays = filterDatasets[activeFilter];
   const current = heatmapDays.find((h) => h.day === selectedDay) || heatmapDays[4];
+  const totalIncidents = heatmapDays.reduce((acc, curr) => acc + curr.count, 0);
 
   const CustomHeatmapTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-[#0c0d0e] border border-[#23252a] rounded-lg p-3 shadow-2xl text-[11px] font-mono z-50 min-w-[210px]">
-          <div className="flex items-center justify-between text-[#f7f8f8] font-bold border-b border-[#1f2125] pb-1.5 mb-1.5">
-            <span>{data.day} Policy Audit</span>
+        <div className="bg-[#0b0c0e]/95 backdrop-blur-md border border-[#26282f] rounded-xl p-3.5 shadow-2xl text-[11px] font-mono z-50 min-w-[220px] ring-1 ring-white/5">
+          <div className="flex items-center justify-between text-[#f7f8f8] font-bold border-b border-[#1f2125] pb-2 mb-2">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: data.color }} />
+              {data.day} Policy Audit
+            </span>
             <span
               style={{ color: data.color }}
-              className="text-[10px] px-1.5 py-0.5 rounded bg-[#18191c] border border-[#26282e]"
+              className="text-[10px] px-2 py-0.5 rounded-full bg-[#18191c] border border-[#26282e] font-semibold"
             >
               {data.status}
             </span>
@@ -735,21 +858,97 @@ export function PolicyViolationHeatmapChart() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[#8a8f98]">
               <span>Violations:</span>
-              <span style={{ color: data.color }} className="font-bold text-[12px]">{data.count} detected</span>
+              <span style={{ color: data.color }} className="font-bold text-[13px]">
+                {data.count} {data.count === 1 ? "incident" : "incidents"}
+              </span>
             </div>
             <div className="flex items-center justify-between text-[#8a8f98]">
-              <span>Primary Vector:</span>
-              <span className="text-[#d0d6e0]">{data.vector}</span>
+              <span>Vector:</span>
+              <span className="text-[#d0d6e0] font-medium truncate max-w-[130px]">{data.vector}</span>
             </div>
             <div className="flex items-center justify-between text-[#8a8f98]">
-              <span>Affected Committers:</span>
-              <span className="text-[#f7f8f8] font-bold">{data.affectedUsers} users</span>
+              <span>Affected Hosts:</span>
+              <span className="text-[#f7f8f8] font-bold">{data.affectedUsers} committers</span>
             </div>
+            {data.mitreTechnique && data.mitreTechnique !== "N/A" && (
+              <div className="pt-1.5 border-t border-[#1f2125] text-[10px] text-[#818cf8] flex items-center justify-between">
+                <span>MITRE ATT&CK:</span>
+                <span className="font-semibold">{data.mitreTechnique}</span>
+              </div>
+            )}
           </div>
         </div>
       );
     }
     return null;
+  };
+
+  const handleRemediate = () => {
+    setIsRemediating(true);
+    setTimeout(() => {
+      setIsRemediating(false);
+      setRemediated(true);
+    }, 900);
+  };
+
+  // Custom Dot Renderer with floating badges on peak points
+  const renderCustomDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    if (cx === undefined || cy === undefined) return null;
+    const isSelected = selectedDay === payload.day;
+    const isBreach = payload.count >= 4;
+    const isWarning = payload.count >= 2 && payload.count < 4;
+    const isNotice = payload.count === 1;
+
+    const dotColor = isBreach ? "#ef4444" : isWarning ? "#f59e0b" : isNotice ? "#eab308" : "#10b981";
+
+    return (
+      <g key={`dot-${payload.day}`} className="cursor-pointer" onClick={() => setSelectedDay(payload.day)}>
+        {/* Animated halo for breach or selected point */}
+        {(isBreach || isSelected) && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={isBreach ? 13 : 9}
+            fill={dotColor}
+            fillOpacity={0.22}
+            className={isBreach ? "animate-pulse" : ""}
+          />
+        )}
+        {/* Outer Ring */}
+        <circle cx={cx} cy={cy} r={isSelected ? 6 : 4.5} fill="#0a0b0d" stroke={dotColor} strokeWidth={2.5} />
+        {/* Inner Core */}
+        <circle cx={cx} cy={cy} r={2} fill={dotColor} />
+
+        {/* Floating count pill above non-zero points */}
+        {payload.count > 0 && (
+          <g transform={`translate(${cx}, ${cy - 16})`}>
+            <rect
+              x="-12"
+              y="-10"
+              width="24"
+              height="15"
+              rx="4.5"
+              fill="#12141a"
+              stroke={dotColor}
+              strokeWidth="1.2"
+              filter="drop-shadow(0px 2px 4px rgba(0,0,0,0.5))"
+            />
+            <text
+              x="0"
+              y="1"
+              textAnchor="middle"
+              fill={dotColor}
+              fontSize="9.5"
+              fontWeight="800"
+              fontFamily="monospace"
+            >
+              {payload.count}
+            </text>
+          </g>
+        )}
+      </g>
+    );
   };
 
   return (
@@ -758,17 +957,20 @@ export function PolicyViolationHeatmapChart() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1f2125] pb-4 mb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#f2c94c] animate-pulse" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b] animate-pulse" />
             <h3 className="text-[15px] font-bold text-[#f7f8f8] tracking-tight">
               Weekly Insider Risk &amp; Workstation Policy Stream
             </h3>
+            <span className="text-[10.5px] font-mono text-[#8a8f98] bg-[#16171b] border border-[#262830] px-2 py-0.5 rounded-full ml-1">
+              {totalIncidents} Total Events
+            </span>
           </div>
           <p className="text-[12px] text-[#8a8f98] mt-0.5">
             Cross-departmental telemetry audited against ISO 27001 &amp; DPDP compliance controls
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Vector Filter Toggle */}
           <div className="flex items-center bg-[#141516] border border-[#23252a] p-0.5 rounded-lg text-[11px] font-mono">
             <button
@@ -810,8 +1012,8 @@ export function PolicyViolationHeatmapChart() {
         </div>
       </div>
 
-      {/* Linear Composite Visualization Canvas with Structured Background Tracks & Area Trajectory */}
-      <div className="h-48 w-full my-3 bg-[#090a0c] border border-[#1e2025] rounded-xl p-4 relative overflow-hidden shadow-inner">
+      {/* Linear Composite Visualization Canvas with Luminous Area & Slender Gradient Bars */}
+      <div className="h-60 w-full my-3 bg-[#090a0c] border border-[#1e2025] rounded-xl p-4 relative overflow-hidden shadow-inner">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
@@ -821,79 +1023,116 @@ export function PolicyViolationHeatmapChart() {
                   setSelectedDay(heatmapDays[Number(e.activeTooltipIndex)].day);
                 }
               }}
-              margin={{ top: 12, right: 15, left: -20, bottom: 0 }}
+              margin={{ top: 26, right: 30, left: 0, bottom: 2 }}
             >
               <defs>
+                {/* Luminous Area Fill Gradient */}
                 <linearGradient id="hrRiskLinearArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ff5555" stopOpacity={0.24} />
-                  <stop offset="50%" stopColor="#f2c94c" stopOpacity={0.08} />
-                  <stop offset="100%" stopColor="#5e6ad2" stopOpacity={0.0} />
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.32} />
+                  <stop offset="60%" stopColor="#8b5cf6" stopOpacity={0.08} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.0} />
                 </linearGradient>
+
+                {/* Friday Breach Bar Gradient */}
                 <linearGradient id="friBarGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ff5555" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#dc2626" stopOpacity={0.7} />
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="#991b1b" stopOpacity={0.65} />
                 </linearGradient>
+
+                {/* Warning Bar Gradient */}
                 <linearGradient id="warnBarGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f2c94c" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#d97706" stopOpacity={0.7} />
+                  <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#b45309" stopOpacity={0.6} />
+                </linearGradient>
+
+                {/* Notice Bar Gradient */}
+                <linearGradient id="noticeBarGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#eab308" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#854d0e" stopOpacity={0.5} />
+                </linearGradient>
+
+                {/* Compliant Baseline Ghost Gradient */}
+                <linearGradient id="safeBarGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#064e3b" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" stroke="#16181c" vertical={false} />
-              <XAxis dataKey="day" stroke="#62666d" fontSize={11} tickLine={false} axisLine={{ stroke: "#1f2125" }} />
-              <YAxis stroke="#62666d" fontSize={10} tickLine={false} axisLine={{ stroke: "#1f2125" }} domain={[0, 5]} allowDecimals={false} />
-              
-              <Tooltip content={<CustomHeatmapTooltip />} cursor={{ fill: "rgba(255, 255, 255, 0.03)" }} />
-
-              {/* Architectural Background Track Pillars: Eliminates the empty void */}
-              <Bar
-                dataKey="trackSlot"
-                radius={[6, 6, 6, 6]}
-                maxBarSize={28}
-                fill="rgba(255, 255, 255, 0.022)"
-                stroke="#1c1e23"
-                strokeWidth={1}
-                isAnimationActive={false}
-                className="pointer-events-none"
+              <CartesianGrid strokeDasharray="3 3" stroke="#16181d" vertical={false} />
+              <XAxis
+                dataKey="day"
+                stroke="#62666d"
+                fontSize={11}
+                tickLine={false}
+                axisLine={{ stroke: "#1e2025" }}
+                tick={{ fill: "#8a8f98", fontWeight: 500 }}
+              />
+              <YAxis
+                stroke="#62666d"
+                fontSize={10}
+                tickLine={false}
+                axisLine={{ stroke: "#1e2025" }}
+                domain={[0, 5]}
+                ticks={[0, 1, 2, 3, 4, 5]}
+                allowDecimals={false}
+                tick={{ fill: "#62666d", fontFamily: "monospace" }}
               />
 
-              {/* Slender Foreground Incident Count Bars */}
-              <Bar dataKey="count" radius={[5, 5, 0, 0]} maxBarSize={16}>
-                {heatmapDays.map((entry, index) => (
-                  <Cell
-                    key={`heatmap-cell-${index}`}
-                    fill={entry.count >= 4 ? "url(#friBarGrad)" : entry.count > 0 ? "url(#warnBarGrad)" : "#2ea043"}
-                    fillOpacity={entry.count === 0 ? 0.35 : 1}
-                    stroke={selectedDay === entry.day ? "#ffffff" : "transparent"}
-                    strokeWidth={selectedDay === entry.day ? 1.5 : 0}
-                    className="cursor-pointer transition-all duration-200"
-                  />
-                ))}
-              </Bar>
+              <Tooltip content={<CustomHeatmapTooltip />} cursor={{ fill: "rgba(99, 102, 241, 0.05)" }} />
 
-              {/* Continuous Smoothed Spline Curve with Gradient Area */}
-              <Area
-                type="monotone"
-                dataKey="count"
-                stroke="#828fff"
-                strokeWidth={2}
-                fill="url(#hrRiskLinearArea)"
-                dot={{ r: 3.5, fill: "#0c0d0e", stroke: "#828fff", strokeWidth: 1.5 }}
-                activeDot={{ r: 6, fill: "#ffffff", stroke: "#5e6ad2", strokeWidth: 2 }}
-              />
+              {/* Shaded Safe / Tolerance Zone (0 to 1) */}
+              <ReferenceArea y1={0} y2={1} fill="#10b981" fillOpacity={0.028} stroke="none" />
 
               {/* Target Tolerance Limit Reference Line */}
               <ReferenceLine
                 y={1}
-                stroke="#5e6ad2"
+                stroke="#f59e0b"
                 strokeDasharray="4 4"
-                strokeOpacity={0.6}
+                strokeOpacity={0.65}
                 label={{
-                  value: "Policy Tolerance Limit (1)",
-                  fill: "#828fff",
+                  value: "Policy Tolerance Limit (≤1 / day)",
+                  fill: "#f59e0b",
                   fontSize: 10,
                   position: "insideTopRight",
+                  offset: 8,
+                  fontWeight: 600,
+                  className: "font-mono",
                 }}
+              />
+
+              {/* Slender Rounded Gradient Incident Bars */}
+              <Bar dataKey="count" radius={[6, 6, 2, 2]} maxBarSize={22} className="cursor-pointer">
+                {heatmapDays.map((entry, index) => {
+                  const isSel = selectedDay === entry.day;
+                  const fillUrl =
+                    entry.count >= 4
+                      ? "url(#friBarGrad)"
+                      : entry.count >= 2
+                      ? "url(#warnBarGrad)"
+                      : entry.count === 1
+                      ? "url(#noticeBarGrad)"
+                      : "url(#safeBarGrad)";
+                  return (
+                    <Cell
+                      key={`bar-cell-${index}`}
+                      fill={fillUrl}
+                      stroke={isSel ? "#ffffff" : "transparent"}
+                      strokeWidth={isSel ? 1.5 : 0}
+                      className="transition-all duration-200 hover:opacity-100"
+                    />
+                  );
+                })}
+              </Bar>
+
+              {/* Continuous Smooth Spline Area Curve */}
+              <Area
+                type="monotone"
+                dataKey="count"
+                stroke="#818cf8"
+                strokeWidth={2.5}
+                fill="url(#hrRiskLinearArea)"
+                dot={renderCustomDot}
+                activeDot={false}
               />
             </ComposedChart>
           </ResponsiveContainer>
@@ -904,51 +1143,112 @@ export function PolicyViolationHeatmapChart() {
         )}
       </div>
 
-      {/* Heatmap Blocks */}
-      <div className="grid grid-cols-5 gap-2.5 mb-4">
+      {/* Heatmap Day Blocks */}
+      <div className="grid grid-cols-5 gap-3 mb-4">
         {heatmapDays.map((h) => {
           const isSelected = selectedDay === h.day;
+          const isBreach = h.count >= 4;
+          const isWarning = h.count >= 2 && h.count < 4;
           return (
             <div
               key={h.day}
               onClick={() => setSelectedDay(h.day)}
-              className={`rounded-xl border p-3 cursor-pointer transition-all duration-200 hover-lift ${
+              className={`rounded-xl border p-3.5 cursor-pointer transition-all duration-200 relative overflow-hidden group ${
                 isSelected
-                  ? "border-[#5e6ad2] bg-[#5e6ad2]/10 ring-1 ring-[#5e6ad2]/40 shadow-md shadow-[#5e6ad2]/10"
-                  : "border-[#23252a] bg-[#141516] hover:border-[#34343a]"
+                  ? isBreach
+                    ? "border-[#ef4444] bg-[#ef4444]/10 ring-1 ring-[#ef4444]/50 shadow-lg shadow-[#ef4444]/10"
+                    : isWarning
+                    ? "border-[#f59e0b] bg-[#f59e0b]/10 ring-1 ring-[#f59e0b]/50 shadow-lg shadow-[#f59e0b]/10"
+                    : "border-[#6366f1] bg-[#6366f1]/10 ring-1 ring-[#6366f1]/50 shadow-lg shadow-[#6366f1]/10"
+                  : "border-[#1e2025] bg-[#111215] hover:border-[#30333d] hover:bg-[#15171c]"
               }`}
             >
+              {isSelected && (
+                <div
+                  className="absolute top-0 left-0 right-0 h-0.5"
+                  style={{ backgroundColor: h.color }}
+                />
+              )}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[12px] font-mono font-semibold text-[#f7f8f8]">{h.day}</span>
                 <span
                   style={{ backgroundColor: h.color }}
-                  className="h-2 w-2 rounded-full shadow-sm"
+                  className={`h-2.5 w-2.5 rounded-full shadow-sm ${isBreach ? "animate-pulse ring-2 ring-red-500/40" : ""}`}
                 />
               </div>
-              <div className="text-[20px] font-semibold font-mono text-[#f7f8f8]">{h.count}</div>
-              <span className="text-[10px] text-[#8a8f98] block mt-0.5 truncate">{h.status}</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-[22px] font-bold font-mono tracking-tight text-[#f7f8f8]">
+                  {h.count}
+                </span>
+                <span className="text-[10px] text-[#8a8f98] font-mono">incidents</span>
+              </div>
+              <span
+                style={{ color: h.color }}
+                className="text-[10px] font-medium block mt-1 truncate"
+              >
+                {h.status}
+              </span>
             </div>
           );
         })}
       </div>
 
       {/* Day Detail Findings Card */}
-      <div className="rounded-xl border border-[#23252a] bg-[#121316] p-4 text-[12px] space-y-2.5 font-mono shadow-sm">
-        <div className="flex items-center justify-between border-b border-[#1f2125] pb-2">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-[#f7f8f8]">{current.day} Policy Audit Findings:</span>
-            <span className="text-[10.5px] text-[#8a8f98]">· Vector: {current.vector}</span>
+      <div
+        className={`rounded-xl border p-4 text-[12px] font-mono transition-all duration-200 shadow-lg ${
+          current.count >= 4
+            ? "border-[#ef4444]/40 bg-[#160d0f] ring-1 ring-[#ef4444]/20"
+            : current.count >= 2
+            ? "border-[#f59e0b]/30 bg-[#16130d]"
+            : "border-[#1e2025] bg-[#111215]"
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5 mb-2.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-[#f7f8f8] flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: current.color }} />
+              {current.day} Policy Audit Findings
+            </span>
+            <span className="text-[10.5px] text-[#8a8f98] px-2 py-0.5 rounded bg-white/5 border border-white/5">
+              Vector: {current.vector}
+            </span>
+            {current.mitreTechnique && current.mitreTechnique !== "N/A" && (
+              <span className="text-[10px] text-[#818cf8] px-2 py-0.5 rounded bg-[#6366f1]/10 border border-[#6366f1]/20">
+                {current.mitreTechnique}
+              </span>
+            )}
           </div>
           <span
             style={{ color: current.color }}
-            className="font-mono text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-[#18191c] border border-[#24262c]"
+            className="font-mono text-[11px] font-bold uppercase px-2.5 py-0.5 rounded bg-black/40 border border-current/20 w-fit"
           >
             {current.status} ({current.count} incidents)
           </span>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[#8a8f98] text-[11.5px]">
-          <span>Primary Flag: <strong className="text-[#d0d6e0]">{current.topViolation}</strong></span>
-          <span>Affected Committers: <strong className="text-[#f7f8f8] font-mono">{current.affectedUsers}</strong></span>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[11.5px] text-[#8a8f98]">
+          <div className="flex items-center gap-2">
+            <span className="text-[#62666d]">Primary Flag:</span>
+            <strong className="text-[#e2e8f0] font-medium">{current.topViolation}</strong>
+          </div>
+          <div className="flex items-center gap-3">
+            <span>
+              Affected Committers: <strong className="text-[#f7f8f8] font-mono">{current.affectedUsers}</strong>
+            </span>
+            {current.count >= 4 && (
+              <button
+                onClick={handleRemediate}
+                disabled={isRemediating || remediated}
+                className={`text-[11px] font-bold px-3 py-1 rounded-md transition-all active:scale-95 flex items-center gap-1.5 ${
+                  remediated
+                    ? "bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40"
+                    : "bg-[#ef4444] text-white hover:bg-[#dc2626] shadow-md shadow-red-500/20"
+                }`}
+              >
+                {isRemediating ? "Remediating..." : remediated ? "✓ Containment Enforced" : "⚡ Trigger SOAR Isolation"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
