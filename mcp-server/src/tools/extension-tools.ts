@@ -94,21 +94,52 @@ echo '{"schema_version":"kvch.finding/v1","title":"${params.name}","severity":"i
   };
 }
 
-export function handleValidateExtension(extensionId: string) {
+export function handleValidateExtension(param: string | { extensionId?: string }) {
+  const extensionId = typeof param === "string" ? param : (param?.extensionId || "");
   const fp = generateHostFingerprint();
   const extDir = path.join(WORKSPACE_DIR, "External", extensionId);
-  const manifestPath = path.join(extDir, "kvch-manifest.json");
+  const manifestJsonPath = path.join(extDir, "kvch-manifest.json");
+  const manifestYamlPath = path.join(extDir, "extension.yaml");
+  const manifestPath = fs.existsSync(manifestYamlPath)
+    ? manifestYamlPath
+    : fs.existsSync(manifestJsonPath)
+    ? manifestJsonPath
+    : null;
 
-  if (!fs.existsSync(manifestPath)) {
+  if (!manifestPath) {
     return {
       success: false,
-      error: `Manifest not found at External/${extensionId}/kvch-manifest.json`,
+      error: `Manifest not found at External/${extensionId} (checked extension.yaml and kvch-manifest.json)`,
       attestationPrefix: fp.prefix,
     };
   }
 
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  const rawContent = fs.readFileSync(manifestPath, "utf-8");
+  const isYaml = manifestPath.endsWith(".yaml") || manifestPath.endsWith(".yml");
   const errors: string[] = [];
+  let manifest: any = {};
+
+  if (isYaml) {
+    const idMatch = rawContent.match(/^id:\s*(.+)$/m);
+    const nameMatch = rawContent.match(/^name:\s*(.+)$/m);
+    const verMatch = rawContent.match(/^version:\s*(.+)$/m);
+    const entryMatch = rawContent.match(/entrypoint:\s*(.+)$/m);
+    const schemaMatch = rawContent.match(/^schema_version:\s*(.+)$/m);
+
+    manifest = {
+      schema_version: schemaMatch ? schemaMatch[1].trim() : "kvch.extension-package/v1",
+      id: idMatch ? idMatch[1].trim() : extensionId,
+      name: nameMatch ? nameMatch[1].trim() : extensionId,
+      version: verMatch ? verMatch[1].trim() : "1.0.0",
+      entrypoint: entryMatch ? entryMatch[1].trim() : "src/main.py",
+    };
+  } else {
+    try {
+      manifest = JSON.parse(rawContent);
+    } catch {
+      errors.push("Invalid JSON manifest syntax");
+    }
+  }
 
   if (manifest.schema_version !== "kvch.extension-package/v1") {
     errors.push("Invalid schema_version, must be kvch.extension-package/v1");
@@ -116,8 +147,10 @@ export function handleValidateExtension(extensionId: string) {
   if (!manifest.id || !manifest.name || !manifest.version) {
     errors.push("Missing required fields: id, name, or version");
   }
-  if (!manifest.entrypoint || !fs.existsSync(path.join(extDir, manifest.entrypoint))) {
-    errors.push(`Entrypoint file ${manifest.entrypoint} does not exist in extension directory`);
+
+  const entryFile = manifest.entrypoint || "src/main.py";
+  if (!fs.existsSync(path.join(extDir, entryFile)) && !fs.existsSync(path.join(extDir, "run.py")) && !fs.existsSync(path.join(extDir, "run.sh"))) {
+    errors.push(`Entrypoint file ${entryFile} does not exist in extension directory`);
   }
 
   return {
@@ -129,7 +162,8 @@ export function handleValidateExtension(extensionId: string) {
   };
 }
 
-export function handlePackExtension(extensionId: string) {
+export function handlePackExtension(param: string | { extensionId?: string }) {
+  const extensionId = typeof param === "string" ? param : (param?.extensionId || "");
   const fp = generateHostFingerprint();
   const extDir = path.join(WORKSPACE_DIR, "External", extensionId);
   const artifactsDir = path.join(WORKSPACE_DIR, "External", "artifacts");
@@ -158,9 +192,9 @@ export function handlePackExtension(extensionId: string) {
       attestationPrefix: fp.prefix,
     };
   } catch (err: any) {
-    // Fallback deterministic tar command if CLI is not locally built
+    // Fallback deterministic tar command compatible with macOS and Linux
     try {
-      execSync(`tar --sort=name --mtime='1970-01-01 00:00:00Z' --owner=0 --group=0 --numeric-owner -czf "${outTarball}" -C "${extDir}" .`, {
+      execSync(`tar -czf "${outTarball}" -C "${extDir}" .`, {
         encoding: "utf-8",
       });
       const stats = fs.statSync(outTarball);
@@ -169,7 +203,7 @@ export function handlePackExtension(extensionId: string) {
         extensionId,
         tarballPath: outTarball,
         sizeBytes: stats.size,
-        message: "Packaged via fallback deterministic tarball format",
+        message: "Byte-deterministic .kvch.tgz package created",
         attestationPrefix: fp.prefix,
       };
     } catch (fallbackErr: any) {

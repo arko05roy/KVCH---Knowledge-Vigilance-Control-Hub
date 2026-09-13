@@ -19,7 +19,9 @@ export declare function handleCreateExtension(params: CreateExtensionParams): {
     attestationPrefix: string;
     error?: undefined;
 };
-export declare function handleValidateExtension(extensionId: string): {
+export declare function handleValidateExtension(param: string | {
+    extensionId?: string;
+}): {
     success: boolean;
     error: string;
     attestationPrefix: string;
@@ -34,7 +36,9 @@ export declare function handleValidateExtension(extensionId: string): {
     attestationPrefix: string;
     error?: undefined;
 };
-export declare function handlePackExtension(extensionId: string): {
+export declare function handlePackExtension(param: string | {
+    extensionId?: string;
+}): {
     success: boolean;
     extensionId: string;
     tarballPath: string;
