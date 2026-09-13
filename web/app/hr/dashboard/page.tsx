@@ -9,6 +9,7 @@ import {
   SemiCircleGaugeChart
 } from "@/components/charts/minimal-charts";
 import { PolicyViolationHeatmapChart } from "@/components/charts/dashboard-charts";
+import { HrEscalationQueue } from "@/components/hr-escalation-queue";
 import { SandboxRunBanner } from "@/components/sandbox-run-banner";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -261,6 +262,11 @@ export default function HrDashboardPage() {
             <AiReportDisplayCard report={reportData} roleTitle="HR & Compliance" />
           </div>
         )}
+
+        {/* Engineering Escalation & Disciplinary Review Queue (Live from Senior Dev) */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <HrEscalationQueue />
+        </div>
 
         {/* Interactive Policy Violation Activity Heatmap Chart */}
         <div className="px-8 mb-6 animate-fadeIn">

@@ -9,6 +9,7 @@ import { CodeDiffViewer } from "@/components/code-diff-viewer";
 import { TelemetryLogStream, SAMPLE_TELEMETRY_LOGS, TelemetryLogEntry } from "@/components/telemetry-log-stream";
 import { SandboxRunBanner } from "@/components/sandbox-run-banner";
 import { AttackProgressionTimeline } from "@/components/attack-progression-timeline";
+import { InternOversightConsole } from "@/components/intern-oversight-console";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
@@ -238,6 +239,11 @@ export default function SrDevDashboardPage() {
             <AiReportDisplayCard report={reportData} roleTitle="Senior Developer" />
           </div>
         )}
+
+        {/* Junior Engineer & Intern Activity Surveillance (Mentor & Escalation Console) */}
+        <div className="px-8 mb-6 animate-fadeIn">
+          <InternOversightConsole />
+        </div>
 
         {/* Technical Containment Workbench & IDE Diff View */}
         <div className="px-8 pb-10 grid grid-cols-3 gap-5">
