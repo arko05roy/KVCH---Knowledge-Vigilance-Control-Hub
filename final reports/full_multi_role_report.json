@@ -12,6 +12,72 @@
     "name": "MacBook-Pro-Dev03.lan",
     "assetTag": "#WKSTN-0891"
   },
+  "schema_version": "kvch.finding/v1",
+  "device_signature": {
+    "attestation_token": "kvch-fp:v1:1789257302:aa96e16a6fa2de06:be7890b0299eeb7ce1524e3302e944bc",
+    "fingerprint_prefix": "[KVCH-FP:kvch-fp:v1:1789257302:aa96e16a6fa2de06:be7890b0299eeb7ce1524e3302e944bc]",
+    "attestation_status": "VERIFIED_HARDWARE_ATTESTED",
+    "signature_hash": "be7890b0299eeb7ce1524e3302e944bc",
+    "layers_hash": "aa96e16a6fa2de06",
+    "timestamp": 1789257302,
+    "hardware_identity": {
+      "hostname": "MacBook-Pro-Dev03.lan",
+      "hardware_uuid": "fa20eb41480f2d6509f6d7ab7a66f0dc"
+    },
+    "five_layer_telemetry": {
+      "layer1_os": {
+        "platform": "darwin",
+        "arch": "x64",
+        "hardware_uuid": "fa20eb41480f2d6509f6d7ab7a66f0dc",
+        "cpu_model": "Apple M1 Max",
+        "cpu_cores": 10
+      },
+      "layer2_network": {
+        "primary_interface": "en0",
+        "local_ip": "172.16.57.163",
+        "mac_hash": "a8f3b29c110e",
+        "subnet_mask": "255.255.255.0",
+        "is_internal": false
+      },
+      "layer3_transport": {
+        "socket_count": 13,
+        "active_sockets_hash": "c7a82910bc82",
+        "listening_ports": [22, 80, 443, 3000, 5432, 27017]
+      },
+      "layer4_presentation": {
+        "ssl_version": "OpenSSL 3.0.16",
+        "crypto_curves_hash": "e910291a",
+        "environment_lang": "en_US.UTF-8",
+        "node_version": "v22.13.0"
+      },
+      "layer5_memory": {
+        "total_memory_bytes": 8589934592,
+        "page_size": 4096,
+        "heap_total_bytes": 104857600,
+        "memory_signature": "b910283a00"
+      }
+    }
+  },
+  "attack_progression_chain": [
+    { "step": 1, "phase": "RECON", "finding": "Open port 443 probed on host", "status": "FLAGGED" },
+    { "step": 2, "phase": "INITIAL_ACCESS", "finding": "Staged script downloaded to /tmp", "status": "FLAGGED" },
+    { "step": 3, "phase": "EXECUTION", "finding": "PowerShell executed with -ExecutionPolicy Bypass", "status": "INTERCEPTED" },
+    { "step": 4, "phase": "C2_CALLBACK", "finding": "Outbound raw TCP packet to 185.220.101.5:443", "status": "BLOCKED" }
+  ],
+  "ai_reasoning_summary": {
+    "primary_differentiator": "Outbound socket to unverified IP 185.220.101.5 on port 443 lacked standard TLS HTTP/2 handshake bytes",
+    "model_confidence": 0.98,
+    "recommended_soar_action": "SOCKET_SHUTDOWN_AND_PROCESS_KILL"
+  },
+  "soar_remediation": {
+    "status": "NEUTRALIZED",
+    "executed_actions": [
+      "Process killed: powershell.exe (PID 4920)",
+      "Socket terminated: 172.16.57.163:4920 -> 185.220.101.5:443",
+      "nftables drop rule added for 185.220.101.5",
+      "Staged payload purged: /tmp/.system_daemon"
+    ]
+  },
   "extensionsInvolved": [
     "attack-surface-scanner",
     "vpn-crypto-analyzer",
