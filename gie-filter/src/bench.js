@@ -90,12 +90,13 @@ for (const n of SIZES) {
 
   // FP/FN vs generator ground truth.
   const defectIdx = new Set(frames.map((f) => f.truthIdx));
+  const frameByIdx = new Map(frames.map((f) => [f.truthIdx, f]));
   let fp = 0, fn = 0, checkMisses = 0;
   truth.forEach((exp, i) => {
     if (exp === null) { if (defectIdx.has(i)) fp++; }
     else if (!defectIdx.has(i)) fn++;
     else {
-      const got = new Set(frames.find((f) => f.truthIdx === i).frame.failed_checks.map((c) => c.id));
+      const got = new Set(frameByIdx.get(i).frame.failed_checks.map((c) => c.id));
       for (const id of exp) if (!got.has(id)) checkMisses++;
     }
   });
